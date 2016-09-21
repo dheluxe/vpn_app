@@ -1584,20 +1584,25 @@ $(document).ready(function(){
         }
     });
 
-    $("#chk_all_tunnel").click(function(){
+    $("body").on("click",".chk_all_tunnel",function(){
         var val=$(this).attr("data-val");
+
         if(val==0){
             $(this).html("<i class='fa fa-fw fa-check-square-o'></i>");
-            $(".tunnel_chk").html("<i class='fa fa-fw fa-check-square-o'></i>");
             $(this).attr("data-val", 1);
-            $(".tunnel_chk").attr("data-val", 1);
-            $(".tunnel_chk").parent('.list_body').addClass('row_chk');
+            $(this).closest(".cloud-tunnels").find(".tunnel_chk").each(function(key,node){
+                $(node).html("<i class='fa fa-fw fa-check-square-o'></i>");
+                $(node).attr("data-val", 1);
+                $(node).parent('.list_body').addClass('row_chk');
+            });
         }else if(val==1){
             $(this).html("<i class='fa fa-fw fa-square-o'></i>");
-            $(".tunnel_chk").html("<i class='fa fa-fw fa-square-o'></i>");
             $(this).attr("data-val", 0);
-            $(".tunnel_chk").attr("data-val", 0);
-            $(".tunnel_chk").parent('.list_body').removeClass('row_chk');
+            $(this).closest(".cloud-tunnels").find(".tunnel_chk").each(function(key,node){
+                $(node).html("<i class='fa fa-fw fa-square-o'></i>");
+                $(node).attr("data-val", 0);
+                $(node).parent('.list_body').removeClass('row_chk');
+            });
         }
         /*$(".display").trigger("click");
         $(".change_location").trigger("click");*/
@@ -4217,6 +4222,9 @@ $(document).ready(function(){
                 if(resp){
                     $("#sponsorModal #msg").addClass("alert-success");
                     $("#sponsorModal #msg").html(resp);
+                    $(".sponsored_"+t_id).css("background-color","#b9c3c8");
+                    $(".sponsored_"+t_id).css("color","#ffffff");
+                    $(".sponsored_"+t_id).css("opacity","1");
                 }else{
                     $(".customer_search_input").addClass("error");
                     $(".customer_search_input").next("level").html("Invalid input data.");
@@ -4240,6 +4248,9 @@ $(document).ready(function(){
                 if(resp){
                     $("#sponsorModal #msg").addClass("alert-success");
                     $("#sponsorModal #msg").html(resp);
+                    $(".sponsored_"+t_id).css("background-color","#b9c3c8");
+                    $(".sponsored_"+t_id).css("color","#ffffff");
+                    $(".sponsored_"+t_id).css("opacity","1");
                 }else{
                     $(".customer_search_input").addClass("error");
                     $(".customer_search_input").next("level").html("Invalid input data.");

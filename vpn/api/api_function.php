@@ -1,5 +1,5 @@
 <?php
-$root_url=$_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST']."/vpn_site/vpn";
+//$root_url=$_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST']."/vpn_site/vpn";
 $root_url=$_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST']."/vpn";
 define("ROOT_URL",$root_url );
 
@@ -2365,7 +2365,7 @@ function cloud_tunnels($id,$name,$token){//id:cloud_id, name:cloud_name
 
                                 <div class="meta" id="" data-toggle="tooltip" data-placement="right" title="Save all"><a href="javascript:void(0);" data-val="<?php echo $cloud_id; ?>" data-count="0" class="all_tunnel_save_btn"><i class="fa fa-floppy-o"></i></a></div>
 
-                                <div class="meta width-30"><div class="cursor" id="chk_all_tunnel" data-toggle="tooltip" data-placement="bottom" data-val="0" title="Select all tunnels"><i class="fa  fa-square-o"></i></div><a href="javascript:void(0);" class="tunnel_vew_by_tnl tunnel_vew_by_tnl_<?php echo $cloud_id; ?>" data-cloud="<?php echo $cloud_id; ?>" data-dif="client"><i class="fa fa-sort"></i></a></div>
+                                <div class="meta width-30"><div class="cursor chk_all_tunnel" data-toggle="tooltip" data-placement="bottom" data-val="0" title="Select all tunnels"><i class="fa  fa-square-o"></i></div><a href="javascript:void(0);" class="tunnel_vew_by_tnl tunnel_vew_by_tnl_<?php echo $cloud_id; ?>" data-cloud="<?php echo $cloud_id; ?>" data-dif="client"><i class="fa fa-sort"></i></a></div>
 
                                 <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Groups"><i class="fa fa-fw fa-group"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_grp" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
 
@@ -3100,7 +3100,7 @@ function show_shared_tunnels(){
 
                             <div class="meta" id="" data-toggle="tooltip" data-placement="right" title="Save all"><a href="javascript:void(0);" data-val="<?php echo $cloud_id; ?>" data-count="0" class="all_tunnel_save_btn"><i class="fa fa-floppy-o"></i></a></div>
 
-                            <div class="meta width-30"><div class="cursor" id="chk_all_tunnel" data-toggle="tooltip" data-placement="bottom" data-val="0" title="Select all tunnels"><i class="fa  fa-square-o"></i></div><a href="javascript:void(0);" class="tunnel_vew_by_tnl tunnel_vew_by_tnl_<?php echo $cloud_id; ?>" data-cloud="<?php echo $cloud_id; ?>" data-dif="client"><i class="fa fa-sort"></i></a></div>
+                            <div class="meta width-30"><div class="cursor chk_all_tunnel" data-toggle="tooltip" data-placement="bottom" data-val="0" title="Select all tunnels"><i class="fa  fa-square-o"></i></div><a href="javascript:void(0);" class="tunnel_vew_by_tnl tunnel_vew_by_tnl_<?php echo $cloud_id; ?>" data-cloud="<?php echo $cloud_id; ?>" data-dif="client"><i class="fa fa-sort"></i></a></div>
 
                             <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Groups"><i class="fa fa-fw fa-group"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_grp" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
 
