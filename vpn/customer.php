@@ -24,18 +24,13 @@ include_once 'common/sidebar.php';
     <input id="tab6" type="radio" name="tabs" class="custom_res_tab">
     <label for="tab6" class="custom_res_tab">Services</label>
 
-    <div id="content5" class="custom_res_tab" >
-        <?php
-        include 'home.php';
-        ?>
+    <div class="custom_res_tab">
+        <div id="content5" class="hidden">
+            <?php
+            include 'home.php';
+            ?>
+        </div>
     </div>
-
-    <div id="content6" class="custom_res_tab" >
-        <?php
-        include 'service.php';
-        ?>
-    </div>
-
 </section>
 
 

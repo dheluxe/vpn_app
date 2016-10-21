@@ -8,7 +8,7 @@ function send( text ) {
 $(document).ready(function(){
     //fancy webocket
     console.log('Connecting...');
-    Server = new FancyWebSocket('ws://198.211.127.72:8880');
+    Server = new FancyWebSocket('ws://'+MAIN_SERVER_IP+':'+WEB_SOCKET_PORT);
     //console.log(Server);
     //Let the user know we're connected
     Server.bind('open', function() {

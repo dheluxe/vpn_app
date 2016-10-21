@@ -1,6 +1,6 @@
 $(document).ready(function(){
 //alert($.parseJSON('{"status":1,"data":"Your request under process, please wait","message_type":"reply","type":"group_change","value":{"id":"10","value":"1 "}}'));
-    var conn = new ab.Session('ws://198.211.127.72:8080',
+    var conn = new ab.Session('ws://'+MAIN_SERVER_IP+':8080',
         function() {
             conn.subscribe(token, function(topic, resp) {
                 // This is the place to handle server pushes

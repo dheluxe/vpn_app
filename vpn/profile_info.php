@@ -1,13 +1,17 @@
 <?php
+@session_start();
+require_once 'includes/config.php';
+require_once 'includes/connection.php';
+include_once 'api/api_function.php';
 //////////////////////////////////////////////////////////////////////////////////////////////
 $get_cusid=$_SESSION['user_id'];
 $sql_user = $db->query("SELECT * FROM `customers_data` where `customer_id`='".$get_cusid."'");
 $row = $sql_user->fetch_assoc(); ?>
 <div class="page-content">
-    <div class="content">
+    <div class="profile-page-content">
         <div class="row">
             <div class="alert alert-success" role="alert" style=<?php echo (isset($_SESSION['msg'])?"display: block;":"display: none;"); ?>><?php echo $_SESSION['msg'] ?></div>
-            <div class="col-lg-6">
+            <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="alert alert-success" role="alert" id="manual_add_success_message" style="display: none;"></div>
                 <div class="alert alert-danger" role="alert" id="manual_add_error_message" style="display: none;"></div>
                 <div id="edtprofile-response-message"></div>
@@ -51,24 +55,24 @@ $row = $sql_user->fetch_assoc(); ?>
                 </form>
 
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-6 col-md-6 col-sm-6">
                 <h4 class="pr_heading">Change your password</h4>
                 <div id="edtpass-response-message"></div>
                 <form id="change_password_form">
-                    <div class="col-lg-12 custom_row">
+                    <div class="custom_row">
                         <label for="ex3">Old password: </label>
                         <input type="password" class="form-control" id="opassword" type="text" name="opassword">
                     </div>
-                    <div class="col-lg-12 custom_row">
+                    <div class="custom_row">
                         <label for="ex3">New password: </label>
                         <input type="password" class="form-control" id="password" type="text" value="" name="password">
                     </div>
-                    <div class="col-lg-12 custom_row">
+                    <div class="custom_row">
                         <label for="ex3">Confirm password: </label>
                         <input type="password" class="form-control" id="cfmPassword" type="text" name="cfmPassword" required>
                     </div>
-                    <div class="col-lg-12 custom_row">
-                        <button type="submit" name="submit" value="Submit" class="btn btn-primary btn-success btn-cpassword" href="javascript:void(0)" id="btn-editpass-profile"/>Update Password</button>
+                    <div class="custom_row">
+                        <button type="submit" name="submit" value="Submit" class="btn btn-primary btn-success btn-cpassword" href="javascript:void(0)" id="btn-editpass-profile">Update Password</button>
                     </div>
                 </form>
             </div>

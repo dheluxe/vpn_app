@@ -55,4 +55,13 @@
 /*.list_body{
     background-color: #939393;
 }*/
-</style>
+.modal-header {
+    background: #68dff0;
+}
+.modal-title {
+    color: white;
+}
+.modal-title {
+    color: white;
+    font-size: 18px;
+}

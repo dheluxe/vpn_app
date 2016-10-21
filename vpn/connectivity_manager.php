@@ -1,4 +1,9 @@
 <?php
+@session_start();
+require_once 'includes/config.php';
+require_once 'includes/connection.php';
+include_once 'api/api_function.php';
+
 //print_r($_SESSION);die;
 $clouds_data=array();
 $token=$_SESSION['token'];
@@ -64,51 +69,4 @@ $clouds_data[]=$cloud;
     </div>
 </div>
 
-<div id="dialog-form" class="animate bounceIn" title="ACL Settings">
-    <div id="acl_div_cont"></div>
-</div>
-
-<div id="dialog-sponsore-form" class="animate bounceIn" title="Sponsore Tunnel">
-
-    <div id="sponsore_div_cont">
-        <div class="row">
-            <input type="hidden" id="all_data">
-            <div class="col-lg-10">
-                <select id="cust_ms" multiple="multiple">
-                    <?php echo $html_cust; ?>
-                </select>
-            </div>
-            <div class="col-lg-2">
-                <button class="btn btn-primary shared_submit_btn">Submit</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="add_cloud" tabindex="-1" role="dialog" aria-labelledby="add_cloud" aria-hidden="true">
-    <div class="modal-dialog" style="z-index:1200">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Add New Cloud</h4>
-            </div>
-            <form id="add_cloud_form">
-                <div class="modal-body">
-                    <div class="alert alert-success" role="alert" id="manual_add_success_message" style="display: none;"></div>
-                    <div class="alert alert-danger" role="alert" id="manual_add_error_message" style="display: none;"></div>
-
-                    <div class="form-group">
-                        <label for="recipient-name" class="control-label">Cloud Name:</label>
-                        <input type="text" class="form-control" name="cloud_name" id="cloud_name" placeholder="enter cloud name">
-                    </div>
-                    <input type="hidden" name="cloud_email" id="cloud_email" value="<?php echo $_SESSION['email'] ?>">
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary"> Save </button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 

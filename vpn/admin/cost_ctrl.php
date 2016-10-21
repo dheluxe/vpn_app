@@ -1,28 +1,25 @@
 <?php include 'elements/admin_header.php';
-
+$check=0;
 if(!empty($_POST)){
     if(isset($_POST['plan'])){
         $db->query("UPDATE `plans` SET `plans`='".$_POST['plan']."' WHERE `id`=".$_POST['id']);
     }
-    if($db->query("UPDATE `package_data` SET `tunnel`='".$_POST['tcost']."', `gateway`='".$_POST['gcost']."', `bidirection`='".$_POST['bcost']."', `realip`=".$_POST['rcost']." WHERE `plan_id`='".$_POST['id']."'")){
+    if($db->query("UPDATE `package_data` SET `route_tag`='".$_POST['route_cost']."', `internet_tag`='".$_POST['internet_cost']."', `server_tag`='".$_POST['server_cost']."', `tunnel`='".$_POST['tcost']."', `gateway`='".$_POST['gcost']."', `bidirection`='".$_POST['bcost']."', `realip`='".$_POST['rcost']."', `route_path`='".$_POST['route_path_cost']."' WHERE `plan_id`='".$_POST['id']."'")){
         $check=1;
     }
+    $_POST = array();
 }
+
 ?>
-
- <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>FooTable</h2>
-        <ol class="breadcrumb">
-            <li>
-                <a href="">Package cost info</a>
-            </li>
-        </ol>
-    </div>
-    <div class="col-lg-2">
-
-    </div>
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <span class="sub-page-title">Package cost info</span>
+        </div>
+    </nav>
 </div>
+
 <div class="wrapper wrapper-content animated fadeInRight">
 
     <div class="row">
@@ -131,9 +128,13 @@ if(!empty($_POST)){
                             <tr>
                                 <th>Plan</th>
                                 <th>Tunnel</th>
+                                <th>route TAG</th>
+                                <th>internet TAG</th>
+                                <th>server TAG</th>
                                 <th>Gateway</th>
-                                <th data-hide="all">Bidirection</th>
-                                <th data-hide="all">Real IP</th>
+                                <th>Bidirection</th>
+                                <th>Real IP</th>
+                                <th>Route Path</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -144,9 +145,13 @@ if(!empty($_POST)){
                                     <tr id="plan_tr_<?php echo $user_query_array['plan_id'] ?>">
                                     <td><?php echo $user_query_array['plans'] ?></td>
                                         <td><?php echo $user_query_array['tunnel'] ?></td>
+                                        <td><?php echo $user_query_array['route_tag'] ?></td>
+                                        <td><?php echo $user_query_array['internet_tag'] ?></td>
+                                        <td><?php echo $user_query_array['server_tag'] ?></td>
                                         <td><?php echo $user_query_array['gateway'] ?></td>
                                         <td><?php echo $user_query_array['bidirection'] ?></td>
                                         <td><?php echo $user_query_array['realip'] ?></td>
+                                        <td><?php echo $user_query_array['route_path'] ?></td>
                                         <td>
                                             <a href="javascript:void(0);" class="edit_plan" data-id="<?php echo $user_query_array['plan_id'] ?>"><i class="fa fa-fw fa-pencil-square-o"></i></a>
                                         </td>
@@ -156,16 +161,33 @@ if(!empty($_POST)){
                         </table>
 
                         <form role="form" action="" method="post">
-                            <div class="form-group" id="scroll_div">
-                            <?php if($check==1){
-                                ?>
-                                  <div id="msg" class="bg-success" style="padding:7px;mergin-top:5px;"><strong>Changes applied successfully</strong></div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 10px;">
                                 <?php
-                              } ?>
-                              <label for="email">Plan name:</label>
-                              <input type="text" class="form-control" id="plan" name="plan" placeholder="Enter tunnel cost" required>
-                              <label for="email">Tunnel cost:</label>
-                              <input type="text" class="form-control" id="tcost" name="tcost" placeholder="Enter tunnel cost" required>
+                                if(isset($check) && $check==1){
+                                    ?>
+                                    <div id="msg" class="bg-success" style="padding:7px;mergin-top:5px;text-align: center;"><strong>Changes applied successfully</strong></div>
+                                <?php
+                                } ?>
+                            </div>
+                            <div class="form-group" id="scroll_div">
+                                <label for="email">Plan name:</label>
+                                <input type="text" class="form-control" id="plan" name="plan" placeholder="Enter tunnel cost" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Tunnel cost:</label>
+                                <input type="text" class="form-control" id="tcost" name="tcost" placeholder="Enter tunnel cost" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Route TAG cost:</label>
+                                <input type="text" class="form-control" id="route_cost" name="route_cost" placeholder="Enter tunnel cost" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Internet TAG cost:</label>
+                                <input type="text" class="form-control" id="internet_cost" name="internet_cost" placeholder="Enter tunnel cost" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Server TAG cost:</label>
+                                <input type="text" class="form-control" id="server_cost" name="server_cost" placeholder="Enter tunnel cost" required>
                             </div>
                             <div class="form-group">
                               <label for="pwd">Gateway cost:</label>
@@ -180,9 +202,13 @@ if(!empty($_POST)){
                               <label for="pwd">Realip cost:</label>
                               <input type="text" class="form-control" id="rcost" name="rcost" placeholder="Enter realip cost" required>
                             </div>
+                            <div class="form-group">
+                                <label for="pwd">Route Path:</label>
+                                <input type="text" class="form-control" id="route_path_cost" name="route_path_cost" placeholder="Enter route path cost" required>
+                            </div>
                             <button type="submit" class="btn btn-success">Update</button>
-                          </form>
-                        </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

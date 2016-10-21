@@ -1,3 +1,16 @@
+<div class="main-loading-message">
+    <div class="loading-wrap">
+        <img src="assets/img/loading3.gif" style="width: 100%;"/>
+    </div>
+</div>
+<div class="sidebar-loading-message hidden">
+    <img src="assets/img/loading3.gif" style="width: 100%;"/>
+</div>
+
+<script type="text/javascript">
+    var ajax_loading_time_ms=1000;
+</script>
+
 
 <script src="assets/js/initial.js" type="text/javascript"></script>
 
@@ -9,8 +22,6 @@
 <!-- end of crop image js -->
 
 <script src="webarch/js/jquery.dragscroll.js" type="text/javascript"></script>
-
-<script src="assets/plugins/pace/pace.min.js" type="text/javascript"></script>
 <script src="assets/plugins/jquery-block-ui/jqueryblockui.min.js" type="text/javascript"></script>
 <script src="assets/plugins/jquery-unveil/jquery.unveil.min.js" type="text/javascript"></script>
 <script src="assets/plugins/jquery-scrollbar/jquery.scrollbar.min.js" type="text/javascript"></script>
@@ -47,9 +58,10 @@
 <script src="assets/js/common-scripts.js"></script>
 
 <script src="assets/js/custom.js" type="text/javascript"></script>
+<script src="assets/js/socket.js" type="text/javascript"></script>
 <script src="assets/js/panel_layout.js" type="text/javascript"></script>
 <script src="assets/js/customer_friend.js" type="text/javascript"></script>
+<script src="assets/js/custom_select_box.js" type="text/javascript"></script>
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
-
 <?php ob_end_flush() ?>

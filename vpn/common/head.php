@@ -1,9 +1,12 @@
 <?php
 //print_r($_SERVER);die;
+
 ob_start();
 $root_dir=dirname(dirname(__FILE__));
 define("ROOT_DIR",$root_dir );
+require_once ROOT_DIR.'/includes/config.php';
 require_once ROOT_DIR.'/api/api_function.php';
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,7 +22,6 @@ require_once ROOT_DIR.'/api/api_function.php';
     <link href="assets/plugins/jquery-datatable/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/datatables-responsive/css/datatables.responsive.css" rel="stylesheet" type="text/css" media="screen"/>
     <link href="assets/plugins/jquery-superbox/css/style.css" rel="stylesheet" type="text/css" media="screen"/>
-    <link href="assets/plugins/pace/pace-theme-flash.css" rel="stylesheet" type="text/css" media="screen"/>
     <link href="assets/plugins/bootstrapv3/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/bootstrapv3/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
@@ -30,9 +32,6 @@ require_once ROOT_DIR.'/api/api_function.php';
     <link href="assets/css/bootstrap-editable.css" rel="stylesheet" type="text/css"/>
     <link href="assets/css/overlay-bootstrap.css" rel="stylesheet" type="text/css"/>
     <link href="webarch/css/webarch.css" rel="stylesheet" type="text/css"/>
-
-
-
 
     <link href="webarch/css/tree.css" rel="stylesheet" type="text/css"/>
     <link href="webarch/css/animate.css" rel="stylesheet" type="text/css"/>
@@ -54,12 +53,13 @@ require_once ROOT_DIR.'/api/api_function.php';
     <link href="assets/css/pagenation.css" rel="stylesheet" type="text/css"/>
     <link href="assets/css/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
 
-
-
     <link href="assets/css/style1.css" rel="stylesheet">
+    <link href="assets/css/custom_select_box.css" rel="stylesheet">
 
-
-
+    <script>
+        var MAIN_SERVER_IP="<?php echo MAIN_SERVER_IP; ?>";
+        var WEB_SOCKET_PORT="<?php echo WEB_SOCKET_PORT; ?>";
+    </script>
     <script src="assets/plugins/jquery/jquery-1.11.3.min.js" type="text/javascript"></script>
     <script src="assets/js/pagination.js" type="text/javascript"></script>
     <script src="assets/js/jquery.contextMenu.js" type="text/javascript"></script>

@@ -15,6 +15,26 @@ function readImage_URL(input){
     }
 }
 
+var everythingLoaded = setInterval(function() {
+    $("#content2").addClass("hidden");
+    $("#content5").addClass("hidden");
+    $(".main-loading-message").removeClass("hidden");
+    $("#blockDiv").removeClass("hidden");
+    if (/loaded|complete/.test(document.readyState)) {
+        clearInterval(everythingLoaded);
+        init_page(); // this is the function that gets called when everything is loaded
+    }
+}, 10);
+function init_page(){
+    console.log("loaded");
+    setTimeout(function(){
+        $("#content2").removeClass("hidden");
+        $("#content5").removeClass("hidden");
+        $(".main-loading-message").addClass("hidden");
+        $("#blockDiv").addClass("hidden");
+    },ajax_loading_time_ms);
+}
+
 $(document).ready(function(){
 
     $("body").on("click",".self-profile-content-row",function(){
@@ -148,38 +168,157 @@ $(document).ready(function(){
         });
     }
 
-    //init_friend_list();
+    $("body").on("change","#tab1", function () {
+        if($(this).val()=="on"){
+            $("#content2").addClass("hidden");
+            $(".main-loading-message").removeClass("hidden");
+            $("#blockDiv").removeClass("hidden");
+            $.ajax({
+                url:"home.php",
+                success:function(resp){
+                    $("#content2").html(resp);
+                    setTimeout(function(){
+                        $("#content2").removeClass("hidden");
+                        $(".main-loading-message").addClass("hidden");
+                        $("#blockDiv").addClass("hidden");
+                    },ajax_loading_time_ms);
+                }
+            });
+        }
+    });
+
+    $("body").on("change","#tab2", function () {
+        if($(this).val()=="on"){
+            $("#content2").addClass("hidden");
+            $(".main-loading-message").removeClass("hidden");
+            $("#blockDiv").removeClass("hidden");
+            $.ajax({
+                url:"connectivity_manager.php",
+                success:function(resp){
+                    $("#content2").html(resp);
+                    setTimeout(function(){
+                        $("#content2").removeClass("hidden");
+                        $(".main-loading-message").addClass("hidden");
+                        $("#blockDiv").addClass("hidden");
+                    },ajax_loading_time_ms);
+                }
+            });
+        }
+    });
+
+    $("body").on("change","#tab3", function () {
+        if($(this).val()=="on"){
+            $("#content2").addClass("hidden");
+            $(".main-loading-message").removeClass("hidden");
+            $("#blockDiv").removeClass("hidden");
+            $.ajax({
+                url:"profile_info.php",
+                success:function(resp){
+                    $("#content2").html(resp);
+                    setTimeout(function(){
+                        $("#content2").removeClass("hidden");
+                        $(".main-loading-message").addClass("hidden");
+                        $("#blockDiv").addClass("hidden");
+                    },ajax_loading_time_ms);
+                }
+            });
+        }
+
+    });
+    $("body").on("change","#tab4", function () {
+        if($(this).val()=="on"){
+            $("#content2").addClass("hidden");
+            $(".main-loading-message").removeClass("hidden");
+            $("#blockDiv").removeClass("hidden");
+            $.ajax({
+                url:"social.php",
+                success:function(resp){
+                    $("#content2").html(resp);
+                    setTimeout(function(){
+                        $("#content2").removeClass("hidden");
+                        $(".main-loading-message").addClass("hidden");
+                        $("#blockDiv").addClass("hidden");
+                    },ajax_loading_time_ms);
+                }
+            });
+        }
+    });
+    $("body").on("change","#tab5", function () {
+        if($(this).val()=="on"){
+            $("#content5").addClass("hidden");
+            $(".main-loading-message").removeClass("hidden");
+            $("#blockDiv").removeClass("hidden");
+            $.ajax({
+                url:"home.php",
+                success:function(resp){
+                    $("#content5").html(resp);
+                    setTimeout(function(){
+                        $("#content5").removeClass("hidden");
+                        $(".main-loading-message").addClass("hidden");
+                        $("#blockDiv").addClass("hidden");
+                    },ajax_loading_time_ms);
+                }
+            });
+        }
+    });
+    $("body").on("change","#tab6", function () {
+        if($(this).val()=="on"){
+            $("#content5").addClass("hidden");
+            $(".main-loading-message").removeClass("hidden");
+            $("#blockDiv").removeClass("hidden");
+            $.ajax({
+                url:"service.php",
+                success:function(resp){
+                    $("#content5").html(resp);
+                    load_customer_acls(customer_id);
+                    setTimeout(function(){
+                        $("#content5").removeClass("hidden");
+                        $(".main-loading-message").addClass("hidden");
+                        $("#blockDiv").addClass("hidden");
+                    },ajax_loading_time_ms);
+                }
+            });
+        }
+    });
 
     $("body").on("click",".tab-element",function(){
         jQuery(".tab-element").removeClass("tab-element-selected");
         jQuery(this).addClass("tab-element-selected");
         var origin_tab=jQuery("#selected_tab").val();
         var current_tab=jQuery(this).attr("data-type");
-        update_badge_cnt();
+        //update_badge_cnt();
         if(origin_tab!=current_tab){
-            jQuery("#selected_tab").val(current_tab);
-            jQuery(".friend-search-text").val("");
+            $("#selected_tab").val(current_tab);
+            $(".friend-search-text").val("");
             if(current_tab=="friends"){
-                jQuery(".friends-box").removeClass("hidden");
-                jQuery(".request-friends-box").addClass("hidden");
-                jQuery(".rejected-friends-box").addClass("hidden");
-                jQuery(".friends-box").html("");
+                $(".friends-box").addClass("hidden");
+                $(".sidebar-loading-message").removeClass("hidden");
+                $(".request-friends-box").addClass("hidden");
+                $(".rejected-friends-box").addClass("hidden");
+                $("#blockDiv").removeClass("hidden");
                 $.ajax({
                     url:"request.php?request=get_friends&customer_id="+current_customer_id,
                     type:"GET",
                     success:function(resp){
                         if(resp!="") {
                             //console.log(resp);
-                            jQuery(".friends-box").html(resp);
+                            $(".friends-box").html(resp);
+                            setTimeout(function(){
+                                $(".friends-box").removeClass("hidden");
+                                $(".sidebar-loading-message").addClass("hidden");
+                                $("#blockDiv").addClass("hidden");
+                            },1000);
                         }
                     }
                 });
             }
             if(current_tab=="request"){
-                jQuery(".request-friends-box").removeClass("hidden");
+                $(".request-friends-box").addClass("hidden");
+                $(".sidebar-loading-message").removeClass("hidden");
                 jQuery(".friends-box").addClass("hidden");
                 jQuery(".rejected-friends-box").addClass("hidden");
                 jQuery(".request-friends-box").html("");
+                $("#blockDiv").removeClass("hidden");
                 $.ajax({
                     url:"request.php?request=get_request_friends&customer_id="+current_customer_id,
                     type:"GET",
@@ -187,15 +326,22 @@ $(document).ready(function(){
                         if(resp!="") {
                             //console.log(resp);
                             jQuery(".request-friends-box").html(resp);
+                            setTimeout(function(){
+                                $(".request-friends-box").removeClass("hidden");
+                                $(".sidebar-loading-message").addClass("hidden");
+                                $("#blockDiv").addClass("hidden");
+                            },1000);
                         }
                     }
                 });
             }
             if(current_tab=="rejected"){
-                jQuery(".rejected-friends-box").removeClass("hidden");
+                $(".rejected-friends-box").addClass("hidden");
+                $(".sidebar-loading-message").removeClass("hidden");
                 jQuery(".request-friends-box").addClass("hidden");
                 jQuery(".friends-box").addClass("hidden");
                 jQuery(".rejected-friends-box").html("");
+                $("#blockDiv").removeClass("hidden");
                 $.ajax({
                     url:"request.php?request=get_rejected_friends&customer_id="+current_customer_id,
                     type:"GET",
@@ -203,6 +349,11 @@ $(document).ready(function(){
                         if(resp!="") {
                             //console.log(resp);
                             jQuery(".rejected-friends-box").html(resp);
+                            setTimeout(function(){
+                                $(".rejected-friends-box").removeClass("hidden");
+                                $(".sidebar-loading-message").addClass("hidden");
+                                $("#blockDiv").addClass("hidden");
+                            },1000);
                         }
                     }
                 });
@@ -291,12 +442,18 @@ $(document).ready(function(){
                     return false;
                 }
 
+                $(".all-customers-box").addClass("hidden");
+                $(".sidebar-loading-message").removeClass("hidden");
                 $.ajax({
                     url:"request.php?request=get_customers&customer_id="+current_customer_id+"&key_code="+key_code,
                     type:"GET",
                     success:function(resp){
                         //console.log(resp);
                         jQuery(".all-customers-box").html(resp);
+                        setTimeout(function(){
+                            $(".sidebar-loading-message").addClass("hidden");
+                            $(".all-customers-box").removeClass("hidden");
+                        },1000);
 
                     }
                 });
@@ -331,9 +488,6 @@ $(document).ready(function(){
 
 
 
-
-
-
     $("body").on("click",".dialog-tab-element",function(){
         jQuery(".dialog-tab-element").removeClass("dialog-tab-element-selected");
         jQuery(this).addClass("dialog-tab-element-selected");
@@ -351,9 +505,38 @@ $(document).ready(function(){
                 jQuery(node).closest(".dialog-left-friend-list-content-row").removeClass("hidden");
             }
         });
-
     });
 
+    $("body").on("click",".header_account_destroy",function(e){
+        e.preventDefault();
+        if(confirm("Are you sure to destroy this account?")){
+            console.log("delete this account");
+            console.log(token);
+            $.ajax({
+                url:"request.php?request=destroy_account&token="+token,
+                success:function(resp){
+                    console.log(resp);
+                    $("#content2").addClass("hidden");
+                    $("#content5").addClass("hidden");
+                    $(".main-loading-message").removeClass("hidden");
+                    $("#blockDiv").removeClass("hidden");
+                    var get={"type":"destroy_account", "message_type":"request", "token":token};
+                    send(JSON.stringify(get));
+                }
+            });
+
+        }
+    });
 });
 
+$(document).ajaxComplete(function(event,xhr,settings){
+    console.log(xhr);
+    var res=xhr.responseText;
+    var trim_res=res.trim();
+    if(trim_res == "empty_session"){
+        token="";
+        console.log(xhr.responseText);
+        location.reload(true);
+    }
+});
 

@@ -8,6 +8,13 @@ if(isset($_GET['request'])){
 
   //include_once 'class.PHPWebSocket.php';
 
+    if($_GET['request']!="dologin" && $_GET['request']!="user_register" && $_GET['request']!="admin_login"){
+        if(!isset($_SESSION['vpn_user']) || trim($_SESSION['vpn_user']) == ""){
+            echo("empty_session");
+            die;
+        }
+    }
+
   switch($_GET['request']){
 
     case 'job_queue_info':
@@ -344,6 +351,27 @@ if(isset($_GET['request'])){
       echo $json_arr;
     break;
 
+    case 'clear_tunnel_real_ip':
+      $cid=$_GET['token'];
+      $result=clear_tunnel_real_ip($_GET, $cid);
+      $json_arr=json_encode($result);
+      echo $json_arr;
+    break;
+
+    case 'change_tunnel_real_ip':
+      $cid=$_GET['token'];
+      $result=change_tunnel_real_ip($_GET, $cid);
+      $json_arr=json_encode($result);
+      echo $json_arr;
+    break;
+
+    case 'clear_acl_real_ip':
+      $cid=$_GET['token'];
+      $result=clear_acl_real_ip($_GET, $cid);
+      $json_arr=json_encode($result);
+      echo $json_arr;
+    break;
+
     case 'get_server_name':
       $result=get_server_name();
       $json_arr=json_encode($result);
@@ -480,7 +508,6 @@ if(isset($_GET['request'])){
         $var_dologin=login_as_user($_GET);
         echo json_encode($var_dologin);
         break;
-
     case 'get_acl_info':
       $res = get_acl_info($_REQUEST['id']);
       echo json_encode($res);
@@ -542,7 +569,10 @@ if(isset($_GET['request'])){
       echo json_encode($res);
       //print_r(json_decode($_POST['data']));
     break;
-
+    case 'get_acl_detail':
+      $res=get_acl_detail($_REQUEST);
+      echo json_encode($res);
+    break;
     case 'point':
       $res = point($_POST);
       echo $res;
@@ -659,7 +689,11 @@ if(isset($_GET['request'])){
           $res=check_tunnel_sponsored($tunnel_id);
           echo json_encode($res);
       break;
-
+      case 'remove_sharing':
+          $data=$_REQUEST;
+          $res=remove_sharing($data);
+          echo json_encode($res);
+      break;
       case 'save_acl_name_description':
           $data=$_GET;
           $res=save_acl_name_description($data);
@@ -713,6 +747,34 @@ if(isset($_GET['request'])){
       case 'get_friends_for_dialog':
           $data=$_REQUEST;
           get_friends_for_dialog($data);
+          break;
+      case 'update_cloud':
+          $data=$_REQUEST;
+          update_cloud($data);
+          break;
+      case 'destroy_account':
+          session_destroy();
+          $token=$_GET['token'];
+          $res=destroy_account($token);
+          echo(json_encode($res));
+          break;
+      case 'get_cost_data_from_tunnel_id':
+          $tunnel_id=$_GET['tunnel_id'];
+          $res=get_cost_data_from_tunnel_id($tunnel_id);
+          echo(json_encode($res));
+          break;
+      case 'get_remote_server_info':
+          $tunnel_id=$_GET['tunnel_id'];
+          $res=get_remote_server_info($_GET);
+          echo(json_encode($res));
+          break;
+      case 'set_remote_server_info':
+          $res=set_remote_server_info($_GET);
+          echo(json_encode($res));
+          break;
+      case 'save_diagram_data':
+          $res=save_diagram_data($_POST);
+          echo(json_encode($res));
           break;
       default:
           echo "404 not found";

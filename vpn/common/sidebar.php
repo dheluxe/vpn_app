@@ -75,59 +75,58 @@ $row1['shared_acl_cnt']=count($get_customer_acl_destination);
                 $sql_friends=$db->query("SELECT * FROM `friends_data`
                 WHERE (`customer_id`='".$_SESSION['customer_id']."' OR `friend_id`='".$_SESSION['customer_id']."') AND `status`='accepted'");
                 if($sql_friends->num_rows>0){
-                while($row=$sql_friends->fetch_assoc()){
-                if($row['friend_id']!=$_SESSION['customer_id']){
-                $friend_ids[]=$row['friend_id'];
-                }else{
-                $friend_ids[]=$row['customer_id'];
-                }
-                }
+                    while($row=$sql_friends->fetch_assoc()){
+                        if($row['friend_id']!=$_SESSION['customer_id']){
+                            $friend_ids[]=$row['friend_id'];
+                        }else{
+                            $friend_ids[]=$row['customer_id'];
+                        }
+                    }
                 }
                 if(count($friend_ids)>0){
-                $friend_ids_str = implode(",", $friend_ids);
-                $all_friends = array();
-                $sql_friends = $db->query("SELECT * FROM `customers_data` WHERE `customer_id` IN (".$friend_ids_str.")");
-                $i = 0;
-                while ($row = $sql_friends->fetch_assoc()){
-                $all_friends[] = $row;
-                $friend_id = $row['customer_id'];
-                $i++;
-                $last_class = "";
-                if ($i==count($all_friends)){
-                $last_class = "left-friend-list-content-row-last";
-                }
-                $odd_even_class = "left-friend-list-content-row-odd";
-                /*if(intval($i/2)*2==$i){
-                    $odd_even_class="left-friend-list-content-row-even";
-                }*/
-                $get_customer_acl_destination = get_customer_acl_destination($friend_id);
-                $row['shared_acl_cnt'] = count($get_customer_acl_destination);
-                ?>
-                <div
-                    class="left-friend-list-content-row <?php echo ($odd_even_class); ?> <?php echo ($last_class); ?> custom_popup_context_item"
-                    data-friend_id="<?php echo ($friend_id); ?>" data-customer_name="<?php echo ($row['name']); ?>">
-                    <div class="profile-info-box" style="float: left;">
-                        <div style="float: left">
-                            <img class="friend_short_image"
-                                 src="<?php echo (($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>"
-                                 alt="<?php echo ($row['profile_image']); ?>">
+                    $friend_ids_str = implode(",", $friend_ids);
+                    $all_friends = array();
+                    $sql_friends = $db->query("SELECT * FROM `customers_data` WHERE `customer_id` IN (".$friend_ids_str.")");
+                    $i = 0;
+                    while ($row = $sql_friends->fetch_assoc()){
+                        $all_friends[] = $row;
+                        $friend_id = $row['customer_id'];
+                        $i++;
+                        $last_class = "";
+                        if ($i==count($all_friends)){
+                            $last_class = "left-friend-list-content-row-last";
+                        }
+                        $odd_even_class = "left-friend-list-content-row-odd";
+                        /*if(intval($i/2)*2==$i){
+                            $odd_even_class="left-friend-list-content-row-even";
+                        }*/
+                        $get_customer_acl_destination = get_customer_acl_destination($friend_id);
+                        $row['shared_acl_cnt'] = count($get_customer_acl_destination);
+                    ?>
+                    <div class="left-friend-list-content-row <?php echo ($odd_even_class); ?> <?php echo ($last_class); ?> custom_popup_context_item"
+                        data-friend_id="<?php echo ($friend_id); ?>" data-customer_name="<?php echo ($row['name']); ?>">
+                        <div class="profile-info-box" style="float: left;">
+                            <div style="float: left">
+                                <img class="friend_short_image"
+                                     src="<?php echo (($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>"
+                                     alt="<?php echo ($row['profile_image']); ?>">
+                            </div>
+                            <div class="friend_info" style="float: left;">
+                                <div class="friend_name"><?php echo ($row['display_name']); ?></div>
+                                <div
+                                    class="friend_tag_id"><?php echo ($row['tag_id']); ?>: <?php echo ($row['shared_acl_cnt']); ?></div>
+                            </div>
+                            <div class="clearfix"></div>
                         </div>
-                        <div class="friend_info" style="float: left;">
-                            <div class="friend_name"><?php echo ($row['display_name']); ?></div>
-                            <div
-                                class="friend_tag_id"><?php echo ($row['tag_id']); ?>: <?php echo ($row['shared_acl_cnt']); ?></div>
+                        <div class="friend-action-box">
+                                <span class="friend-action delete-action" data-friend_id="<?php echo ($friend_id); ?>">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </span>
                         </div>
                         <div class="clearfix"></div>
                     </div>
-                    <div class="friend-action-box">
-                            <span class="friend-action delete-action" data-friend_id="<?php echo ($friend_id); ?>">
-                                <i class="fa fa-trash-o" aria-hidden="true"></i>
-                            </span>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-                <?php
-                }
+                    <?php
+                    }
                 }
                 ?>
             </div>
@@ -139,9 +138,6 @@ $row1['shared_acl_cnt']=count($get_customer_acl_destination);
     </div>
 </aside>
 <!--sidebar end-->
-
-
-
 
 <script>
     $.contextMenu({

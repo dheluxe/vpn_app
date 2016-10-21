@@ -45,7 +45,7 @@ if(!empty($_POST)){
 
 
 if(isset($_GET['ajax'])) {
-    $exi = $db->query("SELECT COUNT(*) FROM `server_subnets`");
+    $exi = $db->query("SELECT COUNT(*) FROM `real_ip_list`");
     $num = $exi->fetch_row();
     $count = $num[0];
     $pagenum = 0;
@@ -67,7 +67,8 @@ if(isset($_GET['ajax'])) {
         }
     }
     $orderdir = $order['dir'];
-    $user_query=$db->query("SELECT lst.real_ip, lst.in_use, td.tunnel_id, td.email FROM `real_ip_list` as lst LEFT JOIN `tunnels_data` as td on lst.real_ip = td.real_ip ORDER BY " . $orderby . " " . $orderdir . " LIMIT " . $Limit_Low . ", " . $Limit_Hi );//SELECT lst.subnet, lst.used_ips, td.tunnel_id, td.email FROM `server_subnets` as lst LEFT JOIN `tunnels_data` as td on lst.subnet = td.cloud_ip ORDER BY " . $orderby . " " . $orderdir . " LIMIT " . $Limit_Low . ", " . $Limit_Hi );
+    $user_query=$db->query("SELECT lst.real_ip, lst.in_use, td.tunnel_id, td.email FROM `real_ip_list` as lst LEFT JOIN `tunnels_data` as td on lst.real_ip = td.real_ip ORDER BY " . $orderby . " " . $orderdir . " LIMIT " . $Limit_Low . ", " . $Limit_Hi );
+    //SELECT lst.subnet, lst.used_ips, td.tunnel_id, td.email FROM `server_subnets` as lst LEFT JOIN `tunnels_data` as td on lst.subnet = td.cloud_ip ORDER BY " . $orderby . " " . $orderdir . " LIMIT " . $Limit_Low . ", " . $Limit_Hi );
     $records = array(
         'draw' => $_GET['draw'],
         'recordsTotal' => $count,
@@ -111,20 +112,15 @@ if(isset($_GET['ajax'])) {
 
 ob_end_flush();
 ?>
-
- <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>FooTable</h2>
-        <ol class="breadcrumb">
-            <li>
-                <a href="">Real IP info</a>
-            </li>
-        </ol>
-    </div>
-    <div class="col-lg-2">
-
-    </div>
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <span class="sub-page-title">Real IP info</span>
+        </div>
+    </nav>
 </div>
+
 <div class="wrapper wrapper-content animated fadeInRight">
 
     <div class="row">
@@ -153,7 +149,7 @@ ob_end_flush();
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <?php if($check==1){
+                    <?php if(isset($check) && $check==1){
                         ?>
                           <div id="msg" class="bg-success" style="padding:7px;mergin-top:5px;"><strong>Real ip created successfully</strong></div>
                         <?php } ?>
@@ -232,12 +228,12 @@ ob_end_flush();
                 type: 'GET'
             }
         });
+
         $('#real_ip_table tbody').on( 'click', 'tr', function () {
             if($(this).data("inuse") == 0) {
                 $(this).toggleClass('selected');
             }
-        } );
-
+        });
 
         x = 46;
         $('input[type="text"]').keypress(function (e) {

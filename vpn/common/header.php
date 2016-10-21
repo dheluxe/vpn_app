@@ -1,12 +1,14 @@
 
-<?php @session_start();
+<?php
+//ini_set('session.gc_maxlifetime', 10*60*60);
+@session_start();
 //print_r($_SESSION);die;
 require_once 'includes/config.php';
 require_once 'includes/connection.php';
 include_once 'api/api_function.php';
 if(!$config['SITE_STATUS'])
 {
-    header('Location: ../app/offline.html');
+    header('Location: ../vpn/offline.html');
     die();
 }
 ob_end_flush();
@@ -49,7 +51,6 @@ if(isset($_REQUEST['customer_id'])){
     $selected_customer_id=$_REQUEST['customer_id'];
 }
 
-
 $sql=$db->query("SELECT * FROM `clouds_data` WHERE `user_token`='".$db->real_escape_string($_SESSION['token'])."'");
 //echo "SELECT * FROM `clouds_data` WHERE `cloud_id` = (SELECT `cloud_id` FROM `shared_tunnel` WHERE `shared_with`=".$_SESSION['user_id'].")";die;
 $sql1=$db->query("SELECT * FROM `clouds_data` WHERE `cloud_id` IN (SELECT `cloud_id` FROM `shared_tunnel` WHERE `shared_with`=".$_SESSION['user_id'].")");
@@ -60,8 +61,7 @@ $sql3=$db->query("SELECT * FROM `customers_data` WHERE `token`<>'".$db->real_esc
 
 $sql_point=$db->query("SELECT `settings_value` FROM `settings` WHERE `settings_name`='cast_to_point'");
 
-?>
-<?php
+
 $row1 = $sql2->fetch_assoc();
 $customer_id=$row1['customer_id'];
 $_SESSION['uname']=array('0'=>$row1['name']);
@@ -73,20 +73,19 @@ $point = $sql_point->fetch_assoc();
 ?>
 
 <body>
-
+<div id="blockDiv"></div>
 <script>
     var customer_id="<?php echo($selected_customer_id); ?>";
     var current_customer_id="<?php echo($_SESSION['customer_id']); ?>"
 </script>
-
-<section id="container" >
+<section id="container">
     <!--header start-->
     <header class="header black-bg">
         <div class="sidebar-toggle-box" style="display : none;">
             <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
         </div>
         <!--logo start-->
-        <a href="#" class="logo"><b>New VPN</b></a>
+        <a href="#" class="logo get_remote_server_info"><b>Pro-Monitoring Service</b></a>
         <!--logo end-->
 
         <div class="tabs-panel-top">
@@ -107,7 +106,8 @@ $point = $sql_point->fetch_assoc();
                         </a>
                         <ul class="dropdown-menu  pull-right" role="menu" aria-labelledby="user-options">
                             <li>
-                                <div style="margin-top:5px; margin-left:5px"><?php echo $_SESSION['email'] ?></div>
+                                <div class="header_account_email"><?php echo $_SESSION['email'] ?></div>
+                                <div class="header_account_destroy">Destroy Account</div>
                                 <a href="request.php?request=acc_logout"><i class="fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a>
                             </li>
                         </ul>

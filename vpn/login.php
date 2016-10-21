@@ -1,4 +1,6 @@
-<?php @session_start();
+<?php
+
+@session_start();
 /*$_SESSION['vpn_user'] = md5(2);
 $_SESSION['user_id'] = 2;
 $_SESSION['email'] = 'rajenpal033@gmail.com';

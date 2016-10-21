@@ -1,0 +1,64 @@
+.custom_select_box{
+    display: table;
+    position: relative;
+}
+.custom_option{
+    border:1px solid #909090;
+    width: 130px;
+    height: 22px;
+    display: block;
+    cursor: pointer;
+    opacity: 1;
+    background-color: #cecece;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-top: 4px;
+    line-height: 1;
+}
+.inactive_option:hover{
+    background-color: #0082d4;
+    color: #FFFFFF;
+}
+.inactive_option:hover .action_btn{
+    background-color: #0082d4;
+    color: #FFFFFF;
+}
+.display_value{
+    float: left;
+    width:84%;
+    height: 100%;
+    padding-left: 4px;
+}
+.action_btn{
+    float: right;
+    color:#DA3838;
+    height: 100%;
+    margin-right: 2px;
+}
+.assign_action_btn{
+    float: right;
+    color:#DA3838;
+    height: 100%;
+    margin-right: 2px;
+}
+.deleted{
+    display: none;
+}
+.inactive_option{
+    z-index: 1000;
+    position: relative;
+}
+.active_option{
+    z-index: 999;
+    position: relative;
+    margin-top: 6px;
+}
+.processing_option{
+    z-index: 999;
+    position: relative;
+    margin-top: 6px;
+}
+.processing_inactive_option{
+    z-index: 1000;
+    position: relative;
+}

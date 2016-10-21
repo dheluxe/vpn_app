@@ -787,7 +787,7 @@ body.boxed-layout .footer-widget {
     border-top-color: #0aa699;
     left: auto;
     right: 15px;
-    top: 72px;
+    top: 12px;
 }
 .pace .pace-progress {
     background: #0aa699 none repeat scroll 0 0;
@@ -2074,6 +2074,7 @@ hr {
     letter-spacing: -1px;
     margin: 0 0 10px;
     padding: 0;
+    width: 830px;
 }
 .page-title h3 {
     display: inline-block;
@@ -2090,7 +2091,6 @@ hr {
     display: inline-block;
     float: left;
     font-size: 30px;
-    margin-right: 12px;
     position: relative;
     top: 7px;
 }
@@ -5104,7 +5104,8 @@ form legend, .form-view legend {
     text-align: right;
 }
 .acl_search_result{
-    height: 680px!important;
+    width: 800px;!important;
+    height: 590px!important;
 }
 .dropdown-menu.pull-right {
     left: auto;
@@ -7862,7 +7863,6 @@ body.bottom-header .page-sidebar {
     width: 250px;
 }
 .page-content {
-    margin-left: 50px;
     min-height: 100%;
 }
 .page-content.no-min-height {
@@ -8240,7 +8240,6 @@ body {
     margin-left: 250px;
 }
 .page-content {
-    margin-left: 50px;
     margin-top: 0;
     min-height: 100%;
 }
@@ -9146,7 +9145,15 @@ body.open-menu-left .page-sidebar {
 }
 .width-80{
     width: 80px !important;
-
+}
+.width-60{
+    width: 60px !important;
+}
+.width-40{
+    width: 40px !important;
+}
+.width-20{
+    width: 20px !important;
 }
 .cursor{
     /*cursor: pointer;*/
@@ -9248,36 +9255,19 @@ body .error
 }
 
 .dev-connected{
-   /* background-color: #0aa699;*/
     margin-left: 0px !important;
-    float: right;
-    cursor: pointer;
-    /*margin-left: 5px;*/
 }
 
 .dev-disconnected{
-    /*background-color: red;*/
     margin-left: 0px !important;
-    float: right;
-    cursor: pointer;
 }
 
 .dev-connecting{
-    /*background-color: #FE961B;*/
     margin-left: 0px !important;
-    float: right;
-    /*margin-left: 5px;*/
 }
 
 .dev-disconnect{
     color: red;
-    float: left;
-    /*height: 14px;*/
-    /*margin-bottom: 13px;*/
-    /*margin-left: 34px;*/
-    /*margin-top: 8px;*/
-    /*padding-left: 0;*/
-    /*width: 13px;*/
 }
 
 .delete_cloud:hover i {
@@ -9374,10 +9364,10 @@ body .error
     border: 2px solid black;
     border-radius: 10px;
     margin-top: -3px;
-    width: 1140px;
+    width: 830px;
 }
 .list_body.tunnel_body{
-    padding-right: 30px;
+    padding-right: 10px;
 }
 
 .Parks.list .list_body.tunnel_body:hover {
@@ -9386,8 +9376,8 @@ body .error
     outline: 0 none;
 }
 .Parks.list .list_header {
-    width: 1140px !important;
-    padding-left: 40px;
+    width: 830px !important;
+    padding-left: 20px;
 }
 .Parks.list > div.list_header > div:nth-child(1), .Parks > div.list_header > div:nth-child(2), .Parks > div.list_header > div:nth-child(3), .Parks > div.list_header > div:nth-child(4), .Parks > div.list_header > div:nth-child(5), .Parks > div.list_header > div:nth-child(6) {
     MARGIN: 0; !important;
@@ -9415,14 +9405,14 @@ body .error
 }
 
 .Parks.list > div.list_header > div:nth-child(11) {
-    width: 100px !important;
+    width: 60px !important;
 }
 .Parks.list > div.list_header > div:nth-child(12) {
-    margin-left: 4px;
+    width: 140px;
 }
 
 .Parks.list > div.list_header > div:nth-child(13) {
-    width: 140px !important;
+    width: 140px;
 }
 #tunnel_body  div.list_body > div.meta.width-80 {
     width: 100px !important;
@@ -9436,11 +9426,11 @@ body .error
 }
 
 .Parks .list_body > .meta:first-child, .p_div > div:first-child {
-    margin-left: 40px !important;
+    margin-left: 20px !important;
 }
 .p_div > div:first-child .holbol {
-    margin-right: 25px !important;
-    width: 120px !important;
+    margin-right: 5px !important;
+    width: 110px !important;
 }
 .Parks .list_body .meta:first-child {
     width: 17px;
@@ -9453,7 +9443,7 @@ body .error
 }
 
 .Parks.list .list_header .meta:nth-child(14), .Parks.list .list_body span .meta:nth-child(2) {
-    width: 80px !important;
+    width: 80px;
 }
 .Parks.list .list_header .meta:nth-child(7), .Parks.list .list_body .meta:nth-child(7) {
     width: 80px !important;
@@ -9482,13 +9472,13 @@ body .error
 }
 .acl_description{
     min-height: 24px!important;
-    margin-left: 15px;
+    margin-left: 5px;
     background-color: #f2f2f2!important;
     /*font-size: 16px!important;*/
 }
 .acl_name{
     min-height: 24px!important;
-    margin-left: 15px;
+    margin-left: 5px;
     background-color: #f2f2f2!important;
     /*font-size: 16px!important;*/
 }
@@ -9505,7 +9495,7 @@ body .error
     background-color: #cecece;
 }
 .acl_search_result .acl_upper_div{
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     margin-top: 12px;
 }
 .acl_search_result .soumya_btn_search{
@@ -9520,8 +9510,11 @@ body .error
 .tunnel_body{
     height: 360px;
     display: inline-block;
+    text-align: left;
 }
 .custom_row{
     margin-top: 15px;
+    width: 90%;
+    min-width: 260px;
 }
 

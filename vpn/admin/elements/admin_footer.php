@@ -26,11 +26,21 @@
 
     <script src="../assets/js/jquery.notify.min.js" type="text/javascript"></script>
     <!-- <script src="../assets/js/custom.js" type="text/javascript"></script> -->
-
 </body>
 </html>
 <script type="text/javascript">
          $(document).ready(function(){
+            $("body").on("click", "#add_remote_server_btn", function(){
+                 $("#add_remote_server_modal .modal-title").html("Add Remote Server");
+                 $(".btn_install").html("Install");
+                 $("#remote_id").val("");
+                 $("#ssh_username").val("");
+                 $("#ssh_password").val("");
+                 $("#sname").val("");
+                 $("#email").val("");
+                 $("#sel1").val("");
+                 $("#add_remote_server_modal").modal("show");
+            });
             $("body").on("click", ".active_user", function(){
                 var id=$(this).attr("data-id");
                 var val=$(this).attr("data-val");
@@ -150,10 +160,12 @@
                     type:"POST",
                     data:{"id": id},
                       success:function(resp){
-                          val=$.parseJSON(resp);
+                          var val=$.parseJSON(resp);
+                          console.log(val);
+                          $(".btn_install").html("Update");
                           $("#remote_id").val(val.remote_ip);
-                          $("#username").val(val.server_uname);
-                          $("#password").val(val.server_pass);
+                          $("#ssh_username").val(val.ssh_username);
+                          $("#ssh_password").val(val.ssh_password);
                           $("#sname").val(val.server_name);
                           $("#email").val(val.email);
                           // $("#"+val.remote_group).attr("selected", "selected");
@@ -198,12 +210,17 @@
                     data:{"id": id},
                       success:function(resp){
                           val=$.parseJSON(resp);
+                          console.log(val);
                           $("#plan").val(val.plans);
                           $("#tcost").val(val.tunnel);
+                          $("#route_cost").val(val.route_tag);
+                          $("#internet_cost").val(val.internet_tag);
+                          $("#server_cost").val(val.server_tag);
                           $("#gcost").val(val.gateway);
                           $("#bcost").val(val.bidirection);
                           $("#rcost").val(val.realip);
                           $("#pid").val(val.plan_id);
+                          $("#route_path_cost").val(val.route_path);
                           $('html, body').animate({
                               scrollTop: $("#scroll_div").offset().top
                           }, 1000);
@@ -257,7 +274,10 @@
             });
 
             $("body").on("click", ".delete", function(){
+                var ths=$(this);
                 var id=$(this).attr("data-pk");
+                ths.addClass("fa-fw fa-circle-o-notch fa-spin");
+                ths.removeClass("fa-trash-o");
                 $.ajax({
                     url:'../request.php?request=remote_server_delete',
                     type:"POST",
@@ -487,4 +507,16 @@
               }
           }
      });
-     </script>
+
+         $(document).ajaxComplete(function(event,xhr,settings){
+             console.log(xhr);
+             var res=xhr.responseText;
+             var trim_res=res.trim();
+             if(trim_res == "empty_session"){
+                 token="";
+                 console.log(xhr.responseText);
+                 location.reload(true);
+             }
+         });
+</script>
+

@@ -6,20 +6,15 @@ if(!empty($_POST)){
     }
 }
 ?>
-
- <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>FooTable</h2>
-        <ol class="breadcrumb">
-            <li>
-                <a href="">Customer info</a>
-            </li>
-        </ol>
-    </div>
-    <div class="col-lg-2">
-
-    </div>
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <span class="sub-page-title">Customer info</span>
+        </div>
+    </nav>
 </div>
+
 <div class="wrapper wrapper-content animated fadeInRight">
 
     <div class="row">

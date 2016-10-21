@@ -35,9 +35,6 @@ class PHPWebSocket
 	// the maximum length, in bytes, of a message's payload data, this is also internally limited to 2,147,483,647
 	const WS_MAX_MESSAGE_PAYLOAD_RECV = 500000;
 
-
-
-
 	// internal
 	const WS_FIN =  128;
 	const WS_MASK = 128;
@@ -170,13 +167,11 @@ class PHPWebSocket
 					}
 				}
 			}
-
 			if (time() >= $nextPingCheck) {
 				$this->wsCheckIdleClients();
 				$nextPingCheck = time() + 1;
 			}
 		}
-
 		return true; // returned when wsStopServer() is called
 	}
 	function wsStopServer() {
@@ -734,6 +729,7 @@ class PHPWebSocket
 	function wsClose($clientID) {
 		return $this->wsSendClientClose($clientID, self::WS_STATUS_NORMAL_CLOSE);
 	}
+
 	function wsSend($clientID, $message, $binary=false) {
 		return $this->wsSendClientMessage($clientID, $binary ? self::WS_OPCODE_BINARY : self::WS_OPCODE_TEXT, $message);
 	}

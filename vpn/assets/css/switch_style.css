@@ -24,8 +24,8 @@
 ============================================================ */
 input.cmn-toggle-round + label {
   padding: 2px;
-  width: 70px;
-  height: 30px;
+  width: 47px;
+  height: 22px;
   background-color: #dddddd;
   -webkit-border-radius: 60px;
   -moz-border-radius: 60px;
@@ -55,7 +55,7 @@ input.cmn-toggle-round + label:before {
   transition: background 0.4s;
 }
 input.cmn-toggle-round + label:after {
-  width: 28px;
+  width: 20px;
   background-color: #fff;
   -webkit-border-radius: 100%;
   -moz-border-radius: 100%;
@@ -74,6 +74,6 @@ input.cmn-toggle-round:checked + label:before {
   background-color: #8ce196;
 }
 input.cmn-toggle-round:checked + label:after {
-  margin-left: 40px;
+  margin-left: 25px;
 }
 

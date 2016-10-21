@@ -5,8 +5,8 @@
 function run_ssh_command($cmd)
 {
     include('Net'.DIRECTORY_SEPARATOR.'SSH2.php');
-    $ssh = new Net_SSH2('198.211.127.72');
-    if (!$ssh->login('root', 'kdcsev113@pass')) {
+    $ssh = new Net_SSH2(MAIN_SERVER_IP);
+    if (!$ssh->login(MAIN_SERVER_SSH_USER_NAME, MAIN_SERVER_SSH_USER_PASS)) {
         return 'Login Failed';
     }
     $ssh->enableQuietMode();
@@ -49,18 +49,16 @@ include 'elements/admin_header.php';
         aler("HURRA");
     });
 </script>
- <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>FooTable</h2>
-        <ol class="breadcrumb">
-            <li>
-                <a href="">ServiceControl</a>
-            </li>
-        </ol>
-    </div>
-    <div class="col-lg-2">
-    </div>
+
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <span class="sub-page-title">Service Control</span>
+        </div>
+    </nav>
 </div>
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row wrapper">
         <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="8">
@@ -74,7 +72,7 @@ include 'elements/admin_header.php';
                 <tr id="testphp">
                     <td>test.php</td>
                     <td>
-                        <?php if(socket_connect($tphpsock , '198.211.127.72', 7575)){
+                        <?php if(socket_connect($tphpsock , MAIN_SERVER_IP, 7575)){
                             echo '<span style="color: green;">Running</span>';
                         }
                         else
@@ -87,7 +85,7 @@ include 'elements/admin_header.php';
                 <tr id="serverphp">
                     <td>server.php</td>
                     <td>
-                        <?php if(socket_connect($srvphpsock , '198.211.127.72', 7272)){
+                        <?php if(socket_connect($srvphpsock , MAIN_SERVER_IP, 7272)){
                             echo '<span style="color: green;">Running</span>';
                         }
                         else
@@ -100,7 +98,7 @@ include 'elements/admin_header.php';
                 <tr id="strigger">
                     <td>socket_trigger.py</td>
                     <td>
-                        <?php if(socket_connect($pythonsock , '198.211.127.72', 7373)){
+                        <?php if(socket_connect($pythonsock , MAIN_SERVER_IP, 7373)){
                             echo '<span style="color: green;">Running</span>';
                         }
                         else

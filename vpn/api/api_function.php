@@ -1,9 +1,7 @@
 <?php
-//$root_url=$_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST']."/vpn_site/vpn";
-$root_url=$_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST']."/vpn";
-define("ROOT_URL",$root_url );
 
-
+include_once(dirname(dirname(__FILE__))."/includes/config.php");
+include_once("api_function1.php");
 //////////////////////////////////////////////////////////////////////////////////////////
 function job_queue_info(){
   global $db;
@@ -59,7 +57,6 @@ function remote($id, $action, $data, $group, $token){
 
 }
 
-
 //login section
 function dologin($data){
    global $db;
@@ -98,7 +95,7 @@ function dologin($data){
              $path="contacts.php";
              header('location:'.$path); //seems strange. check how gauth works!
           return null;
-       }
+      }
   }
   return array("status" => 0, 'data' => 'User not exist', 'type'=>'login', 'message_type'=>'reply', 'value'=>array());
 }
@@ -336,13 +333,36 @@ function tunnels($tunnel, $is_shared=false){
     //print_r($tunnel);die;
   $group_arr=array('<span style="color: #ea4335;"><strong>A</strong></span>', '<span style="color: #839D1C;"><strong>B</strong></span>', '<span style="color: #00A998;"><strong>C</strong></span>', '<span style="color: #F6AE00;"><strong>D</strong></span>', '<span style="color: #4285F4;"><strong>E</strong></span>', '<span style="color: #330033;"><strong>F</strong></span>', '<span style="color: #FF404E;"><strong>G</strong></span>', '<span style="color: #FFFF00;"><strong>H</strong></span>', '<span style="color: #FF3300;"><strong>I</strong></span>', '<span style="color: #CC6600;"><strong>J</strong></span>', '<span style="color: #9999CC;"><strong>K</strong></span>', '<span style="color: #0000CC;"><strong>L</strong></span>', '<span style="color: #FF0000;"><strong>M</strong></span>', '<span style="color: #003366;"><strong>N</strong></span>', '<span style="color: #003333;"><strong>0</strong></span>', '<span style="color: #FF00CC;"><strong>P</strong></span>', '<span style="color: #FF0066;"><strong>Q</strong></span>', '<span style="color: #CC0000;"><strong>R</strong></span>', '<span style="color: #CC6600;"><strong>S</strong></span>', '<span style="color: #666666;"><strong>T</strong></span>', '<span style="color: #330066;"><strong>U</strong></span>', '<span style="color: #CC99CC;"><strong>V</strong></span>', '<span style="color: #FFCC66;"><strong>W</strong></span>', '<span style="color: #FF3399;"><strong>X</strong></span>', '<span style="color: #99CCFF;"><strong>Y</strong></span>', '<span style="color: #0099FF;"><strong>Z</strong></span>');
    $html="";
-   foreach ($tunnel as  $data) {
+   foreach ($tunnel as $data) {
 
     $html.='<div class="p_div">';
         $html.='<div id="p_div_'.$data['tunnel_id'].'">';
-            //if($data['plan_id']!=1){
-                 $html .= '<a class="btn holbol acc_type cursor acc_type_' . $data['tunnel_id'] . '" data-id="' . $data['tunnel_id'] . '" data-val="' . $data['plan_id'] . '" data-toggle="tooltip" data-placement="bottom" ' . ($data['plan_id'] == 1 ? "style='margin-left: 0px; background-color:#b9c3c8; '" : "style='margin-left: 0px; background-color:transparent;  color: black; opacity:0.25'") . '>Premium</a>';
+           $dev_class = 'dev-disconnect';
+           $dev_message = 'Disconnected';
+            $icon='<i class="fa fa-share-square-o" aria-hidden="true"></i>';
+           if($data['dev_status'] == 1){
+               $dev_class = 'dev-connected';
+               $dev_message = $data['DeV'];
+               //$dev_message = 'Connected';
+               $icon='<i class="fa fa-times" aria-hidden="true"></i>';
+           }
+           elseif($data['dev_status'] == 0){
+               $dev_class = 'dev-connecting';
+               $dev_message = 'Initiating';
+               $icon='<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i>';
+           }
+           elseif($data['dev_status'] == -1){
+               $dev_class = 'dev-disconnected';
+               $dev_message = 'Disconnected';
+               $icon='<i class="fa fa-share-square-o" aria-hidden="true"></i>';
+           }
 
+       $html .= '<a class="btn holbol dev_status dev_status_'.$data['tunnel_id'].' '.$dev_class.' " data-tid="' . $data['tunnel_id'] . '" data-val="' . $data['plan_id'] . '" data-toggle="tooltip" data- data-placement="bottom" style="margin-left: 0px; background-color:transparent; color: black; width:24px!important; margin-right:0px!important; margin-left: 0px!important;">'.$icon.'</a>';
+
+       $html .= '<a class="holbol dev-status-label dev-status-label_'.$data['tunnel_id'].'" data-id="' . $data['tunnel_id'] . '" data-val="' . $data['plan_id'] . '" data-toggle="tooltip" data-placement="bottom" style="text-align: center; margin-left: 0px; background-color:transparent; color: black; border-left:none;width: 150px!important;">'.$dev_message.'</a>';
+
+       //if($data['plan_id']!=1){
+                 $html .= '<a class="btn holbol acc_type cursor acc_type_' . $data['tunnel_id'] . '" data-id="' . $data['tunnel_id'] . '" data-val="' . $data['plan_id'] . '" data-toggle="tooltip" data-placement="bottom" ' . ($data['plan_id'] == 1 ? "style='margin-left: 0px; background-color:#b9c3c8; '" : "style='margin-left: 0px; background-color:transparent;  color: black; opacity:0.25'") . '>Premium</a>';
             //}
             //if($data['route']==1){
                 $html.='<a data-val="'.$data['route'].'" class="btn holbol route_change cursor tunnel_route_'.$data['tunnel_id'].'" type="data" data-pos="0" data-id="'.$data['tunnel_id'].'" '.($data['route']==1?"style='background-color:#b9c3c8'":"style='background-color:transparent;  color: black; opacity:0.25'").'>Route</a>';
@@ -357,6 +377,7 @@ function tunnels($tunnel, $is_shared=false){
             }
             $btn_text="Sponsore";
             $check_sponsored_data=check_tunnel_sponsored($data['tunnel_id']);
+            $data['sponsor']=$check_sponsored_data['status'];
             if($check_sponsored_data['status']=='1'){
                 $btn_text="Sponsoring";
                 $opacity = 'background-color: #b9c3c8;;';
@@ -405,23 +426,8 @@ function tunnels($tunnel, $is_shared=false){
          $html.='<div class="meta width-120 tunnel_display_'.$data['tunnel_id'].'" data-toggle="tooltip" data-placement="bottom" title="'.$data['display_name'].'"><a href="javascript:void(0);" class="display display_'.$data['tunnel_id'].' tunnel_editable" data-type="text" data-pk="'.$data['tunnel_id'].'" data-title="Enter display name">'.($data['display_name']!=""?$data['display_name']:"Tunnel ".$data['tunnel_id']).'</a></div>';
 
          $html.='<div class="meta cursor">'.biderection($data['bidirectional_mode'], $data['tunnel_id']).'</div>';
-         $html.='<div class="meta width-80 tunnel_location_'.$data['tunnel_id'].'" data-toggle="tooltip" title=""><a href="javascript:void(0);" class="change_location location_'.$data['tunnel_id'].' tunnel_editable" data-type="select" data-source="request.php?request=get_server_name" data-pk="'.$data['tunnel_id'].'">'.($data['location']!=null?$data['location']:"Select Location").'</a></div>';
+         $html.='<div class="meta width-80 tunnel_location_'.$data['tunnel_id'].'" data-toggle="tooltip" title=""><a href="javascript:void(0);" class="change_location location_'.$data['tunnel_id'].' tunnel_editable" data-type="select" data-source="request.php?request=get_server_name" data-pk="'.$data['tunnel_id'].'">'.($data['location']!=0?$data['location']:"Auto").'</a></div>';
          //new
-         $dev_class = 'dev-disconnect';
-        $dev_message = 'Disconnected';
-           if($data['dev_status'] == 1){
-               $dev_class = 'dev-connected';
-               $dev_message = $data['DeV'];
-           }
-           elseif($data['dev_status'] == 0){
-               $dev_class = 'dev-connecting';
-               $dev_message = 'Initiating';
-           }
-           elseif($data['dev_status'] == -1){
-               $dev_class = 'dev-disconnected';
-               $dev_message = 'Disconnected';
-           }
-         $html.='<div class="meta width-270 text-align-center" style="width:78px;"><div class="dev_status  '.$dev_class.'"  data-tid="'.$data['tunnel_id'].'" id="DeV_'.$data['tunnel_id'].'" data-toggle="tooltip" data-placement="bottom" title="" style="width:100%;">'.$dev_message.'</div></div>';
 
        if($data['tunnel_type']=="client"){
            $html.='<div class="meta width-80 subnet_'.$data['tunnel_id'].'" data-toggle="tooltip" title="">Auto</div>';
@@ -429,46 +435,96 @@ function tunnels($tunnel, $is_shared=false){
            $html.='<div class="meta width-80 subnet_'.$data['tunnel_id'].'" data-toggle="tooltip" title="">'.$data['cloud_ip'].'</div>';
        }
 
-         $tunnel_cost = packages($data['tunnel_type'], $data['plan_id'], $data['tunnel_id']);
-         $html.='<div class="meta plan_cost_'.$data['tunnel_id'].'" data-toggle="tooltip" title="Tunnel points '.$tunnel_cost*cash_to_point().'">'.$tunnel_cost*cash_to_point().'</div>';
+         $tunnel_cost = get_tunnel_cost($data['tunnel_id']);
+
+         $html.='<div class="meta plan_cost_'.$data['tunnel_id'].'" data-toggle="tooltip" title="Tunnel points '.$tunnel_cost.'" style="width:60px;">'.$tunnel_cost.'</div>';
 
          $html.='<span class="not_client_'.$data['tunnel_id'].'">';
          if($data['tunnel_type']!="client"){
+             $html.='<div class="real_ip_meta width-140" data-toggle="tooltip">';
              if( (count($data['real_ip'])>0) || (count($data['installed_real_ips'])>0)){
-                 $html.='<div class="real_ip_meta width-140" data-toggle="tooltip">';
-                 $html.='<select class="select_real_ip real_ip_'.$data['tunnel_id'].'" style="width:120px!important; height:22px!important;min-height:0px;" data-val="'.($data['active']!=null?$data['active']:-1).'" data-id="'.$data['tunnel_id'].'">'.(count($data['real_ip'])!=0?count($data['real_ip']):"Not assigned");
+                 $html.='<div class="real_ip_select_box_'.$data['tunnel_id'].' custom_select_box" data-val="'.($data['active']!=null?$data['active']:-1).'" data-id="'.$data['tunnel_id'].'">';
+
+                 if($data['real_ip'][0]['ip']==""){
+                     $html.='<div class="custom_option active_option">';
+                     $html.='<div class="display_value" data-value="">Not assigned</div>';
+                     $html.='<div class="assign_action_btn" data-id="'.$data['tunnel_id'].'">';
+                     $html.='<i class="fa fa-fw fa-plus"></i>';
+                     $html.='</div>';
+                     $html.='</div>';
+                 }else{
+                     $html.='<div class="custom_option active_option">';
+                     $html.='<div class="display_value" data-value="'.$data['real_ip'][0]['ip'].'">'.$data['real_ip'][0]['ip'].'</div>';
+                     $html.='<div class="action_btn" data-id="'.$data['tunnel_id'].'">';
+                     $html.='<i class="fa fa-fw fa-times"></i>';
+                     $html.='</div>';
+                     $html.='</div>';
+                 }
+                 $html.='<div class="custom_option inactive_option hidden">';
+                     $html.='<div class="display_value" data-value="">None</div>';
+                 $html.='</div>';
+
+                 $i=0;
                  foreach($data['real_ip'] as $real_ip){
-                     $html.='<option value="'.$real_ip.'">'.$real_ip.'</option>';
+                     if($i>0){
+                         $html.='<div class="custom_option inactive_option inactive_option_'.$real_ip['acl_id'].' hidden" data-aid="'.$real_ip['acl_id'].'">';
+                         $html.='<div class="display_value" data-value="'.$real_ip['ip'].'">'.$real_ip['ip'].'</div>';
+                         $html.='<div class="action_btn" data-tid="'.$data['tunnel_id'].'">';
+                         $html.='<i class="fa fa-fw fa-times"></i>';
+                         $html.='</div>';
+                         $html.='</div>';
+                     }
+                     $i++;
                  }
                  foreach($data['installed_real_ips'] as $real_ip){
-                     $html.='<option value="'.$real_ip.'" disabled>'.$real_ip.'</option>';
+                     $html.='<div class="custom_option inactive_option inactive_option_'.$real_ip['acl_id'].' hidden" data-aid="'.$real_ip['acl_id'].'">';
+                     $html.='<div class="display_value" data-value="'.$real_ip['ip'].'">'.$real_ip['ip'].'</div>';
+                     $html.='<div class="action_btn">';
+                     $html.='<i class="fa fa-fw fa-times"></i>';
+                     $html.='</div>';
+                     $html.='</div>';
                  }
-                 $html.='</select>';
-             }else{
-                 $html.='<div class="meta width-140" data-toggle="tooltip">';
-                 $html.='<a href="javascript:void(0);" class="real_ip real_ip_'.$data['tunnel_id'].'" style="color:#1B1E24" data-val="-1" data-id="'.$data['tunnel_id'].'">Not assigned</a>';
+                 $html.='</div>';
+             }else{ //if real ip is not assigned
+                 $html.='<div class="real_ip_select_box_'.$data['tunnel_id'].' custom_select_box" data-val="'.($data['active']!=null?$data['active']:-1).'" data-id="'.$data['tunnel_id'].'">';
+                 $html.='<div class="custom_option active_option">';
+                 $html.='<div class="display_value" data-value="">Not assigned</div>';
+                 $html.='<div class="assign_action_btn" data-id="'.$data['tunnel_id'].'">';
+                 $html.='<i class="fa fa-fw fa-plus"></i>';
+                 $html.='</div>';
+                 $html.='</div>';
+
+                 $html.='<div class="custom_option inactive_option hidden">';
+                 $html.='<div class="display_value" data-value="">None</div>';
+                 $html.='</div>';
+
+                 $html.='</div>';
              }
             $html.='</div>';
-            $html.='<div class="meta cursor">'.gateway($data['gateway_mode'], $data['tunnel_id'], $data['tunnel_type']).'</div>';
+            $html.='<div class="meta cursor width-60">'.gateway($data['gateway_mode'], $data['tunnel_id'], $data['tunnel_type']).'</div>';
          } else {
             $html.='<div class="meta width-140" data-toggle="tooltip" data-placement="right" title="'.($data['tunnel_type']!="client"?"":"To activate this field upgrade to server").'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'" data-id="'.$data['tunnel_id'].'">'.($data['tunnel_type']!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>").'</a></div>';
 
-            $html.='<div class="meta" data-toggle="tooltip" data-placement="right" title="'.($data['tunnel_type']!="client"?"":"To activate this field upgrade to server").'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'" data-id="'.$data['tunnel_id'].'">'.($data['tunnel_type']!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>").'</a></div>';
+            $html.='<div class="meta width-60" data-toggle="tooltip" data-placement="right" title="'.($data['tunnel_type']!="client"?"":"To activate this field upgrade to server").'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'" data-id="'.$data['tunnel_id'].'">'.($data['tunnel_type']!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>").'</a></div>';
          }
-         $html.='<div class="meta cursor float-right">'.status($data['status'], $data['tunnel_id']).'</div>';
-         $html.='</span><div class="meta float-right" data-toggle="tooltip" title="Delete this tunnel" ><a href="javascript:void(0);" data-id="'.$data['tunnel_id'].'" class="delete_tunnel delete_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'"><i class="fa fa-fw fa-trash" style="color:#DA3838"></i></a></div>';
 
-      $html.='</div>';
+
        $html.='<div class="tunnel_searchable_switch_block">';
        $html.='<input id="cmn-toggle-tunnel-'.$data['tunnel_id'].'" class="cmn-toggle cmn-toggle-round tunnel_searchable_switch" data-tunnel_id="'.$data['tunnel_id'].'" type="checkbox" '.($data["is_searchable"]==1?"checked":"").'>';
        $html.='<label for="cmn-toggle-tunnel-'.$data['tunnel_id'].'"></label>';
        $html.='</div>';
+
+
+         $html.='<div class="meta cursor float-right">'.status($data['status'], $data['tunnel_id']).'</div>';
+         $html.='</span><div class="meta float-right" data-toggle="tooltip" title="Delete this tunnel" ><a href="javascript:void(0);" data-id="'.$data['tunnel_id'].'" class="delete_tunnel delete_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'"><i class="fa fa-fw fa-trash" style="color:#DA3838"></i></a></div>';
+
+      $html.='</div>';
       $html.='</div>';
 
        //tunnel acl
 
        $html.='<div class="tunnel_acl_div_'.$data['tunnel_id'].' tunnel_acl_div" data-id="'.$data['tunnel_id'].'" style="display:none;">';
-        $html.='<label style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 20px;">Source base<span class="source_no_data_p_'.$data['tunnel_id'].'" style="color: #ea4335; font-size: 15px;"></span>&nbsp;&nbsp;<input type="button" class="btn btn-xs btn-primary acl_destination_search_btn" value="Search ACL" data-tid="'.$data['tunnel_id'].'" style="margin-bottom: 3px;"/></label>';
+        $html.='<label style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 10px;">Source base<span class="source_no_data_p_'.$data['tunnel_id'].'" style="color: #ea4335; font-size: 15px;"></span>&nbsp;&nbsp;<input type="button" class="btn btn-xs btn-primary acl_destination_search_btn" value="Search ACL" data-tid="'.$data['tunnel_id'].'" style="margin-bottom: 3px;"/></label>';
         $html.='<div class="source_acl_content_'.$data['tunnel_id'].'"></div>';
         $html.='<label  style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 20px;margin-top: 5px;">Destination base<span class="destination_no_data_p_'.$data['tunnel_id'].'" style="color: #ea4335; font-size: 15px;"></span></label>';
         $deststate = ($data['tunnel_type']!="client"?"":"disabled");
@@ -482,13 +538,37 @@ function sponsor_tunnels($tunnel, $is_shared=true){
     //print_r($tunnel);die;
     $group_arr=array('<span style="color: #ea4335;"><strong>A</strong></span>', '<span style="color: #839D1C;"><strong>B</strong></span>', '<span style="color: #00A998;"><strong>C</strong></span>', '<span style="color: #F6AE00;"><strong>D</strong></span>', '<span style="color: #4285F4;"><strong>E</strong></span>', '<span style="color: #330033;"><strong>F</strong></span>', '<span style="color: #FF404E;"><strong>G</strong></span>', '<span style="color: #FFFF00;"><strong>H</strong></span>', '<span style="color: #FF3300;"><strong>I</strong></span>', '<span style="color: #CC6600;"><strong>J</strong></span>', '<span style="color: #9999CC;"><strong>K</strong></span>', '<span style="color: #0000CC;"><strong>L</strong></span>', '<span style="color: #FF0000;"><strong>M</strong></span>', '<span style="color: #003366;"><strong>N</strong></span>', '<span style="color: #003333;"><strong>0</strong></span>', '<span style="color: #FF00CC;"><strong>P</strong></span>', '<span style="color: #FF0066;"><strong>Q</strong></span>', '<span style="color: #CC0000;"><strong>R</strong></span>', '<span style="color: #CC6600;"><strong>S</strong></span>', '<span style="color: #666666;"><strong>T</strong></span>', '<span style="color: #330066;"><strong>U</strong></span>', '<span style="color: #CC99CC;"><strong>V</strong></span>', '<span style="color: #FFCC66;"><strong>W</strong></span>', '<span style="color: #FF3399;"><strong>X</strong></span>', '<span style="color: #99CCFF;"><strong>Y</strong></span>', '<span style="color: #0099FF;"><strong>Z</strong></span>');
     $html="";
-    foreach ($tunnel as  $data) {
+    foreach ($tunnel as $data) {
 
         $html.='<div class="p_div">';
         $html.='<div id="p_div_'.$data['tunnel_id'].'">';
+        $dev_class = 'dev-disconnect';
+        $dev_message = 'Disconnected';
+        $icon='<i class="fa fa-share-square-o" aria-hidden="true"></i>';
+        if($data['dev_status'] == 1){
+            $dev_class = 'dev-connected';
+            $dev_message = $data['DeV'];
+            //$dev_message = 'Connected';
+            $icon='<i class="fa fa-times" aria-hidden="true"></i>';
+        }
+        elseif($data['dev_status'] == 0){
+            $dev_class = 'dev-connecting';
+            $dev_message = 'Initiating';
+            $icon='<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i>';
+        }
+        elseif($data['dev_status'] == -1){
+            $dev_class = 'dev-disconnected';
+            $dev_message = 'Disconnected';
+            $icon='<i class="fa fa-share-square-o" aria-hidden="true"></i>';
+        }
+
+        $html .= '<a class="btn holbol dev_status ' . $dev_class . '" data-tid="' . $data['tunnel_id'] . '" data-val="' . $data['plan_id'] . '" data-toggle="tooltip" data- data-placement="bottom" style="margin-left: 0px; background-color:transparent; color: black; width:24px!important; margin-right:0px!important; margin-left: 0px!important;">'.$icon.'</a>';
+
+        $html .= '<a class="holbol dev-status-label dev-status-label_'.$data['tunnel_id'].'" data-id="' . $data['tunnel_id'] . '" data-val="' . $data['plan_id'] . '" data-toggle="tooltip" data-placement="bottom" style="text-align: center; margin-left: 0px; background-color:transparent; color: black; border-left:none;width: 150px!important;">'.$dev_message.'</a>';
+
+
         //if($data['plan_id']!=1){
         $html .= '<a class="btn holbol acc_type cursor acc_type_' . $data['tunnel_id'] . '" data-id="' . $data['tunnel_id'] . '" data-val="' . $data['plan_id'] . '" data-toggle="tooltip" data-placement="bottom" ' . ($data['plan_id'] == 1 ? "style='margin-left: 0px; background-color:#b9c3c8; '" : "style='margin-left: 0px; background-color:transparent;  color: black; opacity:0.25'") . '>Premium</a>';
-
         //}
         //if($data['route']==1){
         $html.='<a data-val="'.$data['route'].'" class="btn holbol route_change cursor tunnel_route_'.$data['tunnel_id'].'" type="data" data-pos="0" data-id="'.$data['tunnel_id'].'" '.($data['route']==1?"style='background-color:#b9c3c8'":"style='background-color:transparent;  color: black; opacity:0.25'").'>Route</a>';
@@ -499,15 +579,15 @@ function sponsor_tunnels($tunnel, $is_shared=true){
         //}
         $opacity = '';
         $sponsore_class="sponsored";
+        $opacity = 'opacity:1; background-color: #b9c3c8;';
+        $data['sponsor']=1;
         if($is_shared == false){
             $opacity = 'opacity:0.25; color: black; background-color: transparent;';
             $sponsore_class="sponsore";
         }
-        $html.='<a data-val="" class="btn holbol '.$sponsore_class.' sponsored_'.$data['tunnel_id'].'" type="data" data-pos="0" data-tid="'.$data['tunnel_id'].'"  data-cloud="'.$data['cloud_id'].'" data-u="'.$_SESSION['user_id'].'" style="background-color:#1D9E74;'.$opacity.'">Sponsored</a>';
+        $html.='<a data-val="" class="btn holbol '.$sponsore_class.' sponsored_'.$data['tunnel_id'].'" type="data" data-pos="0" data-tid="'.$data['tunnel_id'].'"  data-cloud="'.$data['cloud_id'].'" data-u="'.$_SESSION['user_id'].'" style="'.$opacity.'">Sponsored</a>';
 
-        $html.='<a class="btn holbol change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-id="'.$data['tunnel_id'].'" data-type="'.($data['tunnel_type']!="client"?"server":"client").'" href="javascript:void(0)" '.($data['tunnel_type']!="client"?"style='background-color:#b9c3c8'":"style='background-color:transparent;  color: black; opacity:0.25'").'>Server';
-
-        $html.='</a>';
+        $html.='<a class="btn holbol change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-id="'.$data['tunnel_id'].'" data-type="'.($data['tunnel_type']!="client"?"server":"client").'" href="javascript:void(0)" '.($data['tunnel_type']!="client"?"style='background-color:#b9c3c8'":"style='background-color:transparent;  color: black; opacity:0.25'").'>Server</a>';
 
         $html.='</div>';
 
@@ -547,23 +627,8 @@ function sponsor_tunnels($tunnel, $is_shared=true){
         $html.='<div class="meta width-120 tunnel_display_'.$data['tunnel_id'].'" data-toggle="tooltip" data-placement="bottom" title="'.$data['display_name'].'"><a href="javascript:void(0);" class="display display_'.$data['tunnel_id'].' tunnel_editable" data-type="text" data-pk="'.$data['tunnel_id'].'" data-title="Enter display name">'.($data['display_name']!=""?$data['display_name']:"Tunnel ".$data['tunnel_id']).'</a></div>';
 
         $html.='<div class="meta cursor">'.biderection($data['bidirectional_mode'], $data['tunnel_id']).'</div>';
-        $html.='<div class="meta width-80 tunnel_location_'.$data['tunnel_id'].'" data-toggle="tooltip" title=""><a href="javascript:void(0);" class="change_location location_'.$data['tunnel_id'].' tunnel_editable" data-type="select" data-source="request.php?request=get_server_name" data-pk="'.$data['tunnel_id'].'">'.($data['location']!=null?$data['location']:"Select Location").'</a></div>';
+        $html.='<div class="meta width-80 tunnel_location_'.$data['tunnel_id'].'" data-toggle="tooltip" title=""><a href="javascript:void(0);" class="change_location location_'.$data['tunnel_id'].' tunnel_editable" data-type="select" data-source="request.php?request=get_server_name" data-pk="'.$data['tunnel_id'].'">'.($data['location']!=0?$data['location']:"Auto").'</a></div>';
         //new
-        $dev_class = 'dev-disconnect';
-        $dev_message = 'Disconnected';
-        if($data['dev_status'] == 1){
-            $dev_class = 'dev-connected';
-            $dev_message = $data['DeV'];
-        }
-        elseif($data['dev_status'] == 0){
-            $dev_class = 'dev-connecting';
-            $dev_message = 'Initiating';
-        }
-        elseif($data['dev_status'] == -1){
-            $dev_class = 'dev-disconnected';
-            $dev_message = 'Disconnected';
-        }
-        $html.='<div class="meta width-270 text-align-center" style="width:78px;"><div class="dev_status  '.$dev_class.'"  data-tid="'.$data['tunnel_id'].'" id="DeV_'.$data['tunnel_id'].'" data-toggle="tooltip" data-placement="bottom" title="" style="width:100%;">'.$dev_message.'</div></div>';
 
         if($data['tunnel_type']=="client"){
             $html.='<div class="meta width-80 subnet_'.$data['tunnel_id'].'" data-toggle="tooltip" title="">Auto</div>';
@@ -571,46 +636,96 @@ function sponsor_tunnels($tunnel, $is_shared=true){
             $html.='<div class="meta width-80 subnet_'.$data['tunnel_id'].'" data-toggle="tooltip" title="">'.$data['cloud_ip'].'</div>';
         }
 
-        $tunnel_cost = packages($data['tunnel_type'], $data['plan_id'], $data['tunnel_id']);
-        $html.='<div class="meta plan_cost_'.$data['tunnel_id'].'" data-toggle="tooltip" title="Tunnel points '.$tunnel_cost*cash_to_point().'">'.$tunnel_cost*cash_to_point().'</div>';
+        $tunnel_cost =get_tunnel_cost($data['tunnel_id']);
+
+        $html.='<div class="meta plan_cost_'.$data['tunnel_id'].'" data-toggle="tooltip" title="Tunnel points '.$tunnel_cost.'" style="width:60px;">'.$tunnel_cost.'</div>';
 
         $html.='<span class="not_client_'.$data['tunnel_id'].'">';
         if($data['tunnel_type']!="client"){
+            $html.='<div class="real_ip_meta width-140" data-toggle="tooltip">';
             if( (count($data['real_ip'])>0) || (count($data['installed_real_ips'])>0)){
-                $html.='<div class="real_ip_meta width-140" data-toggle="tooltip">';
-                $html.='<select class="select_real_ip real_ip_'.$data['tunnel_id'].'" style="width:120px!important; height:22px!important;min-height:0px;" data-val="'.($data['active']!=null?$data['active']:-1).'" data-id="'.$data['tunnel_id'].'">'.(count($data['real_ip'])!=0?count($data['real_ip']):"Not assigned");
+                $html.='<div class="real_ip_select_box_'.$data['tunnel_id'].' custom_select_box" data-val="'.($data['active']!=null?$data['active']:-1).'" data-id="'.$data['tunnel_id'].'">';
+
+                if($data['real_ip'][0]['ip']==""){
+                    $html.='<div class="custom_option active_option">';
+                    $html.='<div class="display_value" data-value="">Not assigned</div>';
+                    $html.='<div class="assign_action_btn" data-id="'.$data['tunnel_id'].'">';
+                    $html.='<i class="fa fa-fw fa-plus"></i>';
+                    $html.='</div>';
+                    $html.='</div>';
+                }else{
+                    $html.='<div class="custom_option active_option">';
+                    $html.='<div class="display_value" data-value="'.$data['real_ip'][0]['ip'].'">'.$data['real_ip'][0]['ip'].'</div>';
+                    $html.='<div class="action_btn" data-id="'.$data['tunnel_id'].'">';
+                    $html.='<i class="fa fa-fw fa-times"></i>';
+                    $html.='</div>';
+                    $html.='</div>';
+                }
+                $html.='<div class="custom_option inactive_option hidden">';
+                $html.='<div class="display_value" data-value="">None</div>';
+                $html.='</div>';
+
+                $i=0;
                 foreach($data['real_ip'] as $real_ip){
-                    $html.='<option value="'.$real_ip.'">'.$real_ip.'</option>';
+                    if($i>0){
+                        $html.='<div class="custom_option inactive_option inactive_option_'.$real_ip['acl_id'].' hidden" data-aid="'.$real_ip['acl_id'].'">';
+                        $html.='<div class="display_value" data-value="'.$real_ip['ip'].'">'.$real_ip['ip'].'</div>';
+                        $html.='<div class="action_btn" data-tid="'.$data['tunnel_id'].'">';
+                        $html.='<i class="fa fa-fw fa-times"></i>';
+                        $html.='</div>';
+                        $html.='</div>';
+                    }
+                    $i++;
                 }
                 foreach($data['installed_real_ips'] as $real_ip){
-                    $html.='<option value="'.$real_ip.'" disabled>'.$real_ip.'</option>';
+                    $html.='<div class="custom_option inactive_option inactive_option_'.$real_ip['acl_id'].' hidden" data-aid="'.$real_ip['acl_id'].'">';
+                    $html.='<div class="display_value" data-value="'.$real_ip['ip'].'">'.$real_ip['ip'].'</div>';
+                    $html.='<div class="action_btn">';
+                    $html.='<i class="fa fa-fw fa-times"></i>';
+                    $html.='</div>';
+                    $html.='</div>';
                 }
-                $html.='</select>';
-            }else{
-                $html.='<div class="meta width-140" data-toggle="tooltip">';
-                $html.='<a href="javascript:void(0);" class="real_ip real_ip_'.$data['tunnel_id'].'" style="color:#1B1E24" data-val="-1" data-id="'.$data['tunnel_id'].'">Not assigned</a>';
+                $html.='</div>';
+            }else{ //if real ip is not assigned
+                $html.='<div class="real_ip_select_box_'.$data['tunnel_id'].' custom_select_box" data-val="'.($data['active']!=null?$data['active']:-1).'" data-id="'.$data['tunnel_id'].'">';
+                $html.='<div class="custom_option active_option">';
+                $html.='<div class="display_value" data-value="">Not assigned</div>';
+                $html.='<div class="assign_action_btn" data-id="'.$data['tunnel_id'].'">';
+                $html.='<i class="fa fa-fw fa-plus"></i>';
+                $html.='</div>';
+                $html.='</div>';
+
+                $html.='<div class="custom_option inactive_option hidden">';
+                $html.='<div class="display_value" data-value="">None</div>';
+                $html.='</div>';
+
+                $html.='</div>';
             }
             $html.='</div>';
-            $html.='<div class="meta cursor">'.gateway($data['gateway_mode'], $data['tunnel_id'], $data['tunnel_type']).'</div>';
+            $html.='<div class="meta cursor width-60">'.gateway($data['gateway_mode'], $data['tunnel_id'], $data['tunnel_type']).'</div>';
         } else {
             $html.='<div class="meta width-140" data-toggle="tooltip" data-placement="right" title="'.($data['tunnel_type']!="client"?"":"To activate this field upgrade to server").'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'" data-id="'.$data['tunnel_id'].'">'.($data['tunnel_type']!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>").'</a></div>';
 
-            $html.='<div class="meta" data-toggle="tooltip" data-placement="right" title="'.($data['tunnel_type']!="client"?"":"To activate this field upgrade to server").'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'" data-id="'.$data['tunnel_id'].'">'.($data['tunnel_type']!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>").'</a></div>';
+            $html.='<div class="meta width-60" data-toggle="tooltip" data-placement="right" title="'.($data['tunnel_type']!="client"?"":"To activate this field upgrade to server").'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'" data-id="'.$data['tunnel_id'].'">'.($data['tunnel_type']!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>").'</a></div>';
         }
-        $html.='<div class="meta cursor float-right">'.status($data['status'], $data['tunnel_id']).'</div>';
-        $html.='</span>';
 
-        $html.='</div>';
+
         $html.='<div class="tunnel_searchable_switch_block">';
         $html.='<input id="cmn-toggle-tunnel-'.$data['tunnel_id'].'" class="cmn-toggle cmn-toggle-round tunnel_searchable_switch" data-tunnel_id="'.$data['tunnel_id'].'" type="checkbox" '.($data["is_searchable"]==1?"checked":"").'>';
         $html.='<label for="cmn-toggle-tunnel-'.$data['tunnel_id'].'"></label>';
+        $html.='</div>';
+
+
+        $html.='<div class="meta cursor float-right">'.status($data['status'], $data['tunnel_id']).'</div>';
+        $html.='</span><div class="meta float-right" data-toggle="tooltip" title="Delete this tunnel" ><a href="javascript:void(0);" data-id="'.$data['tunnel_id'].'" class="delete_tunnel delete_tunnel_'.$data['tunnel_id'].'" data-type="'.$data['tunnel_type'].'"><i class="fa fa-fw fa-trash" style="color:#DA3838"></i></a></div>';
+
         $html.='</div>';
         $html.='</div>';
 
         //tunnel acl
 
         $html.='<div class="tunnel_acl_div_'.$data['tunnel_id'].' tunnel_acl_div" data-id="'.$data['tunnel_id'].'" style="display:none;">';
-        $html.='<label style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 20px;">Source base<span class="source_no_data_p_'.$data['tunnel_id'].'" style="color: #ea4335; font-size: 15px;"></span>&nbsp;&nbsp;<input type="button" class="btn btn-xs btn-primary acl_destination_search_btn" value="Search ACL" data-tid="'.$data['tunnel_id'].'" style="margin-bottom: 3px;"/></label>';
+        $html.='<label style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 10px;">Source base<span class="source_no_data_p_'.$data['tunnel_id'].'" style="color: #ea4335; font-size: 15px;"></span>&nbsp;&nbsp;<input type="button" class="btn btn-xs btn-primary acl_destination_search_btn" value="Search ACL" data-tid="'.$data['tunnel_id'].'" style="margin-bottom: 3px;"/></label>';
         $html.='<div class="source_acl_content_'.$data['tunnel_id'].'"></div>';
         $html.='<label  style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 20px;margin-top: 5px;">Destination base<span class="destination_no_data_p_'.$data['tunnel_id'].'" style="color: #ea4335; font-size: 15px;"></span></label>';
         $deststate = ($data['tunnel_type']!="client"?"":"disabled");
@@ -790,7 +905,7 @@ function addTunnel($data, $token){
        }else{
            $subnet_row=$subnet_res->fetch_assoc();
            $subnet_ip = $subnet_row['subnet'];
-
+           $db->query("UPDATE `server_subnets` SET `used_ips`='1'  WHERE `subnet`='".$subnet_ip."'");
             $tunnel[0]['uname']=$m;
             $tunnel[0]['upass']=$n;
             $tunnel[0]['cloud_id']=$data['cloud_id'];
@@ -804,6 +919,7 @@ function addTunnel($data, $token){
             $tunnel[0]['username']=$m;
             $tunnel[0]['password']=$n;
             $tunnel[0]['token']=$token;
+            $tunnel[0]['location']=0;
        }
        //return array("status" => 0, 'data' => 'Unexpected error occured.');
        $res=remote("", "add_new_tunnel", $tunnel, "a", $token);
@@ -848,7 +964,6 @@ function add_server_clone($clone_id, $token){
           $db->query("UPDATE `server_subnets` SET `used_ips`='1'  WHERE `subnet`='".$subnet_clone."'");
           return array("status"=>1, "data"=>"Your request under process, please wait...", 'message_type'=>'reply', "type"=>"add_server_clone", "uid"=>$row_clone['customer_id'], "value"=>$tunnel);
         }
-      //}
   }else{
     return array("status"=>0, "data"=>"Unexpected error occured, try again");
   }
@@ -1022,12 +1137,11 @@ function request_real_ip($data, $token){
   if($real_num>0){
     $real_row=$real_res->fetch_assoc();
     //if($db->query("UPDATE `tunnels_data` SET `real_ip`='".$real_row['real_ip']."' WHERE `tunnel_id`=".$data['id'])){
-
       $arr=array("id"=>$data['id'], "real_ip"=>$real_row['real_ip']);
       $res=remote($data['id'], "request_real_ip", $arr, "b", $token);
       // $res=remote($_SESSION['user_id'], $data['id'], "request_real_ip", array("id"=>$data['id'], "real_ip"=>$real_row['real_ip']), "b");
       if($res==1){
-        $db->query("UPDATE `real_ip_list` SET `in_use`=1 WHERE `real_ip`='".$real_row['real_ip']."'");
+        //$db->query("UPDATE `real_ip_list` SET `in_use`=1 WHERE `real_ip`='".$real_row['real_ip']."'");
         return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'request_real_ip', 'id'=>$data['id'], 'value'=>$real_row['real_ip']);
       }
     //}
@@ -1035,10 +1149,38 @@ function request_real_ip($data, $token){
     return array('status'=>0, 'data'=>'Real ip not assigned, Try again');
   }
 }
+function clear_tunnel_real_ip($data, $token){
+    global $db;
+    $arr=array("id"=>$data['id'], "real_ip"=>$data['real_ip']);
+    //print_r($arr);die;
+    $res=remote($data['id'], "clear_tunnel_real_ip", $arr, "b", $token);
+    if($res==1){
+        //$db->query("UPDATE `real_ip_list` SET `in_use`=0 WHERE `real_ip`='".$data['real_ip']."'");
+        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'clear_tunnel_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
+    }
+}
+function change_tunnel_real_ip($data, $token){
+    global $db;
+    $arr=array("id"=>$data['id'], "real_ip"=>$data['real_ip']);
+    //print_r($arr);die;
+    $res=remote($data['id'], "change_tunnel_real_ip", $arr, "b", $token);
+    if($res==1){
+        //$db->query("UPDATE `real_ip_list` SET `in_use`=0 WHERE `real_ip`='".$data['real_ip']."'");
+        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
+    }
+}
+function clear_acl_real_ip($data, $token){
+    global $db;
+    $arr=array("id"=>$data['id'],"aid"=>$data['aid'], "real_ip"=>$data['real_ip']);
+    //print_r($arr);die;
+    $res=remote($data['id'], "clear_acl_real_ip", $arr, "b", $token);
+    if($res==1){
+        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'clear_acl_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
+    }
+}
 
 function get_server_name(){
   global $db;
-
     $location_arr=array();
   //echo "SELECT `id`,`server_name` FROM `remote_server_list` WHERE `remote_group`<>'a'";
   $sql=$db->query("SELECT `id`,`server_name` FROM `remote_server_list` WHERE `remote_group`<>'a'");
@@ -1048,25 +1190,94 @@ function get_server_name(){
   return $location_arr;
 }
 
-function packages($type, $plan_id, $id){
-  global $db;
-  if($type=="server"){
-    $t_qry=$db->query("SELECT `real_ip` FROM `tunnels_data` WHERE `tunnel_id`=".$id);
-    $t_qry_row=$t_qry->fetch_assoc();
-    $real_chk=$db->query("SELECT `is_active` FROM `real_ip_list` WHERE `real_ip`='".$t_qry_row['real_ip']."'");
-    $real_chk_row=$real_chk->fetch_assoc();
-    if(isset($t_qry_row['real_ip']) && $real_chk_row['is_active']==1){
-      $sqlPackage=$db->query("SELECT SUM(`tunnel` + `gateway` + `bidirection` + `realip`) total FROM `package_data` WHERE `plan_id`=".$plan_id);
-    }else {
-      $sqlPackage=$db->query("SELECT SUM(`tunnel` + `gateway` + `bidirection`) total FROM `package_data` WHERE `plan_id`=".$plan_id);
+function packages($data){
+/*    ,$type, $plan_id, $id*/
+    //print_r($data);
+    global $db;
+    $tunnel_cost=0;
+    $cost_data=array();
+    $user_query=$db->query("SELECT * FROM `package_data` JOIN `plans` ON `plans`.`id`=`package_data`.`plan_id`");
+    while($user_query_array=$user_query->fetch_assoc()){
+        $cost_data[]=$user_query_array;
     }
-    $rowPackage=$sqlPackage->fetch_assoc();
-  } else if($type=="client"){
-    $sqlPackage=$db->query("SELECT SUM(`tunnel` + `bidirection`) total FROM `package_data` WHERE `plan_id`=".$plan_id);
-    $rowPackage=$sqlPackage->fetch_assoc();
-  }
-  //print_r($package);
-  return $rowPackage['total'];
+    if(count($cost_data)==0){
+        return 0;
+    }elseif(count($cost_data)==1){
+        $cost_data[]=$cost_data[0];
+    }
+
+    if(!isset($data['plan_id'])){
+        return 0;
+    }
+
+    if($data['plan_id']!=1){
+        $data['plan_id']=0;
+    }
+    /*if($data['sponsor']==0){*/
+        $tunnel_cost+=intval($cost_data[$data['plan_id']]['tunnel']);
+
+        if($data['route']==1){
+            $tunnel_cost+=intval($cost_data[$data['plan_id']]['route_tag']);
+        }
+        if($data['internet']==1){
+            $tunnel_cost+=intval($cost_data[$data['plan_id']]['internet_tag']);
+        }
+        if($data['tunnel_type']=="server"){
+            $tunnel_cost+=intval($cost_data[$data['plan_id']]['server_tag']);
+            if($data['gateway_mode']==1){
+                $tunnel_cost+=intval($cost_data[$data['plan_id']]['gateway']);
+            }
+            $real_ip_cnt=0;
+            if($data['real_ip'][0]['ip']=="" || $data['real_ip'][0]['ip']==0){
+                $real_ip_cnt=-1;
+            }
+            $real_ip_cnt+=count($data['real_ip'])+count($data['installed_real_ips']);
+            $tunnel_cost+=intval($cost_data[$data['plan_id']]['realip']) * $real_ip_cnt;
+        }
+        /*if($data['bidirectional_mode']!=0){
+            $tunnel_cost+=intval($cost_data[$data['plan_id']]['bidirection']);
+        }*/
+    $route_path_cnt=get_route_path_cnt($data['tunnel_id']);
+    $tunnel_cost+=intval($cost_data[$data['plan_id']]['route_path'])*$route_path_cnt;
+
+
+    /*}*/
+    return $tunnel_cost;
+}
+function get_route_path_cnt($tunnel_id){
+    $path_cnt=0;
+    $acls=get_acl_info($tunnel_id);
+    foreach($acls as $acl){
+        if(isset($acl['c_routing']['country']['value']) && intval($acl['c_routing']['country']['value'])>=1){
+            //print_r(intval($acl['c_routing']['country']['value']));
+            $path_cnt++;
+        }
+    }
+    return $path_cnt;
+}
+
+function get_cloud_cost($cloud_id,$tunnel_ids_str){
+    /*$cloud_cost=0;
+    $tunnel_ids=explode(",",$tunnel_ids_str);
+    foreach ($tunnel_ids as $tunnel_id){
+        $tunnel_data=get_tunnels_data($tunnel_id);
+        $cloud_cost+=intval(packages($tunnel_data[0]));
+    }*/
+    //return $cloud_cost;
+    global $db;
+    $cloud_cost=0;
+    $tunnel_sql = "SELECT `tunnel_id` FROM `tunnels_data` WHERE `cloud_id`='".$db->real_escape_string($cloud_id)."' and `user_token`='".$db->real_escape_string($_SESSION['token'])."' and `tunnels_data`.`is_deleted`=0";
+    $tunnel_query=$db->query($tunnel_sql);
+    while($row=$tunnel_query->fetch_assoc()){
+        $tunnel_id=$row['tunnel_id'];
+        $cloud_cost+=get_tunnel_cost($tunnel_id);
+    }
+    return $cloud_cost;
+}
+function get_tunnel_cost($tunnel_id){
+    $tunnel_data=get_tunnels_data($tunnel_id);
+    $tunnel_cost=intval(packages($tunnel_data[0])) * cash_to_point();
+    return $tunnel_cost;
 }
 
 function change_tunnel($data){
@@ -1315,123 +1526,71 @@ function voucher_edit($data){
     return $sql->fetch_assoc();
   }
 }
-
-function remote_server_delete($data){
-  global $db;
-  if($db->query("DELETE FROM `remote_server_list` WHERE `id`=".$data['id'])){
-    return 1;
-  }
-}
-
-function test_all_remote(){
-  global $db;
-  $arr=array();
-  $sql=$db->query("SELECT * FROM `remote_server_list`");
-  if($sql->num_rows>0){
-      while($res=$sql->fetch_assoc()){
-          $conn = new mysqli($res['remote_ip'], $res['server_uname'], $res['server_pass']);
-          if ($conn->connect_error) {
-              if($db->query("UPDATE `remote_server_list` SET `is_active`=0 WHERE `id`=".$res['id'])){
-                  $arr[$res["id"]]=array("result"=>0);
-              }
-          }else{
-              if($db->query("UPDATE `remote_server_list` SET `is_active`=1 WHERE `id`=".$res['id'])){
-                  $arr[$res["id"]]=array("result"=>1);
-              }
-          }
-          $subject ='Remote Server';
-           $message ='<html>
-               <head>
-                   <title>"'.$subject.'"</title>
-               </head>
-               <body>
-                    Dear sir/madam,<br>
-                        "'.$res['remote_ip'].'" Remote server status has been changed, please check.<br><br>
-                    Thank you,<br>
-                    Demovpn team.
-               </body>
-           </html>';
-           $headers = "MIME-Version: 1.0" . "\r\n";
-           $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-           $headers .= 'From:DemoVPN <demovpn@comenzarit.com>' . "\r\n";
-           mail($_POST['email'],$subject,$message,$headers);
-      }
-      $conn->close();
-      return $arr;
-  }
-}
-
 function delete_user_by_admin($customer_id){
-  global $db;
-  $delete_qry="DELETE FROM `customers_data` WHERE `customer_id`=".$customer_id;
-  $delete_succ=$db->query($delete_qry);
-  return $delete_succ;
+    global $db;
+    $delete_qry="DELETE FROM `customers_data` WHERE `customer_id`=".$customer_id;
+    $delete_succ=$db->query($delete_qry);
+    return $delete_succ;
 }
-
 function delete_voucher_by_admin($id){
-  global $db;
-  $delete_qry="DELETE FROM `voucher` WHERE `id`=".$id;
-  $delete_succ=$db->query($delete_qry);
-  return $delete_succ;
+    global $db;
+    $delete_qry="DELETE FROM `voucher` WHERE `id`=".$id;
+    $delete_succ=$db->query($delete_qry);
+    return $delete_succ;
 }
-
 function delete_vpn_by_admin($id){
-  global $db;
-  $delete_qry="DELETE FROM `server_subnets` WHERE `cloud_id`=".$id;
-  $delete_succ=$db->query($delete_qry);
-  return $delete_succ;
+    global $db;
+    $delete_qry="DELETE FROM `server_subnets` WHERE `cloud_id`=".$id;
+    $delete_succ=$db->query($delete_qry);
+    return $delete_succ;
 }
-
 function delete_real_by_admin($id){
-  global $db;
-  $delete_qry="DELETE FROM `real_ip_list` WHERE `real_ip`=".$id;
-  $delete_succ=$db->query($delete_qry);
-  return $delete_succ;
+    global $db;
+    $delete_qry="DELETE FROM `real_ip_list` WHERE `real_ip`=".$id;
+    $delete_succ=$db->query($delete_qry);
+    return $delete_succ;
 }
-
 function admin_login($data){
-  global $db;
-  $usrnm = $data['email'];
-  $encpass = $data['password'];
-  $qry = "SELECT * FROM `admin` WHERE uname='".$usrnm."' AND password='".$encpass."'";
-  $res = $db->query($qry);
-  if($res->num_rows > 0){
-    return $res->fetch_assoc();
-  }else{
-    $pass = $encpass;
-    $pass = substr($pass, 0, 2) . $pass . substr($pass, -2, 2);
-    $uqry = "SELECT * FROM `customers_data` WHERE `email`='".$usrnm."' AND `password`='".md5($pass)."' AND `is_admin`=1";
-    $ures = $db->query($uqry);
-    if($ures->num_rows > 0){
-      return $ures->fetch_assoc();
+    global $db;
+    $usrnm = $data['email'];
+    $encpass = $data['password'];
+    $qry = "SELECT * FROM `admin` WHERE uname='".$usrnm."' AND password='".$encpass."'";
+    $res = $db->query($qry);
+    if($res->num_rows > 0){
+        return $res->fetch_assoc();
     }else{
-      return 0;
+        $pass = $encpass;
+        $pass = substr($pass, 0, 2) . $pass . substr($pass, -2, 2);
+        $uqry = "SELECT * FROM `customers_data` WHERE `email`='".$usrnm."' AND `password`='".md5($pass)."' AND `is_admin`=1";
+        $ures = $db->query($uqry);
+        if($ures->num_rows > 0){
+            return $ures->fetch_assoc();
+        }else{
+            return 0;
+        }
     }
-  }
 }
-
 function login_as_user($data){
-   global $db;
-   //echo "SELECT COUNT(*) AS `total`, `login_type`, `email`, `password`, `customer_id` FROM `customers_data` WHERE `email`='" . $db->real_escape_string($data['email']) . "' AND `is_active`='1' AND `is_verfied`=1";
-   $sql = $db->query("SELECT COUNT(*) AS `total`, `login_type`, `name`, `email`, `token`, `password`, `customer_id` FROM `customers_data` WHERE `customer_id`='" .$data['id'] . "' AND `is_active`='1' AND `is_verfied`=1");
-   $row = $sql->fetch_assoc();
+    global $db;
+    //echo "SELECT COUNT(*) AS `total`, `login_type`, `email`, `password`, `customer_id` FROM `customers_data` WHERE `email`='" . $db->real_escape_string($data['email']) . "' AND `is_active`='1' AND `is_verfied`=1";
+    $sql = $db->query("SELECT COUNT(*) AS `total`, `login_type`, `name`, `email`, `token`, `password`, `customer_id` FROM `customers_data` WHERE `customer_id`='" .$data['id'] . "' AND `is_active`='1' AND `is_verfied`=1");
+    $row = $sql->fetch_assoc();
 
-   if ($row['total'] == 1) {
-    $_SESSION['vpn_user'] = md5($row['customer_id']);
-    $_SESSION['user_id'] = $row['customer_id'];
-    $_SESSION['uname']=explode(" ", $row['name']);
-    $_SESSION['email'] = $row['email'];
-    $_SESSION['token'] = $row['token'];
-    $_SESSION['user_type'] = 'customer';
-    header("location:contacts.php");
-  }else{
-      return array("status" => 0, 'data' => 'User not exist', 'type'=>'login', 'message_type'=>'reply', 'value'=>array());
-   }
+    if ($row['total'] == 1) {
+        $_SESSION['vpn_user'] = md5($row['customer_id']);
+        $_SESSION['user_id'] = $row['customer_id'];
+        $_SESSION['uname']=explode(" ", $row['name']);
+        $_SESSION['email'] = $row['email'];
+        $_SESSION['token'] = $row['token'];
+        $_SESSION['user_type'] = 'customer';
+        header("location:contacts.php");
+    }else{
+        return array("status" => 0, 'data' => 'User not exist', 'type'=>'login', 'message_type'=>'reply', 'value'=>array());
+    }
 }
-
 function get_tunnels($token){
-  global $db;
-  $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE  `tunnels_data`.`user_token`='".$db->real_escape_string($token)."' and `tunnels_data`.`is_deleted`=0";
+    global $db;
+    $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE  `tunnels_data`.`user_token`='".$db->real_escape_string($token)."' and `tunnels_data`.`is_deleted`=0";
     //echo $tunnel." order by group_id asc ";die;
     $sql=$db->query($tunnel." order by group_id asc, group_id");
     $data=array();
@@ -1440,14 +1599,12 @@ function get_tunnels($token){
     }
     return array("type"=>"get_tunnels", "message_type"=>"reply", "data"=>$data);
 }
-
 function set_def_cash($data){
     global $db;
     if($db->query("UPDATE `settings` SET `settings_value`=".$data['dcash']." WHERE `settings_name`='default_cash'")){
         return true;
     }
 }
-
 function set_point_val($data){
     global $db;
     if($db->query("UPDATE `settings` SET `settings_value`=".$data['dcash']." WHERE `settings_name`='cast_to_point'")){
@@ -1501,1654 +1658,5 @@ function check_acl_status($tunnel_id,$acl_id){
     }
     return $result;
 }
-function get_acl_info($id){
-    global $db;
-    $default_acl_id=0;
-    $default_acl_res = $db->query("SELECT `default_acl` FROM `tunnels_data` WHERE `tunnel_id`=".$id);
-    if($default_acl_res->num_rows>0){
-        $default_acl=$default_acl_res->fetch_assoc();
-        $default_acl_id=$default_acl['default_acl'];
-    }
-
-    $arr=array();
-    $cur_tunnel_id=$id;
-    $res = $db->query("SELECT `id` FROM `tunnel_acl_relation` WHERE `tunnel_id`=".$id);
-    $val = '';
-    $res_shared_acl = $db->query("SELECT `acl_id` FROM `user_acl_relation` WHERE `tunnel_id`=".$id);
-    $val_shared_acl="";
-    if($res->num_rows > 0 || $res_shared_acl->num_rows > 0){
-      while($row = $res->fetch_assoc()){
-          $val.=$row['id'].",";
-      }
-      while($row_shared_acl = $res_shared_acl->fetch_assoc()){
-          $val.=$row_shared_acl['acl_id'].",";
-      }
-
-      $val=rtrim($val, ",");
-
-        //print_r($val);
-
-      $main_query="SELECT * FROM `tunnel_acl_relation`
-            JOIN `destination` ON `tunnel_acl_relation`.`id` = `destination`.`acl_id`
-            JOIN `d_final` ON `tunnel_acl_relation`.`id` = `d_final`.`acl_id`
-            JOIN `c_firewall` ON `tunnel_acl_relation`.`id` = `c_firewall`.`acl_id`
-            JOIN `c_forwarding` ON `tunnel_acl_relation`.`id` = `c_forwarding`.`acl_id`
-            JOIN `c_qos` ON `tunnel_acl_relation`.`id` = `c_qos`.`acl_id`
-            JOIN `c_routing` ON `tunnel_acl_relation`.`id` = `c_routing`.`acl_id`
-            JOIN `source` ON `tunnel_acl_relation`.`id` = `source`.`acl_id`
-            JOIN `s_firewall` ON `tunnel_acl_relation`.`id` = `s_firewall`.`acl_id`
-            JOIN `s_aliasing` ON `tunnel_acl_relation`.`id` = `s_aliasing`.`acl_id`
-            JOIN `s_qos` ON `tunnel_acl_relation`.`id` = `s_qos`.`acl_id`
-            JOIN `s_tos` ON `tunnel_acl_relation`.`id` = `s_tos`.`acl_id`
-            WHERE `tunnel_acl_relation`.`id`
-            IN (".$val.")";
-      $res1 = $db->query($main_query);
-      while($row1 = $res1->fetch_assoc()){
-          $arr[] = $row1;
-      }
-        //print_r($arr);
-      $acl_info = array();
-      foreach ($arr as $key => $value) {
-
-          $id = $value['acl_id'];
-          $acl_info[$id]=array();
-          $acl_info[$id]["tunnel_id"]=$value['tunnel_id'];
-          $acl_info[$id]["is_installed"]=is_acl_installed($cur_tunnel_id,$value['id']);
-
-          if($acl_info[$id]["is_installed"]==1){
-              $acl_info[$id]["is_subscribed"] = 0;
-          }else{
-              $acl_info[$id]["is_subscribed"]=is_acl_subscribed($cur_tunnel_id,$value['id']);
-          }
-
-          $acl_info[$id]["status"]=check_acl_status($cur_tunnel_id,$value['id']);
-          $acl_info[$id]["acl_name"]=$value['acl_name'];
-          $acl_info[$id]["acl_description"]=$value['acl_description'];
-          $acl_info[$id]["is_searchable"]=$value['is_searchable'];
-          $acl_info[$id]["default_acl_id"]=$default_acl_id;
-          unset($value['id']);
-          unset($value['acl_id']);
-          unset($value['tunnel_id']);
-          unset($value['creation_time']);
-          unset($value['is_active']);
-          unset($value['acl_name']);
-          unset($value['acl_description']);
-          unset($value['is_searchable']);
-
-          foreach ($value as $k => $val) { //k: this is database name
-            $key = explode("-", $k);
-            $base = $key[0];
-            if(!isset($acl_info[$id][$base])){
-                $acl_info[$id][$base]=array();
-            }
-            $label = ucwords(str_replace('_', ' ', $key[1]));
-            //if($val>0){
-                $acl_info[$id][$base][$key[1]] = array('label'=>readLabel($key), 'value'=>$val);
-            //}
-          }
-      }
-      //print_r($acl_info);die;
-      return $acl_info;
-  }
-  else{
-      return array('status' =>0 , 'message'=>'No ACL found for this Tunnel');
-  }
-
-}
-function get_own_acl_info($id){
-    global $db;
-    $arr=array();
-    $cur_tunnel_id=$id;
-    $res = $db->query("SELECT `id` FROM `tunnel_acl_relation` WHERE `tunnel_id`=".$id);
-    $val = '';
-    if($res->num_rows > 0){
-        while($row = $res->fetch_assoc()){
-            $val.=$row['id'].",";
-        }
-
-        $val=rtrim($val, ",");
-
-        $main_query="SELECT * FROM `tunnel_acl_relation`
-            JOIN `destination` ON `tunnel_acl_relation`.`id` = `destination`.`acl_id`
-            JOIN `d_final` ON `tunnel_acl_relation`.`id` = `d_final`.`acl_id`
-            JOIN `c_firewall` ON `tunnel_acl_relation`.`id` = `c_firewall`.`acl_id`
-            JOIN `c_forwarding` ON `tunnel_acl_relation`.`id` = `c_forwarding`.`acl_id`
-            JOIN `c_qos` ON `tunnel_acl_relation`.`id` = `c_qos`.`acl_id`
-            JOIN `c_routing` ON `tunnel_acl_relation`.`id` = `c_routing`.`acl_id`
-            JOIN `source` ON `tunnel_acl_relation`.`id` = `source`.`acl_id`
-            JOIN `s_firewall` ON `tunnel_acl_relation`.`id` = `s_firewall`.`acl_id`
-            JOIN `s_aliasing` ON `tunnel_acl_relation`.`id` = `s_aliasing`.`acl_id`
-            JOIN `s_qos` ON `tunnel_acl_relation`.`id` = `s_qos`.`acl_id`
-            JOIN `s_tos` ON `tunnel_acl_relation`.`id` = `s_tos`.`acl_id`
-            WHERE `tunnel_acl_relation`.`id`
-            IN (".$val.")";
-        $res1 = $db->query($main_query);
-        while($row1 = $res1->fetch_assoc()){
-            $arr[] = $row1;
-        }
-        $acl_info = array();
-        foreach ($arr as $key => $value) {
-            $id = $value['id'];
-            $acl_info[$id]=array();
-            $acl_info[$id]["tunnel_id"]=$value['tunnel_id'];
-
-            unset($value['id']);
-            unset($value['acl_id']);
-            unset($value['tunnel_id']);
-            unset($value['creation_time']);
-            unset($value['is_active']);
-
-            foreach ($value as $k => $val) {
-                $key = explode("-", $k);
-                $base = $key[0];
-                if(!isset($acl_info[$id][$base])){
-                    $acl_info[$id][$base]=array();
-                }
-                $label = ucwords(str_replace('_', ' ', $key[1]));
-                $acl_info[$id][$base][$key[1]] = array('label'=>readLabel($key), 'value'=>$val);
-            }
-        }
-        return $acl_info;
-    }
-    else{
-        return array();
-    }
-
-}
-function readLabel($key) {
-    $label = ucwords(str_replace('_', ' ', $key[1]));
-    $result = array(
-     'full' => $label,
-     'short' => ucwords(mb_substr($key[1], 0, 1, 'utf-8'))
-     );
-    if($key[0] == 'destination')
-    {
-        if($key[1] == 'real_ip'){
-            $result = array(
-                'full' => 'Real Ip',
-                'short' => 'R'
-            );
-        }elseif($key[1] == 'this_tunnel'){
-            $result = array(
-                'full' => 'This tunnel',
-                'short' => 'T'
-            );
-        }
-
-    }
-    elseif($key[0] == 'source' && $key[1] == 'my_cloud')
-    {
-        if($key[1] == 'my_cloud')
-            $result = array(
-                'full' => 'this cloud',
-                'short' => 'T'
-            );
-    }
-    else if($key[0] == 'source')
-    {
-        if($key[1] == 'my_cloud')
-            $result = array(
-                'full' => $label,
-                'short' => 'C'
-            );
-        if($key[1] == 'specific_tunnel')
-            $result = array(
-                'full' => $label,
-                'short' => 'T'
-            );
-        if($key[1] == 'specific_group')
-            $result = array(
-                'full' => $label,
-                'short' => 'G'
-            );
-    }
-    else if($key[1] == 'country')
-        $result = array(
-            'full' => 'Path',
-            'short' => 'P'
-        );
-    return $result;
-}
-function create_new_acl($data){
-    global $db;
-    $res=remote($data['id'], "create_new_acl", $data, "a", $data["token"]);
-    if($res==1){
-      return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'create_new_acl', 'value'=>$data['id']);
-    }
-}
-
-function acl_update($data){
-  global $db;
-  if($db->query("UPDATE `".$data['type']."` SET `".$data['type']."-".$data['name']."`='".$data['val']."' WHERE `acl_id`=".$data['id'])){
-      return true;
-  }
-}
-
-function save_acl_name_description($data){
-    global $db;
-    $sql="UPDATE `tunnel_acl_relation` SET `".$data['field']."`='".$data['value']."' WHERE `id`=".$data['acl_id'];
-    if($db->query($sql)){
-        return true;
-    }
-    return false;
-}
-/////////////////////////////////
-function change_searchable($data){
-    global $db;
-    $sql="";
-    if($data['database']=="customers_data"){
-        $sql="UPDATE `".$data['database']."` SET `".$data['field']."`='".$data['value']."' WHERE `customer_id`=".$data['id'];
-    }elseif($data['database']=="clouds_data"){
-        $sql="UPDATE `".$data['database']."` SET `".$data['field']."`='".$data['value']."' WHERE `cloud_id`=".$data['id'];
-    }elseif($data['database']=="tunnels_data"){
-        $sql="UPDATE `".$data['database']."` SET `".$data['field']."`='".$data['value']."' WHERE `tunnel_id`=".$data['id'];
-    }elseif($data['database']=="tunnel_acl_relation"){
-        $sql="UPDATE `".$data['database']."` SET `".$data['field']."`='".$data['value']."' WHERE `id`=".$data['id'];
-    }
-    if($sql==""){
-        return false;
-    }
-
-    if($db->query($sql)){
-        return true;
-    }
-    return false;
-}
-
-function get_acl_val($data){
-  global $db;
-    if($data['type']=="destination" && $data['name']=="real_ip"){
-        $real_ips=array();
-        $installed_real_ips=array();
-        $current_real_ip=0;
-        $tunnel_id=0;
-        $acl_ids=array();
-        $installed_acl_ids=array();
-        $sql="select td.* from tunnels_data as td, tunnel_acl_relation as tar where tar.tunnel_id=td.tunnel_id and tar.id='".$data['id']."'";
-        $res=$db->query($sql);
-        $result=$res->fetch_assoc();
-        if(count($result)>0){
-            if($result['real_ip']!=""){
-                $real_ips[]=$result['real_ip'];
-            }
-            $tunnel_id=$result['tunnel_id'];
-        }
-        $sql="select id from tunnel_acl_relation where tunnel_id='".$tunnel_id."'";
-        $res=$db->query($sql);
-        while($row=$res->fetch_assoc()){
-            $acl_ids[]=$row['id'];
-        }
-        if(count($acl_ids)>0){
-            $acl_ids_str=implode(",",$acl_ids);
-            $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                if(!in_array($row['destination-real_ip'],$real_ips)){
-                    if($row['destination-real_ip']!=""){
-                        $real_ips[]=$row['destination-real_ip'];
-                    }
-                }
-            }
-        }
-
-
-        $sql="select acl_id from user_acl_relation where tunnel_id='".$tunnel_id."' and status='1'";
-        $res=$db->query($sql);
-        while($row=$res->fetch_assoc()){
-            $installed_acl_ids[]=$row['acl_id'];
-        }
-        if(count($installed_acl_ids)>0){
-            $acl_ids_str=implode(",",$installed_acl_ids);
-            $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                if(!in_array($row['destination-real_ip'],$installed_real_ips)){
-                    if($row['destination-real_ip']!=""){
-                        $installed_real_ips[]=$row['destination-real_ip'];
-                    }
-                }
-            }
-        }
-
-        $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id`=".$data['id'];
-        $res=$db->query($sql);
-        $row=$res->fetch_assoc();
-        $current_real_ip=$row['destination-real_ip'];
-        return json_encode(array('real_ips'=>$real_ips,'installed_real_ips'=>$installed_real_ips,'cur_real_ip'=>$current_real_ip));
-    }else{
-        $res = $db->query("SELECT `".$data['type']."-".$data['name']."` FROM `".$data['type']."` WHERE `acl_id`=".$data['id']);
-        $result = $res->fetch_assoc();
-        return $result[$data['type']."-".$data['name']];
-    }
-
-}
-
-function chk_res($data){
-  global $db;
-  $arr = array();
-  $res = $db->query("SELECT `".$data['type']."-".$data['val']."` FROM `".$data['type']."` WHERE `acl_id`=".$data['id']);
-  $result = $res->fetch_assoc();
-  $arr['option_val'] = $result[$data['type']."-".$data['val']];
-
-  if($data['type']=="destination"){
-    $data['type']="source";
-  } else if($data['type']=="source"){
-    $data['type']="destination";
-  }
-  $res1 = $db->query("SELECT `".$data['type']."-".$data['val']."` FROM `".$data['type']."` WHERE `acl_id`=".$data['id']);
-  $result = $res1->fetch_assoc();
-  $arr['exist_tunnel'] = $result[$data['type']."-".$data['val']];
-
-    $tunnel_id=$_REQUEST['tunnel'];
-    $sql="select `cloud_id` from `tunnels_data` where `tunnel_id`=".$tunnel_id;
-    $res2=$db->query($sql);
-    $result=$res2->fetch_assoc();
-    $cloud_id=$result['cloud_id'];
-    $group_ids=array();
-    $sql="select `group_id` from `tunnels_data` where `cloud_id`=".$cloud_id." group by `group_id` order by `group_id`";
-    $res2=$db->query($sql);
-    while($row=$res2->fetch_assoc()){
-        if(count($row)){
-            $group_ids[]=$row['group_id'];
-        }
-    }
-    $arr['cloud_group_ids'] = $group_ids;
-  return $arr;
-}
-
-function create_acl_clone($data){
-    global $db;
-    $arr=array();
-    $acl_info = array();
-
-    $res1 = $db->query("SELECT *FROM `tunnel_acl_relation`
-          JOIN `destination` ON `tunnel_acl_relation`.`id` = `destination`.`acl_id`
-          JOIN `d_final` ON `tunnel_acl_relation`.`id` = `d_final`.`acl_id`
-          JOIN `c_firewall` ON `tunnel_acl_relation`.`id` = `c_firewall`.`acl_id`
-          JOIN `c_forwarding` ON `tunnel_acl_relation`.`id` = `c_forwarding`.`acl_id`
-          JOIN `c_qos` ON `tunnel_acl_relation`.`id` = `c_qos`.`acl_id`
-          JOIN `c_routing` ON `tunnel_acl_relation`.`id` = `c_routing`.`acl_id`
-          JOIN `source` ON `tunnel_acl_relation`.`id` = `source`.`acl_id`
-          JOIN `s_firewall` ON `tunnel_acl_relation`.`id` = `s_firewall`.`acl_id`
-          JOIN `s_aliasing` ON `tunnel_acl_relation`.`id` = `s_aliasing`.`acl_id`
-          JOIN `s_qos` ON `tunnel_acl_relation`.`id` = `s_qos`.`acl_id`
-          JOIN `s_tos` ON `tunnel_acl_relation`.`id` = `s_tos`.`acl_id`
-          WHERE `tunnel_acl_relation`.`id`=".$data['id']);
-    while($row1 = $res1->fetch_assoc()){
-        $arr[] = $row1;
-    }
-
-
-    foreach ($arr as $key => $value) {
-
-        $id = $value['id'];
-        $acl_info[$id]=array();
-        $acl_info[$id]["tunnel_id"]=$value['tunnel_id'];
-        unset($value['id']);
-        unset($value['acl_id']);
-        unset($value['tunnel_id']);
-        unset($value['creation_time']);
-        unset($value['is_active']);
-
-        foreach ($value as $k => $val) {
-          $key = explode("-", $k);
-          $base = $key[0];
-          if(!isset($acl_info[$id][$base])){
-              $acl_info[$id][$base]=array();
-          }
-          $label = ucwords(str_replace('_', ' ', $key[1]));
-          //if($val>0){
-              $acl_info[$id][$base][$key[1]] = array('label'=>$label, 'value'=>$val);
-          //}
-        }
-    }
-    //print_r($acl_info);die;
-
-    $res=remote($data['tid'], "create_acl_clone", $acl_info, "a", $data["token"]);
-    if($res==1){
-      return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'create_acl_clone', 'value'=>$data['tid']);
-    }
-}
-
-function delete_acl($data){
-    global $db;
-
-    $res=remote($data['tid'], "delete_acl", $data, "a", $data["token"]);
-    if($res==1){
-      return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'delete_acl', 'value'=>$data['id']);
-    }
-    /*if($db->query("DELETE FROM `tunnel_acl_relation` WHERE `id`=".$id)){
-        if($db->query("DELETE FROM `destination` WHERE `acl_id`=".$id)){
-            if($db->query("DELETE FROM `d_final` WHERE `acl_id`=".$id)){
-                if($db->query("DELETE FROM `c_firewall` WHERE `acl_id`=".$id)){
-                    if($db->query("DELETE FROM `c_forwarding` WHERE `acl_id`=".$id)){
-                        if($db->query("DELETE FROM `c_qos` WHERE `acl_id`=".$id)){
-                            if($db->query("DELETE FROM `c_routing` WHERE `acl_id`=".$id)){
-                                if($db->query("DELETE FROM `source` WHERE `acl_id`=".$id)){
-                                    if($db->query("DELETE FROM `s_aliasing` WHERE `acl_id`=".$id)){
-                                        if($db->query("DELETE FROM `s_firewall` WHERE `acl_id`=".$id)){
-                                            if($db->query("DELETE FROM `s_qos` WHERE `acl_id`=".$id)){
-                                                if($db->query("DELETE FROM `s_tos` WHERE `acl_id`=".$id)){
-                                                   return true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }*/
-}
-
-function clear_acl_values($data){
-    global $db;
-
-    $res=remote($data['tid'], "clear_acl_values", $data, "a", $data["token"]);
-    if($res==1){
-      return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'clear_acl_values', 'value'=>$data['id']);
-    }
-}
-
-function save_acl_values($data){
-    //print_r($data);
-  global $db;
-  $res=remote($data['tid'], "save_acl_values", $data, "a", $data["token"]);
-    if($res==1){
-      return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'save_acl_values', 'value'=>$data['id']);
-    }
-}
-
-function change_acl($data){
-    global $db;
-
-    $res=remote($data['tid'], "change_acl", $data, "a", $data["token"]);
-    if($res==1){
-      return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_acl', 'value'=>$data['id']);
-    }
-}
-
-function set_default_acl($data){
-    global $db;
-    $query=$db->query("UPDATE `tunnels_data` SET `default_acl`=".$data['id']." WHERE `tunnel_id`=".$data['tid']);
-
-        return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'This acl is set as default.', 'message_type'=>'reply', 'type'=>'set_default_acl', 'value'=>$data['id']);
-
-    /*$res=remote($data['tid'], "set_default_acl", $data, "a", $data["token"]);
-    if($res==1){
-        return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_acl', 'value'=>$data['id']);
-    }*/
-
-}
-
-
-function point($data){
-  global $db;
-  $point_set = $db->query("SELECT `settings_value` FROM `settings` WHERE `settings_name`='cast_to_point'");
-  $res_point = $point_set->fetch_assoc();
-
-  $res = $db->query("SELECT * FROM `customers_data` WHERE `Cash_amount` >= ".$data['point']/$res_point['settings_value']." AND `customer_id`=".$data['id']);
-  if($res->num_rows>0){
-    $cust_chk = $db->query("SELECT * FROM `customers_data` WHERE `email`='".$data['email']."'");
-    if($cust_chk->num_rows>0){
-      if($db->query("UPDATE `customers_data` SET `Cash_amount` = (`Cash_amount`)+".$data['point']/$res_point['settings_value']." WHERE `email`='".$data['email']."'")){
-          if($db->query("UPDATE `customers_data` SET `Cash_amount` = (`Cash_amount`)-".$data['point']/$res_point['settings_value']." WHERE `customer_id`=".$data['id'])){
-            return 1;
-          }
-      }else{
-        return 0;
-      }
-    }else{
-      return 0;
-    }
-  }else{
-    return 0;
-  }
-}
-
-function send_point_to_friend($data){
-    global $db;
-    $point_set = $db->query("SELECT `settings_value` FROM `settings` WHERE `settings_name`='cast_to_point'");
-    $res_point = $point_set->fetch_assoc();
-
-    $res = $db->query("SELECT * FROM `customers_data` WHERE `Cash_amount` >= ".$data['point']/$res_point['settings_value']." AND `customer_id`=".$data['my_id']);
-    if($res->num_rows>0){
-        $cust_chk = $db->query("SELECT * FROM `customers_data` WHERE `customer_id`='".$data['friend_id']."'");
-        if($cust_chk->num_rows>0){
-            if($db->query("UPDATE `customers_data` SET `Cash_amount` = (`Cash_amount`)+".$data['point']/$res_point['settings_value']." WHERE `customer_id`='".$data['friend_id']."'")){
-                if($db->query("UPDATE `customers_data` SET `Cash_amount` = (`Cash_amount`)-".$data['point']/$res_point['settings_value']." WHERE `customer_id`=".$data['my_id'])){
-                    return 1;
-                }
-            }else{
-                return 0;
-            }
-        }else{
-            return 0;
-        }
-    }else{
-        return 0;
-    }
-}
-
-function shared_tunnel_search($data){
-  global $db;
-    $shared_with_str = $data['shared_with'];
-    $sql="SELECT * FROM `customers_data` WHERE (`display_name`='".$shared_with_str."' OR `tag_id`='".$shared_with_str."' OR `email`='".$shared_with_str."') AND `customer_id`<>'".$data['user_id']."'";
-    $query=$db->query($sql);
-    if($query->num_rows>0){
-        $row=$query->fetch_assoc();
-        $value=$row['customer_id'];
-        $data['shared_with']=$value;
-        return shared_tunnel($data);
-    }else{
-        return "";
-    }
-}
-function shared_tunnel($data){
-    global $db;
-    $shared_with = $data['shared_with'];
-    if($db->query("SELECT * FROM `shared_tunnel` WHERE `user_id`='".$data['user_id']."' AND `tunnel_id`='".$data['t_id']."' AND `cloud_id`='".$data['c_id']."' AND `shared_with`='".$shared_with."'")->num_rows>0){
-        return "Already shared.";
-    }
-    if($sql=$db->query("INSERT INTO `shared_tunnel` (`user_id`,`tunnel_id`,`cloud_id`,`shared_with`) VALUES(".$data['user_id'].",".$data['t_id'].",".$data['c_id'].",'".$shared_with."')")){
-        return "Tunnel shared successful";
-    }else{
-        return "";
-    }
-}
-
-function get_acl_destination_base($email, $id){
-  global $db;
-
-    $arr = array();
-  $sql = $db->query("SELECT * FROM `customers_data` WHERE `email`='".$email."' AND `is_searchable`=1 AND `customer_id`<>".$id);
-
-  if($sql->num_rows>0){
-
-    $sql_get_acl = $db->query("SELECT * FROM `tunnel_acl_relation`
-                JOIN `destination` ON `tunnel_acl_relation`.`id` = `destination`.`acl_id`
-                JOIN `d_final` ON `tunnel_acl_relation`.`id` = `d_final`.`acl_id`
-                JOIN `c_firewall` ON `tunnel_acl_relation`.`id` = `c_firewall`.`acl_id`
-                JOIN `c_forwarding` ON `tunnel_acl_relation`.`id` = `c_forwarding`.`acl_id`
-                JOIN `c_qos` ON `tunnel_acl_relation`.`id` = `c_qos`.`acl_id`
-                JOIN `c_routing` ON `tunnel_acl_relation`.`id` = `c_routing`.`acl_id`
-                JOIN `source` ON `tunnel_acl_relation`.`id` = `source`.`acl_id`
-                JOIN `s_firewall` ON `tunnel_acl_relation`.`id` = `s_firewall`.`acl_id`
-                JOIN `s_aliasing` ON `tunnel_acl_relation`.`id` = `s_aliasing`.`acl_id`
-                JOIN `s_qos` ON `tunnel_acl_relation`.`id` = `s_qos`.`acl_id`
-                JOIN `s_tos` ON `tunnel_acl_relation`.`id` = `s_tos`.`acl_id`
-                WHERE `tunnel_acl_relation`.`is_searchable`=1 AND `tunnel_acl_relation`.`id`
-                IN (SELECT `tunnel_acl_relation`.`id` FROM `customers_data` JOIN `tunnels_data` ON `customers_data`.`token`=`tunnels_data`.`user_token`
-                JOIN `tunnel_acl_relation` ON `tunnels_data`.`tunnel_id`=`tunnel_acl_relation`.`tunnel_id` JOIN `clouds_data` ON `tunnels_data`.`cloud_id`=`clouds_data`.`cloud_id` WHERE `tunnels_data`.`is_deleted`=0 AND `tunnels_data`.`is_searchable`=1 AND `clouds_data`.`is_searchable`=1 AND `customers_data`.`email`='".$email."') ORDER BY `tunnel_acl_relation`.`id`");
-    while($row1 = $sql_get_acl->fetch_assoc()){
-        $arr[] = $row1;
-    }
-      //print_r($arr);die;
-    $acl_info = array();
-    foreach ($arr as $key => $value) {
-
-        $id = $value['acl_id'];
-        $acl_info[$id]=array();
-        $acl_info[$id]["tunnel_id"]=$value['tunnel_id'];
-        $acl_info[$id]["acl_name"]=$value['acl_name'];
-        $acl_info[$id]["acl_description"]=$value['acl_description'];
-
-        unset($value['id']);
-        unset($value['acl_id']);
-        unset($value['tunnel_id']);
-        unset($value['creation_time']);
-        unset($value['is_active']);
-        unset($value['acl_name']);
-        unset($value['acl_description']);
-        unset($value['is_searchable']);
-
-        foreach ($value as $k => $val) {
-            $key = explode("-", $k);
-            $base = $key[0];
-            if(!isset($acl_info[$id][$base])){
-                $acl_info[$id][$base]=array();
-            }
-            $label = ucwords(str_replace('_', ' ', $key[1]));
-            //if($val>0){
-            $acl_info[$id][$base][$key[1]] = array('label'=>readLabel($key), 'value'=>$val);
-            //}
-        }
-    }
-    //print_r($acl_info);die;
-    return $acl_info;
-  }else{
-    return 0;
-  }
-}
-
-function get_customer_acl_destination($id){
-    global $db;
-    $arr = array();
-    $sql = $db->query("SELECT * FROM `customers_data` WHERE `is_searchable`=1 AND `customer_id`=".$id);
-        if($sql->num_rows>0){
-            $sql_get_acl = $db->query("SELECT * FROM `tunnel_acl_relation`
-                JOIN `destination` ON `tunnel_acl_relation`.`id` = `destination`.`acl_id`
-                JOIN `d_final` ON `tunnel_acl_relation`.`id` = `d_final`.`acl_id`
-                JOIN `c_firewall` ON `tunnel_acl_relation`.`id` = `c_firewall`.`acl_id`
-                JOIN `c_forwarding` ON `tunnel_acl_relation`.`id` = `c_forwarding`.`acl_id`
-                JOIN `c_qos` ON `tunnel_acl_relation`.`id` = `c_qos`.`acl_id`
-                JOIN `c_routing` ON `tunnel_acl_relation`.`id` = `c_routing`.`acl_id`
-                JOIN `source` ON `tunnel_acl_relation`.`id` = `source`.`acl_id`
-                JOIN `s_firewall` ON `tunnel_acl_relation`.`id` = `s_firewall`.`acl_id`
-                JOIN `s_aliasing` ON `tunnel_acl_relation`.`id` = `s_aliasing`.`acl_id`
-                JOIN `s_qos` ON `tunnel_acl_relation`.`id` = `s_qos`.`acl_id`
-                JOIN `s_tos` ON `tunnel_acl_relation`.`id` = `s_tos`.`acl_id`
-                WHERE `tunnel_acl_relation`.`is_searchable`=1 AND `tunnel_acl_relation`.`id`
-                IN (SELECT `tunnel_acl_relation`.`id` FROM `customers_data` JOIN `tunnels_data` ON `customers_data`.`token`=`tunnels_data`.`user_token`
-                JOIN `tunnel_acl_relation` ON `tunnels_data`.`tunnel_id`=`tunnel_acl_relation`.`tunnel_id` JOIN `clouds_data` ON `tunnels_data`.`cloud_id`=`clouds_data`.`cloud_id` WHERE `tunnels_data`.`is_deleted`=0 AND `tunnels_data`.`is_searchable`=1 AND `clouds_data`.`is_searchable`=1 AND `customers_data`.`customer_id`='".$id."') ORDER BY `tunnel_acl_relation`.`id`");
-        while($row1 = $sql_get_acl->fetch_assoc()){
-            $arr[] = $row1;
-        }
-        $acl_info = array();
-        foreach ($arr as $key => $value) {
-            if($value['tunnel_id']==$value['destination-specific_tunnel']){
-                $id = $value['acl_id'];
-                $acl_info[$id]=array();
-                $acl_info[$id]["tunnel_id"]=$value['tunnel_id'];
-                $acl_info[$id]["acl_name"]=$value['acl_name'];
-                $acl_info[$id]["acl_description"]=$value['acl_description'];
-
-                unset($value['id']);
-                unset($value['acl_id']);
-                unset($value['tunnel_id']);
-                unset($value['creation_time']);
-                unset($value['is_active']);
-                unset($value['acl_name']);
-                unset($value['acl_description']);
-                unset($value['is_searchable']);
-
-                foreach ($value as $k => $val) {
-                    $key = explode("-", $k);
-
-                    $base = $key[0];
-                    if(!isset($acl_info[$id][$base])){
-                        $acl_info[$id][$base]=array();
-                    }
-                    $acl_info[$id][$base][$key[1]] = array('label'=>readLabel($key), 'value'=>$val);
-                }
-            }
-        }
-        //print_r($acl_info);die;
-        return $acl_info;
-    }else{
-        return array();
-    }
-}
-
-
-function install_acl($data, $u_id){
-  global $db;
-
-  if($db->query("INSERT INTO `user_acl_relation` (`acl_id`,`user_id`,`tunnel_id`) VALUES(".$data['acl_id'].",".$u_id.",".$data['tunnel_id'].")")){
-    echo 1;
-  }else{
-    echo 0;
-  }
-
-}
-
-function cash_to_point(){
-  global $db;
-  $sql_point=$db->query("SELECT `settings_value` FROM `settings` WHERE `settings_name`='cast_to_point'");
-  $point = $sql_point->fetch_assoc();
-  return $point['settings_value'];
-}
-
-function change_profile_picture($file){
-
-  global $db;
-  $path="assets/user_img/";
-  $formats = array("jpg", "png", "gif", "bmp", "jpeg");
-  $name = $file['name'];
-    $size = $file['size'];
-    $tmp = $file['tmp_name'];
-    if (strlen($name)) {
-      $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-      if (in_array($ext, $formats)) {
-        $imgn = time() . rand() . "." . $ext;
-        if (move_uploaded_file($tmp, $path . $imgn)) {
-          $res = $imgn;
-        }
-      } else {
-        $res = '0';
-      }
-    } else {
-      $res = '0';
-    }
-    $original_image = explode('.', $name);
-    return array($res, $original_image[0]);
-}
-
-function get_available_real_ip(){
-    global $db;
-    $sql="select `subnet` from `server_subnets` where `used_ips`=0";
-    $res=$db->query($sql);
-    $row=$res->fetch_assoc();
-    return $row['subnet'];
-}
-
-function cloud_tunnels($id,$name,$token){//id:cloud_id, name:cloud_name
-    global $db;
-    $cloud_ids=array();
-    if($id==0){
-        $sql="select * from `clouds_data` where `user_token`='".$token."' and `is_deleted`=0";
-        $res=$db->query($sql);
-        if($res->num_rows>0){
-            while($row=$res->fetch_assoc()){
-                $cloud_ids[]=array('cloud_id'=>$row['cloud_id'],'cloud_name'=>$row['cloud_name'],'is_searchable'=>$row['is_searchable']);
-            }
-        }
-    }else{
-        $sql="select * from `clouds_data` where `cloud_id`=".$id." and `user_token`='".$token."' and `is_deleted`=0";
-        $res=$db->query($sql);
-        if($res->num_rows>0){
-            while($row=$res->fetch_assoc()){
-                $cloud_ids[]=array('cloud_id'=>$row['cloud_id'],'cloud_name'=>$row['cloud_name'],'is_searchable'=>$row['is_searchable']);
-            }
-        }
-    }
-
-    foreach($cloud_ids as $cloud_data){
-        $cloud_id=$cloud_data['cloud_id'];
-        $cloud_name=$cloud_data['cloud_name'];
-        $is_searchable=$cloud_data['is_searchable'];
-        $_SESSION['cloud']=$cloud_id;
-        $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE `tunnels_data`.`cloud_id`='".$db->real_escape_string($cloud_id)."' and `tunnels_data`.`user_token`='".$db->real_escape_string($_SESSION['token'])."' and `tunnels_data`.`is_deleted`=0";
-        $sql=$db->query($tunnel." order by group_id asc, group_id");
-        $data=array();
-        while($row=$sql->fetch_assoc()){
-            $data[]=$row;
-        }
-        $tunnels_data=array();
-        $tunnel_ids="";
-        foreach($data as $tunnel_data){
-            $tunnel_ids.=$tunnel_data['tunnel_id'];
-            $tunnel_ids.=",";
-
-            $acl_ids=array();
-            $installed_acl_ids=array();
-            $real_ips=array();
-            $installed_real_ips=array();
-
-            $sql="select id from tunnel_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."'";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                $acl_ids[]=$row['id'];
-            }
-            if($tunnel_data['real_ip']!=""){
-                $real_ips[]=$tunnel_data['real_ip'];
-            }
-            unset($tunnel_data['real_ip']);
-            if(count($acl_ids)>0){
-                $acl_ids_str=implode(",",$acl_ids);
-                $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-                $res=$db->query($sql);
-                while($row=$res->fetch_assoc()){
-                    if(!in_array($row['destination-real_ip'],$real_ips)){
-                        if($row['destination-real_ip']!=""){
-                            $real_ips[]=$row['destination-real_ip'];
-                        }
-                    }
-                }
-            }
-            $sql="select acl_id from user_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."' and status=1";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                $installed_acl_ids[]=$row['acl_id'];
-            }
-            if(count($installed_acl_ids)>0){
-                $acl_ids_str=implode(",",$installed_acl_ids);
-                $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-                $res=$db->query($sql);
-                while($row=$res->fetch_assoc()){
-                    if(!in_array($row['destination-real_ip'],$installed_real_ips)){
-                        if($row['destination-real_ip']!=""){
-                            $installed_real_ips[]=$row['destination-real_ip'];
-                        }
-                    }
-                }
-            }
-            $tunnel_data['real_ip']=$real_ips;
-            $tunnel_data['installed_real_ips']=$installed_real_ips;
-            $tunnels_data[]=$tunnel_data;
-        }
-        $tunnel_ids=trim($tunnel_ids,",");
-
-        $sql_contact=$db->query("SELECT `users_data`.`id`, `users_data`.`user_email`, `users_data`.`name` FROM `users_data` INNER JOIN `customer_user_relations` ON `users_data`.`id`=`customer_user_relations`.`user_id` AND `customer_user_relations`.`user_token`='".$db->real_escape_string($_SESSION['token'])."'");
-
-        $html="";
-        while ($row_contact=$sql_contact->fetch_assoc()) {
-            $html.='<option value="'.$row_contact['user_email'].'">'.$row_contact['user_email'].'</option>';
-        }
-
-        $sql_cust=$db->query("SELECT * FROM `customers_data` WHERE `customer_id`<>".$_SESSION['user_id']);
-        $html_cust="";
-        while ($row_cust=$sql_cust->fetch_assoc()) {
-            $html_cust.='<option value="'.$row_cust['customer_id'].'">'.$row_cust['email'].'</option>';
-        }
-        ?>
-        <div class="cloud-row cloud-row-<?php echo($cloud_id); ?>" data-cid="<?php echo($cloud_id); ?>">
-            <div class="cloud-tunnels cloud-tunnels-<?php echo($cloud_id); ?>">
-
-                <div class="page-content">
-                    <div class="content" style="padding-top: 0px;">
-                        <div class="page-title col-md-12">
-                            <div class="cloud-name cloud-name-<?php echo($cloud_id); ?>">
-                                <?php echo($cloud_name); ?>
-                            </div>
-                            <span class="delete_cloud" data-val="<?php echo $cloud_id ?>"><i class="fa fa-trash pull-right cursor" data-toggle="tooltip" data-placement="top" title="Delete this Cloud"></i></span>
-                            <?php
-                            $switch_checked_val=($is_searchable==1?"checked":"");
-                            ?>
-                            <div class="cloud_searchable_switch_block">
-                                <input id="cmn-toggle-cloud-<?php echo $cloud_id; ?>" class="cmn-toggle cmn-toggle-round cloud_searchable_switch" data-cloud_id="<?php echo $cloud_id; ?>" type="checkbox" <?php echo($switch_checked_val); ?>>
-                                <label for="cmn-toggle-cloud-<?php echo $cloud_id; ?>"></label>
-                            </div>
-                        </div>
-
-                        <div class="clearfix"></div>
-                        <div data-uid="<?php echo $_SESSION['user_id'] ?>" class="just list Parks">
-
-                            <div class="list_header">
-                                <div class="meta" data-toggle="tooltip" data-placement="right" title="ACL"><i class="fa fa-eye"></i></div>
-                                <div class="meta" data-toggle="tooltip" data-placement="right" title="Create ACL"><i class="fa fa-cogs"></i></div>
-
-                                <div class="meta" id="SortByName" data-toggle="tooltip" data-placement="right" title="Add tunnels"><a href="javascript:void(0);" data-val="<?php echo $cloud_id; ?>" data-mail="<?php echo $_SESSION['email'] ?>" data-count="0" class="tunnel_add_form_btn"><i class="fa fa-fw fa-plus-circle"></i></a></div>
-
-                                <div class="meta" id="" data-toggle="tooltip" data-placement="right" title="Save all"><a href="javascript:void(0);" data-val="<?php echo $cloud_id; ?>" data-count="0" class="all_tunnel_save_btn"><i class="fa fa-floppy-o"></i></a></div>
-
-                                <div class="meta width-30"><div class="cursor chk_all_tunnel" data-toggle="tooltip" data-placement="bottom" data-val="0" title="Select all tunnels"><i class="fa  fa-square-o"></i></div><a href="javascript:void(0);" class="tunnel_vew_by_tnl tunnel_vew_by_tnl_<?php echo $cloud_id; ?>" data-cloud="<?php echo $cloud_id; ?>" data-dif="client"><i class="fa fa-sort"></i></a></div>
-
-                                <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Groups"><i class="fa fa-fw fa-group"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_grp" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-
-                                <div class="meta width-120" data-toggle="tooltip" data-placement="bottom" title="Tunnel name"><i class="fa fa-cog"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_name" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-                                <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Bidirection mode"><i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_bidirection" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-                                <div class="meta width-80" data-toggle="tooltip" data-placement="bottom" title="Location"><i class="fa fa-fw fa-globe"></i></div>
-                                <div class="meta width-270" data-toggle="tooltip" data-placement="bottom" title="DeV">DeV</div>
-                                <div class="meta width-80" data-toggle="tooltip" data-placement="bottom" title="VPN IP"><i class="fa  fa-map-pin"></i></div>
-                                <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Points" style="margin-left: 4px;"><i class="fa fa-fw fa-dollar"></i></div>
-                                <div class="meta width-80" data-toggle="tooltip" data-placement="bottom" title="Real IP">Real IP</div>
-                                <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Gateway mode">Gateway&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_bidirection" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-                                <div class="meta">&nbsp;</div>
-                            </div>
-                            <form id="tunnels_form_field" style="display:none;">
-                                <input type="button" class="btn btn-sm btn-primary btn_add_tunnel" data-cloud="<?php echo $cloud_id; ?>" value="Submit">
-                                <input type="reset" class="btn btn-sm btn-warning" id="tunnel_form_close_btn" value="Cancel">
-                            </form>
-                            <div class="tunnel_body tunnel_body_<?php echo $cloud_id; ?>">
-                                <?php
-                                //echo tunnels($tunnels_data);
-                                ?>
-                            </div>
-                            <div id="tunnel_body_pagenation_<?php echo $cloud_id; ?>">
-
-                            </div>
-                            <script>
-                                console.log("<?php echo($tunnel_ids); ?>");
-                                $("#tunnel_body_pagenation_<?php echo $cloud_id; ?>").pagination({
-                                    dataSource: [<?php echo($tunnel_ids); ?>],
-                                    pageSize: 5,
-                                    autoHidePrevious: true,
-                                    autoHideNext: true,
-                                    callback: function(data, pagination) {
-                                        console.log(data);
-                                        console.log(pagination);
-                                        // template method of yourself
-                                        var html = tunnel_template(data,".tunnel_body_<?php echo $cloud_id; ?>");
-                                        /*$(".tunnel_body_<?php //echo $cloud_id; ?>").html(html);*/
-                                    }
-                                });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php
-    }
-    if($id==0 || $id==-1){
-        show_shared_tunnels();
-    }
-
-}
-
-function get_tunnel_from_id($tunnel_id){
-    global $db;
-
-        $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE `tunnels_data`.`tunnel_id`='".$tunnel_id."' and `tunnels_data`.`is_deleted`=0";
-        $sql=$db->query($tunnel." order by group_id asc, group_id");
-        $data=array();
-        $tunnel_data=$sql->fetch_assoc();
-
-            $acl_ids=array();
-            $installed_acl_ids=array();
-            $real_ips=array();
-            $installed_real_ips=array();
-
-            $sql="select id from tunnel_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."'";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                $acl_ids[]=$row['id'];
-            }
-            if($tunnel_data['real_ip']!=""){
-                $real_ips[]=$tunnel_data['real_ip'];
-            }
-            unset($tunnel_data['real_ip']);
-            if(count($acl_ids)>0){
-                $acl_ids_str=implode(",",$acl_ids);
-                $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-                $res=$db->query($sql);
-                while($row=$res->fetch_assoc()){
-                    if(!in_array($row['destination-real_ip'],$real_ips)){
-                        if($row['destination-real_ip']!=""){
-                            $real_ips[]=$row['destination-real_ip'];
-                        }
-                    }
-                }
-            }
-            $sql="select acl_id from user_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."' and status=1";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                $installed_acl_ids[]=$row['acl_id'];
-            }
-            if(count($installed_acl_ids)>0){
-                $acl_ids_str=implode(",",$installed_acl_ids);
-                $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-                $res=$db->query($sql);
-                while($row=$res->fetch_assoc()){
-                    if(!in_array($row['destination-real_ip'],$installed_real_ips)){
-                        if($row['destination-real_ip']!=""){
-                            $installed_real_ips[]=$row['destination-real_ip'];
-                        }
-                    }
-                }
-            }
-            $tunnel_data['real_ip']=$real_ips;
-            $tunnel_data['installed_real_ips']=$installed_real_ips;
-            $tunnels_data=array();
-            $tunnels_data[]=$tunnel_data;
-            echo tunnels($tunnels_data);
-
-
-}
-
-function get_tunnels_from_ids($data){
-    //print_r($data);die;
-    foreach($data['tunnel_ids'] as $tunnel_id){
-        get_tunnel_from_id($tunnel_id);
-    }
-    exit;
-}
-function get_sponsor_tunnels_from_id($tunnel_id){
-    global $db;
-
-    $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE `tunnels_data`.`tunnel_id`='".$tunnel_id."' and `tunnels_data`.`is_deleted`=0";
-    $sql=$db->query($tunnel." order by group_id asc, group_id");
-    $data=array();
-    $tunnel_data=$sql->fetch_assoc();
-
-    $acl_ids=array();
-    $installed_acl_ids=array();
-    $real_ips=array();
-    $installed_real_ips=array();
-
-    $sql="select id from tunnel_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."'";
-    $res=$db->query($sql);
-    while($row=$res->fetch_assoc()){
-        $acl_ids[]=$row['id'];
-    }
-    if($tunnel_data['real_ip']!=""){
-        $real_ips[]=$tunnel_data['real_ip'];
-    }
-    unset($tunnel_data['real_ip']);
-    if(count($acl_ids)>0){
-        $acl_ids_str=implode(",",$acl_ids);
-        $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-        $res=$db->query($sql);
-        while($row=$res->fetch_assoc()){
-            if(!in_array($row['destination-real_ip'],$real_ips)){
-                if($row['destination-real_ip']!=""){
-                    $real_ips[]=$row['destination-real_ip'];
-                }
-            }
-        }
-    }
-    $sql="select acl_id from user_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."' and status=1";
-    $res=$db->query($sql);
-    while($row=$res->fetch_assoc()){
-        $installed_acl_ids[]=$row['acl_id'];
-    }
-    if(count($installed_acl_ids)>0){
-        $acl_ids_str=implode(",",$installed_acl_ids);
-        $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-        $res=$db->query($sql);
-        while($row=$res->fetch_assoc()){
-            if(!in_array($row['destination-real_ip'],$installed_real_ips)){
-                if($row['destination-real_ip']!=""){
-                    $installed_real_ips[]=$row['destination-real_ip'];
-                }
-            }
-        }
-    }
-    $tunnel_data['real_ip']=$real_ips;
-    $tunnel_data['installed_real_ips']=$installed_real_ips;
-    $tunnels_data=array();
-    $tunnels_data[]=$tunnel_data;
-    echo sponsor_tunnels($tunnels_data);
-
-
-}
-function get_sponsor_tunnels_from_ids($data){
-    //print_r($data);die;
-    foreach($data['tunnel_ids'] as $tunnel_id){
-        get_sponsor_tunnels_from_id($tunnel_id);
-    }
-    exit;
-}
-function check_tunnel_sponsored($tunnel_id){
-    global $db;
-    $sql="SELECT * FROM `shared_tunnel` WHERE `user_id`=".$_SESSION['customer_id']." AND `tunnel_id`=".$tunnel_id;
-    $query=$db->query($sql);
-    $result=array('status'=>'0','shared_with'=>"");
-    if($query->num_rows>0){
-        $shared_with=$query->fetch_assoc()['shared_with'];
-        $sql="SELECT * FROM `customers_data` WHERE `customer_id`=".$shared_with;
-        $customer_query=$db->query($sql);
-        if($customer_query->num_rows>0){
-            $cust_name=$customer_query->fetch_assoc()['display_name'];
-            return array('status'=>'1','shared_with'=>$cust_name);
-        }else{
-            return $result;
-        }
-    }else{
-        return $result;
-    }
-}
-function update_badge_cnt($data){
-    global $db;
-    $friends_sql="SELECT id FROM `friends_data` WHERE (friend_id=".$_SESSION['customer_id']." OR customer_id=".$_SESSION['customer_id'].") AND status='accepted'";
-    $request_friends_sql="SELECT id FROM `friends_data` WHERE (friend_id=".$_SESSION['customer_id']." OR customer_id=".$_SESSION['customer_id'].") AND status='request'";
-    $rejected_friends_sql="SELECT id FROM `friends_data` WHERE (friend_id=".$_SESSION['customer_id']." OR customer_id=".$_SESSION['customer_id'].") AND status='rejected'";
-    $friends_cnt=$db->query($friends_sql)->num_rows;
-    $request_friends_cnt=$db->query($request_friends_sql)->num_rows;
-    $rejected_friends_cnt=$db->query($rejected_friends_sql)->num_rows;
-    return array('friends_cnt'=>$friends_cnt,'request_friends_cnt'=>$request_friends_cnt,'rejected_friends_cnt'=>$rejected_friends_cnt);
-}
-function set_friend($data){
-    global $db;
-    $customer_id=$data['customer_id'];
-    $friend_id=$data['friend_id'];
-    $status=$data['status'];
-    if($status=="request"){
-        $sql="SELECT id FROM `friends_data` WHERE ((`customer_id`=".$customer_id." AND `friend_id`=".$friend_id.") OR (`customer_id`=".$friend_id." AND `friend_id`=".$customer_id."))";
-        $res=$db->query($sql);
-        if($res->num_rows==0){
-            $sql="INSERT INTO `friends_data` (`customer_id`,`friend_id`,`status`) VALUES ('".$customer_id."','".$friend_id."','".$status."')";
-            $res=$db->query($sql);
-            return $db->insert_id;
-        }
-    }elseif($status=="accepted" || $status=="rejected"){
-        $sql="UPDATE `friends_data` SET `status`='".$status."' WHERE `customer_id`=".$customer_id." AND `friend_id`=".$friend_id;
-        $res=$db->query($sql);
-        if($res){
-            return $res;
-        }else{
-            return;
-        }
-    }elseif($status=="deleted"){
-        $sql="DELETE FROM `friends_data` WHERE ((`customer_id`=".$customer_id." AND `friend_id`=".$friend_id.") OR (`customer_id`=".$friend_id." AND `friend_id`=".$customer_id."))";
-        $res=$db->query($sql);
-        if($res){
-            return $res;
-        }else{
-            return "";
-        }
-    }
-}
-function get_customers($data){
-    global $db;
-    $key_code=$data['key_code'];
-    $where=" AND (`display_name` LIKE '%".$key_code."%' OR `email` LIKE '%".$key_code."%' OR `tag_id` LIKE '%".$key_code."%')";
-        $related_customers=array();
-        $sql_related_customers=$db->query("SELECT * FROM `friends_data` WHERE (`customer_id`='".$_SESSION['customer_id']."' OR `friend_id`='".$_SESSION['customer_id']."')");
-        if($sql_related_customers->num_rows>0){
-            while($row=$sql_related_customers->fetch_assoc()){
-                if($row['friend_id']!=$_SESSION['customer_id']){
-                    $related_customers[]=$row['friend_id'];
-                }else{
-                    $related_customers[]=$row['customer_id'];
-                }
-            }
-        }
-        $related_customers_str=implode(",",$related_customers);
-        $sql="SELECT * FROM `customers_data` WHERE `customer_id`<>".$_SESSION['customer_id']." AND `is_searchable`=1";
-        if(count($related_customers)>0){
-            $sql="SELECT * FROM `customers_data` WHERE `customer_id` NOT IN (".$related_customers_str.") AND `customer_id`<>".$_SESSION['customer_id']." AND `is_searchable`=1";
-        }
-    //print_r($sql.$where);die;
-        $sql3=$db->query($sql.$where);
-        $all_customers=array();
-        $i=0;
-        while($row=$sql3->fetch_assoc()){
-            $i++;
-            $last_class="";
-            if($i==$sql3->num_rows){
-                $last_class="left-friend-list-content-row-last";
-            }
-            $odd_even_class="left-friend-list-content-row-odd";
-            /*if(intval($i/2)*2==$i){
-                $odd_even_class="left-friend-list-content-row-even";
-            }*/
-            $get_customer_acl_destination=get_customer_acl_destination($row['customer_id']);
-            $row['shared_acl_cnt']=count($get_customer_acl_destination);
-            $all_customers[]=$row;
-            //print_r($row);
-            ?>
-            <div class="left-friend-list-content-row <?php echo($odd_even_class); ?> <?php echo($last_class); ?>" data-customer_id="<?php echo($row['customer_id']); ?>" data-customer_name="<?php echo($row['name']); ?>">
-                <div class="profile-info-box" style="float: left;">
-                    <div style="float: left">
-                        <img class="friend_short_image" src="<?php echo(($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>" alt="<?php echo($row['profile_image']); ?>">
-                    </div>
-                    <div class="friend_info" style="float: left;">
-                        <div class="friend_name"><?php echo($row['display_name']); ?></div>
-                        <div class="friend_tag_id"><?php echo($row['tag_id']); ?>: <?php echo($row['shared_acl_cnt']); ?></div>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="friend-action-box">
-                            <span class="friend-action" data-friend_id="<?php echo($row['customer_id']); ?>">
-                                <i class="fa fa-plus" aria-hidden="true"></i>
-                            </span>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        <?php
-        }
-
-}
-function get_friends($data){
-    global $db;
-    //$customer_id=$data['customer_id'];
-?>
-    <div class="all-customers-box hidden"></div>
-    <div class="current-friends-box">
-        <?php
-        $friend_ids=array();
-        $sql_friends=$db->query("SELECT * FROM `friends_data`
-                WHERE (`customer_id`='".$_SESSION['customer_id']."' OR `friend_id`='".$_SESSION['customer_id']."') AND `status`='accepted'");
-        if($sql_friends->num_rows>0){
-            while($row=$sql_friends->fetch_assoc()){
-                if($row['friend_id']!=$_SESSION['customer_id']){
-                    $friend_ids[]=$row['friend_id'];
-                }else{
-                    $friend_ids[]=$row['customer_id'];
-                }
-            }
-        }
-        if(count($friend_ids)>0){
-            $friend_ids_str = implode(",", $friend_ids);
-            $all_friends = array();
-            $sql_friends = $db->query("SELECT * FROM `customers_data` WHERE `customer_id` IN (".$friend_ids_str.")");
-            $i = 0;
-            while ($row = $sql_friends->fetch_assoc()){
-                $all_friends[] = $row;
-                $friend_id = $row['customer_id'];
-                $i++;
-                $last_class = "";
-                if ($i==count($all_friends)){
-                    $last_class = "left-friend-list-content-row-last";
-                }
-                $odd_even_class = "left-friend-list-content-row-odd";
-                /*if(intval($i/2)*2==$i){
-                    $odd_even_class="left-friend-list-content-row-even";
-                }*/
-                $get_customer_acl_destination = get_customer_acl_destination($friend_id);
-                $row['shared_acl_cnt'] = count($get_customer_acl_destination);
-                ?>
-                <div class="left-friend-list-content-row <?php echo ($odd_even_class); ?> <?php echo ($last_class); ?> custom_popup_context_item" data-friend_id="<?php echo ($friend_id); ?>" data-friend_name="<?php echo ($row['name']); ?>">
-                    <div class="profile-info-box" style="float: left;">
-                        <div style="float: left">
-                            <img class="friend_short_image"
-                                 src="<?php echo (($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>"
-                                 alt="<?php echo ($row['profile_image']); ?>">
-                        </div>
-                        <div class="friend_info" style="float: left;">
-                            <div class="friend_name"><?php echo ($row['display_name']); ?></div>
-                            <div class="friend_tag_id"><?php echo ($row['tag_id']); ?>: <?php echo ($row['shared_acl_cnt']); ?></div>
-                        </div>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="friend-action-box">
-                        <span class="friend-action delete-action" data-friend_id="<?php echo ($friend_id); ?>">
-                            <i class="fa fa-trash-o" aria-hidden="true"></i>
-                        </span>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-            <?php
-            }
-        }
-        ?>
-    </div>
-<?php
-}
-function get_request_friends($data){
-        global $db;
-        $sql_request_friends=$db->query("SELECT * FROM `friends_data`
-            LEFT JOIN `customers_data` ON `friends_data`.`customer_id`=`customers_data`.`customer_id`
-            WHERE `friends_data`.`friend_id`='".$_SESSION['customer_id']."' AND `friends_data`.`status`='request'");
-        $all_friends=array();
-        $i=0;
-        while($row=$sql_request_friends->fetch_assoc()){
-            $i++;
-            $last_class="";
-            if($i==$sql_request_friends->num_rows){
-                $last_class="left-friend-list-content-row-last";
-            }
-            $odd_even_class="left-friend-list-content-row-odd";
-            /*if(intval($i/2)*2==$i){
-                $odd_even_class="left-friend-list-content-row-even";
-            }*/
-            $get_customer_acl_destination=get_customer_acl_destination($row['customer_id']);
-            $row['shared_acl_cnt']=count($get_customer_acl_destination);
-            $all_friends[]=$row;
-            //print_r($row);
-            ?>
-
-            <div class="left-friend-list-content-row <?php echo($odd_even_class); ?> <?php echo($last_class); ?>" data-customer_id="<?php echo($row['customer_id']); ?>" data-customer_name="<?php echo($row['name']); ?>">
-                <div class="profile-info-box" style="float: left;">
-                    <div style="float: left">
-                        <img class="friend_short_image" src="<?php echo(($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>" alt="<?php echo($row['profile_image']); ?>">
-                    </div>
-                    <div class="friend_info" style="float: left;">
-                        <div class="friend_name"><?php echo($row['display_name']); ?></div>
-                        <div class="friend_tag_id"><?php echo($row['tag_id']); ?>: <?php echo($row['shared_acl_cnt']); ?></div>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="friend-action-box">
-                        <span class="friend-action accept-action" data-friend_id="<?php echo($row['customer_id']); ?>">
-                            <i class="fa fa-check" aria-hidden="true"></i>
-                        </span>
-                        <span class="friend-action reject-action" data-friend_id="<?php echo($row['customer_id']); ?>">
-                            <i class="fa fa-ban" aria-hidden="true"></i>
-                        </span>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        <?php
-        }
-        ?>
-
-        <?php
-        $sql_request_friends=$db->query("SELECT * FROM `friends_data`
-            LEFT JOIN `customers_data` ON `friends_data`.`friend_id`=`customers_data`.`customer_id`
-            WHERE `friends_data`.`customer_id`='".$_SESSION['customer_id']."' AND `friends_data`.`status`='request'");
-        $all_friends=array();
-        $i=0;
-        while($row=$sql_request_friends->fetch_assoc()){
-            $i++;
-            $last_class="";
-            if($i==$sql_request_friends->num_rows){
-                $last_class="left-friend-list-content-row-last";
-            }
-            $odd_even_class="left-friend-list-content-row-odd";
-            /*if(intval($i/2)*2==$i){
-                $odd_even_class="left-friend-list-content-row-even";
-            }*/
-            $get_customer_acl_destination=get_customer_acl_destination($row['customer_id']);
-            $row['shared_acl_cnt']=count($get_customer_acl_destination);
-            $all_friends[]=$row;
-            //print_r($row);
-            ?>
-
-            <div class="left-friend-list-content-row <?php echo($odd_even_class); ?> <?php echo($last_class); ?>" data-customer_id="<?php echo($row['customer_id']); ?>" data-customer_name="<?php echo($row['name']); ?>">
-                <div class="profile-info-box" style="float: left;">
-                    <div style="float: left">
-                        <img class="friend_short_image" src="<?php echo(($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>" alt="<?php echo($row['profile_image']); ?>">
-                    </div>
-                    <div class="friend_info" style="float: left;">
-                        <div class="friend_name"><?php echo($row['display_name']); ?></div>
-                        <div class="friend_tag_id"><?php echo($row['tag_id']); ?>: <?php echo($row['shared_acl_cnt']); ?></div>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="friend-action-box">
-
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        <?php
-        }
-}
-function get_rejected_friends($data){
-    global $db;
-        $sql_rejected_friends=$db->query("SELECT * FROM `friends_data`
-                LEFT JOIN `customers_data` ON `friends_data`.`customer_id`=`customers_data`.`customer_id`
-                WHERE `friends_data`.`friend_id`='".$_SESSION['customer_id']."' AND `friends_data`.`status`='rejected'");
-        $all_friends=array();
-        $i=0;
-        while($row=$sql_rejected_friends->fetch_assoc()){
-            $i++;
-            $last_class="";
-            if($i==$sql_rejected_friends->num_rows){
-                $last_class="left-friend-list-content-row-last";
-            }
-            $odd_even_class="left-friend-list-content-row-odd";
-            /*if(intval($i/2)*2==$i){
-                $odd_even_class="left-friend-list-content-row-even";
-            }*/
-            $get_customer_acl_destination=get_customer_acl_destination($row['customer_id']);
-            $row['shared_acl_cnt']=count($get_customer_acl_destination);
-            $all_friends[]=$row;
-            //print_r($row);
-            ?>
-
-            <div class="left-friend-list-content-row <?php echo($odd_even_class); ?> <?php echo($last_class); ?>" data-customer_id="<?php echo($row['customer_id']); ?>" data-customer_name="<?php echo($row['name']); ?>">
-                <div class="profile-info-box" style="float: left;">
-                    <div style="float: left">
-                        <img class="friend_short_image" src="<?php echo(($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>" alt="<?php echo($row['profile_image']); ?>">
-                    </div>
-                    <div class="friend_info" style="float: left;">
-                        <div class="friend_name"><?php echo($row['display_name']); ?></div>
-                        <div class="friend_tag_id"><?php echo($row['tag_id']); ?>: <?php echo($row['shared_acl_cnt']); ?></div>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="friend-action-box">
-                        <span class="friend-action delete-action" data-friend_id="<?php echo($row['customer_id']); ?>">
-                            <i class="fa fa-trash-o" aria-hidden="true"></i>
-                        </span>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        <?php
-        }
-        ?>
-
-        <?php
-        $sql_rejected_friends=$db->query("SELECT * FROM `friends_data`
-                LEFT JOIN `customers_data` ON `friends_data`.`friend_id`=`customers_data`.`customer_id`
-                WHERE `friends_data`.`customer_id`='".$_SESSION['customer_id']."' AND `friends_data`.`status`='rejected'");
-        $all_friends=array();
-        $i=0;
-        while($row=$sql_rejected_friends->fetch_assoc()){
-            $i++;
-            $last_class="";
-            if($i==$sql_rejected_friends->num_rows){
-                $last_class="left-friend-list-content-row-last";
-            }
-            $odd_even_class="left-friend-list-content-row-odd";
-            /*if(intval($i/2)*2==$i){
-                $odd_even_class="left-friend-list-content-row-even";
-            }*/
-            $get_customer_acl_destination=get_customer_acl_destination($row['customer_id']);
-            $row['shared_acl_cnt']=count($get_customer_acl_destination);
-            $all_friends[]=$row;
-            //print_r($row);
-            ?>
-
-            <div class="left-friend-list-content-row <?php echo($odd_even_class); ?> <?php echo($last_class); ?>" data-customer_id="<?php echo($row['customer_id']); ?>" data-customer_name="<?php echo($row['name']); ?>">
-                <div class="profile-info-box" style="float: left;">
-                    <div style="float: left">
-                        <img class="friend_short_image" src="<?php echo(($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>" alt="<?php echo($row['profile_image']); ?>">
-                    </div>
-                    <div class="friend_info" style="float: left;">
-                        <div class="friend_name"><?php echo($row['display_name']); ?></div>
-                        <div class="friend_tag_id"><?php echo($row['tag_id']); ?>: <?php echo($row['shared_acl_cnt']); ?></div>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="friend-action-box">
-
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        <?php
-        }
-}
-
-function get_friends_for_dialog($data){
-    global $db;
-    //$customer_id=$data['customer_id'];
-    ?>
-    <div class="current-friends-box">
-        <?php
-        $friend_ids=array();
-        $sql_friends=$db->query("SELECT * FROM `friends_data`
-                WHERE (`customer_id`='".$_SESSION['customer_id']."' OR `friend_id`='".$_SESSION['customer_id']."') AND `status`='accepted'");
-        if($sql_friends->num_rows>0){
-            while($row=$sql_friends->fetch_assoc()){
-                if($row['friend_id']!=$_SESSION['customer_id']){
-                    $friend_ids[]=$row['friend_id'];
-                }else{
-                    $friend_ids[]=$row['customer_id'];
-                }
-            }
-        }
-        if(count($friend_ids)>0){
-            $friend_ids_str = implode(",", $friend_ids);
-            $all_friends = array();
-            $sql_friends = $db->query("SELECT * FROM `customers_data` WHERE `customer_id` IN (".$friend_ids_str.")");
-            $i = 0;
-            while ($row = $sql_friends->fetch_assoc()){
-                $all_friends[] = $row;
-                $friend_id = $row['customer_id'];
-                $i++;
-                $last_class = "";
-                if ($i==count($all_friends)){
-                    $last_class = "left-friend-list-content-row-last";
-                }
-                $odd_even_class = "left-friend-list-content-row-odd";
-                /*if(intval($i/2)*2==$i){
-                    $odd_even_class="left-friend-list-content-row-even";
-                }*/
-                $get_customer_acl_destination = get_customer_acl_destination($friend_id);
-                $row['shared_acl_cnt'] = count($get_customer_acl_destination);
-                ?>
-                <div class="left-friend-list-content-row <?php echo ($odd_even_class); ?> <?php echo ($last_class); ?>" data-friend_id="<?php echo ($friend_id); ?>" data-customer_name="<?php echo ($row['name']); ?>">
-                    <div class="customer-profile-info-box">
-                        <div style="float: left">
-                            <img class="friend_short_image"
-                                 src="<?php echo (($row['profile_image']!="")?$row['profile_image']:ROOT_URL.'/assets/img/profiles/demo-user.jpg'); ?>"
-                                 alt="<?php echo ($row['profile_image']); ?>">
-                        </div>
-                        <div class="friend_info" style="float: left;">
-                            <div class="friend_name"><?php echo ($row['display_name']); ?></div>
-                            <div class="friend_tag_id"><?php echo ($row['tag_id']); ?>: <?php echo ($row['shared_acl_cnt']); ?></div>
-                        </div>
-                        <div class="clearfix"></div>
-                    </div>
-                </div>
-            <?php
-            }
-        }
-        ?>
-    </div>
-<?php
-}
-
-function show_shared_tunnels(){
-    global $db;
-    $sql_tunnel= $db->query("SELECT * FROM `shared_tunnel` WHERE `shared_with`=".$db->real_escape_string($_SESSION['customer_id']));
-    $tunnels="";
-    if($sql_tunnel->num_rows>0){
-
-        while($row_tunnel=$sql_tunnel->fetch_assoc()){
-            $tunnels.=$row_tunnel['tunnel_id'].",";
-        }
-        $tunnels=rtrim($tunnels, ",");
-    }
-    if($tunnels==""){
-        return false;
-    }
-
-    $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE `tunnels_data`.`tunnel_id` IN (".$tunnels.") and `tunnels_data`.`is_deleted`=0";
-    $sql=$db->query($tunnel." order by group_id asc, group_id");
-    $data=array();
-    while($row=$sql->fetch_assoc()){
-        $data[]=$row;
-    }
-
-    $cloud_data=array();
-    $cloud_sql="SELECT * FROM `clouds_data` WHERE `email`='".$_SESSION['customer_email']."' AND `is_shared`=1";
-    $query=$db->query($cloud_sql);
-    if($query->num_rows==0){
-        $cloud_insert_sql="INSERT INTO `clouds_data` (`cloud_name`,`email`,`is_shared`) VALUES ('shared','".$_SESSION['customer_email']."','1')";
-        $cloud_insert_query=$db->query($cloud_insert_sql);
-        $cloud_insert_id=$db->insert_id;
-        $cloud_data=array('cloud_id'=>$cloud_insert_id,'cloud_name'=>"shared",'is_searchable'=>1);
-    }else{
-        $cloud_data=$query->fetch_assoc();
-    }
-
-    $cloud_id=$cloud_data['cloud_id'];
-    $cloud_name=$cloud_data['cloud_name'];
-    $is_searchable=$cloud_data['is_searchable'];
-
-    $tunnels_data=array();
-    $tunnel_ids="";
-
-    foreach($data as $tunnel_data){
-        $tunnel_ids.=$tunnel_data['tunnel_id'];
-        $tunnel_ids.=",";
-
-        $acl_ids=array();
-        $installed_acl_ids=array();
-        $real_ips=array();
-        $installed_real_ips=array();
-
-        $sql="select id from tunnel_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."'";
-        $res=$db->query($sql);
-        while($row=$res->fetch_assoc()){
-            $acl_ids[]=$row['id'];
-        }
-        if($tunnel_data['real_ip']!=""){
-            $real_ips[]=$tunnel_data['real_ip'];
-        }
-        unset($tunnel_data['real_ip']);
-        if(count($acl_ids)>0){
-            $acl_ids_str=implode(",",$acl_ids);
-            $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                if(!in_array($row['destination-real_ip'],$real_ips)){
-                    if($row['destination-real_ip']!=""){
-                        $real_ips[]=$row['destination-real_ip'];
-                    }
-                }
-            }
-        }
-        $sql="select acl_id from user_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."' and status=1";
-        $res=$db->query($sql);
-        while($row=$res->fetch_assoc()){
-            $installed_acl_ids[]=$row['acl_id'];
-        }
-        if(count($installed_acl_ids)>0){
-            $acl_ids_str=implode(",",$installed_acl_ids);
-            $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
-            $res=$db->query($sql);
-            while($row=$res->fetch_assoc()){
-                if(!in_array($row['destination-real_ip'],$installed_real_ips)){
-                    if($row['destination-real_ip']!=""){
-                        $installed_real_ips[]=$row['destination-real_ip'];
-                    }
-                }
-            }
-        }
-        $tunnel_data['real_ip']=$real_ips;
-        $tunnel_data['installed_real_ips']=$installed_real_ips;
-        $tunnels_data[]=$tunnel_data;
-    }
-    $tunnel_ids=trim($tunnel_ids,",");
-
-    ?>
-    <div class="cloud-row cloud-row-<?php echo($cloud_id); ?>" data-cid="<?php echo($cloud_id); ?>">
-        <div class="cloud-tunnels cloud-tunnels-<?php echo($cloud_id); ?>">
-
-            <div class="page-content">
-                <div class="content" style="padding-top: 0px;">
-                    <div class="page-title col-md-12">
-                        <div class="cloud-name cloud-name-<?php echo($cloud_id); ?>">
-                            <?php echo($cloud_name); ?>
-                        </div>
-                        <!--<span class="delete_cloud" data-val="<?php /*echo $cloud_id */?>"><i class="fa fa-trash pull-right cursor" data-toggle="tooltip" data-placement="top" title="Delete this Cloud"></i></span>-->
-                        <?php
-                        $switch_checked_val=($is_searchable==1?"checked":"");
-                        ?>
-                        <div class="cloud_searchable_switch_block">
-                            <input id="cmn-toggle-cloud-<?php echo $cloud_id; ?>" class="cmn-toggle cmn-toggle-round cloud_searchable_switch" data-cloud_id="<?php echo $cloud_id; ?>" type="checkbox" <?php echo($switch_checked_val); ?>>
-                            <label for="cmn-toggle-cloud-<?php echo $cloud_id; ?>"></label>
-                        </div>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div data-uid="<?php echo $_SESSION['user_id'] ?>" class="just list Parks">
-
-                        <div class="list_header">
-                            <div class="meta" data-toggle="tooltip" data-placement="right" title="ACL"><i class="fa fa-eye"></i></div>
-                            <div class="meta" data-toggle="tooltip" data-placement="right" title="Create ACL"><i class="fa fa-cogs"></i></div>
-
-                            <div class="meta" id="SortByName" data-toggle="tooltip" data-placement="right" title="Add tunnels"><a href="javascript:void(0);" data-val="<?php echo $cloud_id; ?>" data-mail="<?php echo $_SESSION['email'] ?>" data-count="0" class="tunnel_add_form_btn"><i class="fa fa-fw fa-plus-circle"></i></a></div>
-
-                            <div class="meta" id="" data-toggle="tooltip" data-placement="right" title="Save all"><a href="javascript:void(0);" data-val="<?php echo $cloud_id; ?>" data-count="0" class="all_tunnel_save_btn"><i class="fa fa-floppy-o"></i></a></div>
-
-                            <div class="meta width-30"><div class="cursor chk_all_tunnel" data-toggle="tooltip" data-placement="bottom" data-val="0" title="Select all tunnels"><i class="fa  fa-square-o"></i></div><a href="javascript:void(0);" class="tunnel_vew_by_tnl tunnel_vew_by_tnl_<?php echo $cloud_id; ?>" data-cloud="<?php echo $cloud_id; ?>" data-dif="client"><i class="fa fa-sort"></i></a></div>
-
-                            <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Groups"><i class="fa fa-fw fa-group"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_grp" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-
-                            <div class="meta width-120" data-toggle="tooltip" data-placement="bottom" title="Tunnel name"><i class="fa fa-cog"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_name" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-                            <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Bidirection mode"><i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right"></i>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_bidirection" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-                            <div class="meta width-80" data-toggle="tooltip" data-placement="bottom" title="Location"><i class="fa fa-fw fa-globe"></i></div>
-                            <div class="meta width-270" data-toggle="tooltip" data-placement="bottom" title="DeV">DeV</div>
-                            <div class="meta width-80" data-toggle="tooltip" data-placement="bottom" title="VPN IP"><i class="fa  fa-map-pin"></i></div>
-                            <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Points" style="margin-left: 4px;"><i class="fa fa-fw fa-dollar"></i></div>
-                            <div class="meta width-80" data-toggle="tooltip" data-placement="bottom" title="Real IP">Real IP</div>
-                            <div class="meta" data-toggle="tooltip" data-placement="bottom" title="Gateway mode">Gateway&nbsp;&nbsp;<a href="javascript:void(0);" class="tunnel_vew_by_bidirection" data-cloud="<?php echo $cloud_id; ?>" data-dif="asc"><i class="fa fa-sort"></i></a></div>
-                            <div class="meta">&nbsp;</div>
-                        </div>
-                        <form id="tunnels_form_field" style="display:none;">
-                            <input type="button" class="btn btn-sm btn-primary btn_add_tunnel" data-cloud="<?php echo $cloud_id; ?>" value="Submit">
-                            <input type="reset" class="btn btn-sm btn-warning" id="tunnel_form_close_btn" value="Cancel">
-                        </form>
-                        <div class="tunnel_body tunnel_body_<?php echo $cloud_id; ?>">
-                            <?php
-                            //echo tunnels($tunnels_data);
-                            ?>
-                        </div>
-                        <div id="tunnel_body_pagenation_<?php echo $cloud_id; ?>">
-
-                        </div>
-                        <script>
-                            console.log("<?php echo($tunnel_ids); ?>");
-                            $("#tunnel_body_pagenation_<?php echo $cloud_id; ?>").pagination({
-                                dataSource: [<?php echo($tunnel_ids); ?>],
-                                pageSize: 5,
-                                autoHidePrevious: true,
-                                autoHideNext: true,
-                                callback: function(data, pagination) {
-                                    console.log(data);
-                                    console.log(pagination);
-                                    // template method of yourself
-                                    var html = sponsor_tunnel_template(data,".tunnel_body_<?php echo $cloud_id; ?>");
-                                }
-                            });
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php
-
-}
-
 ?>
 

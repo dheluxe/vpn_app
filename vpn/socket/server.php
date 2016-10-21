@@ -380,6 +380,16 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
                                 $message=null;
                             }
                         break;
+                        case 'destroy_account':
+                            if(is_valid_client($clientID)){
+                                $res=array("status"=>1, "type"=>"destroy_account_result", "token"=>$message['token'], "message_type"=>"reply", "data"=>array("token"=>$message['token']));
+                                $message=$res;
+                            }else{
+                                $message=array("data"=>"You are not authorized to do any operations");
+                                $Server->wsSend($clientID, json_encode($message));
+                                $message=null;
+                            }
+                            break;
                         case 'process_complete':
                             $arr="";
                             $sql="SELECT * FROM `job_queue` WHERE `is_complete_action`=2 AND `is_seen`=0";
@@ -456,6 +466,24 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
                                     if($result['action']=="request_real_ip"){
                                         $update_data=unserialize($result['old_data']);
                                         $arr=array("status"=>1, "type"=>"request_real_ip_result", "message_type"=>"reply", "data"=>$update_data);
+                                        $message=job_done($db, $result['tunnel_id'], $result['job_id'], $result['token'], json_encode($arr));
+                                        send_reply($result['token'], $Server, $message);
+                                    }
+                                    if($result['action']=="clear_tunnel_real_ip"){
+                                        $update_data=unserialize($result['old_data']);
+                                        $arr=array("status"=>1, "type"=>"clear_tunnel_real_ip_result", "message_type"=>"reply", "data"=>$update_data);
+                                        $message=job_done($db, $result['tunnel_id'], $result['job_id'], $result['token'], json_encode($arr));
+                                        send_reply($result['token'], $Server, $message);
+                                    }
+                                    if($result['action']=="change_tunnel_real_ip"){
+                                        $update_data=unserialize($result['old_data']);
+                                        $arr=array("status"=>1, "type"=>"change_tunnel_real_ip_result", "message_type"=>"reply", "data"=>$update_data);
+                                        $message=job_done($db, $result['tunnel_id'], $result['job_id'], $result['token'], json_encode($arr));
+                                        send_reply($result['token'], $Server, $message);
+                                    }
+                                    if($result['action']=="clear_acl_real_ip"){
+                                        $update_data=unserialize($result['old_data']);
+                                        $arr=array("status"=>1, "type"=>"clear_acl_real_ip_result", "message_type"=>"reply", "data"=>$update_data);
                                         $message=job_done($db, $result['tunnel_id'], $result['job_id'], $result['token'], json_encode($arr));
                                         send_reply($result['token'], $Server, $message);
                                     }
@@ -537,6 +565,20 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
                                         $message=job_done($db, $result['tunnel_id'], $result['job_id'], $result['token'], json_encode($arr));
                                         send_reply($result['token'], $Server, $message);
                                     }
+                                    if($result['action']=="get_remote_server_info"){
+                                        $old_data=unserialize($result['old_data']);
+                                        $row=$old_data['row'];
+                                        $arr=array("status"=>1, "type"=>"get_remote_server_info_result", "message_type"=>"reply", "data"=>$row);
+                                        $message=job_done($db, $result['tunnel_id'], $result['job_id'], $result['token'], json_encode($arr));
+                                        send_reply($result['token'], $Server, $message);
+                                    }
+                                    if($result['action']=="set_remote_server_info"){
+                                        $old_data=unserialize($result['old_data']);
+                                        $row=$old_data['row'];
+                                        $arr=array("status"=>1, "type"=>"set_remote_server_info_result", "message_type"=>"reply", "data"=>$row);
+                                        $message=job_done($db, $result['tunnel_id'], $result['job_id'], $result['token'], json_encode($arr));
+                                        send_reply($result['token'], $Server, $message);
+                                    }
                                 }
                             }
                             $message=null;
@@ -609,30 +651,30 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
                 }
             //The speaker is the only person in the room. Don't let them feel lonely.
             if($message!=null){
-                    if($message['type']=="login" || $message['type']=="signup" || $message['type']=="authorize"){
-                            $Server->wsSend($clientID, json_encode($message));
-                     }else{
-                        $token=null;
-                        foreach ($Server->wsValidClients as $user_token => $value) {
-                            foreach ($value as  $socket_id) {
-                                if($clientID==$socket_id){
-                                    $token=$user_token;
-                                    break;
-                                }
+                if($message['type']=="login" || $message['type']=="signup" || $message['type']=="authorize"){
+                    $Server->wsSend($clientID, json_encode($message));
+                }else{
+                    $token=null;
+                    foreach ($Server->wsValidClients as $user_token => $value) {
+                        foreach ($value as $socket_id) {
+                            if($clientID==$socket_id){
+                                $token=$user_token;
+                                break;
                             }
                         }
-                        if($token!=null){
-                            if(isset($Server->wsValidClients[$token])){
-                                foreach ($Server->wsValidClients[$token] as $socket_id) {
-                                    $Server->wsSend($socket_id, json_encode($message));
-                                }
-                            }
-                        } else{
-                            $message=array("data"=>"You are not authorized to do any operations");
-                            $Server->wsSend($clientID, json_encode($message));
-                        }
-                     }
+                    }
 
+                    if($token!=null){
+                        if(isset($Server->wsValidClients[$token])){
+                            foreach ($Server->wsValidClients[$token] as $socket_id) {
+                                $Server->wsSend($socket_id, json_encode($message));
+                            }
+                        }
+                    }else{
+                        $message=array("data"=>"You are not authorized to do any operations");
+                        $Server->wsSend($clientID, json_encode($message));
+                    }
+                }
             }
         }
 }
@@ -648,37 +690,37 @@ function job_done($db, $tunnel_id, $id, $token, $json){
         return $json;
     }
 
-    function sql_job_check($db, $tunnel_id){
-        $sql_job_check=$db->query("SELECT * FROM `job_queue` WHERE `is_seen`=0 AND `tunnel_id`=".$tunnel_id);
-        if($sql_job_check->num_rows>0){
-            return "no";
-        }else{
-            return "yes";
+function sql_job_check($db, $tunnel_id){
+    $sql_job_check=$db->query("SELECT * FROM `job_queue` WHERE `is_seen`=0 AND `tunnel_id`=".$tunnel_id);
+    if($sql_job_check->num_rows>0){
+        return "no";
+    }else{
+        return "yes";
+    }
+}
+
+function send_reply($token, $Server, $message){
+    if(isset($Server->wsValidClients[$token])){
+        foreach ($Server->wsValidClients[$token] as $socket_id) {
+            $Server->wsSend($socket_id, json_encode($message));
         }
     }
+}
 
-    function send_reply($token, $Server, $message){
-        if(isset($Server->wsValidClients[$token])){
-            foreach ($Server->wsValidClients[$token] as $socket_id) {
-                $Server->wsSend($socket_id, json_encode($message));
+function is_valid_client($clientID){
+    /*$qry=$db->query("SELECT `user_token` FROM `tunnels_data` WHERE `tunnel_id`=".$id);
+    $row=$qry->fetch_assoc();
+    if($row['user_token']==)*/
+    global $Server;
+    foreach ($Server->wsValidClients as $user_token => $value) {
+        foreach ($value as $socket_id) {
+            if($clientID==$socket_id){
+                return true;
             }
         }
     }
-
-    function is_valid_client($clientID){
-        /*$qry=$db->query("SELECT `user_token` FROM `tunnels_data` WHERE `tunnel_id`=".$id);
-        $row=$qry->fetch_assoc();
-        if($row['user_token']==)*/
-        global $Server;
-        foreach ($Server->wsValidClients as $user_token => $value) {
-            foreach ($value as  $socket_id) {
-                if($clientID==$socket_id){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    return false;
+}
 
 /*function wsOnMessage($clientID, $message, $messageLength, $binary) {
     global $Server;
@@ -728,7 +770,6 @@ function wsOnClose($clientID, $status) {
 
 }
 
-
 /*
 function status_responder()
 {
@@ -750,7 +791,6 @@ $thrd = new Thread('status_responder');
 $thrd->start();
 */
 
-
 // start the server
 $Server = new PHPWebSocket();
 $Server->bind('message', 'wsOnMessage');
@@ -758,6 +798,6 @@ $Server->bind('open', 'wsOnOpen');
 $Server->bind('close', 'wsOnClose');
 // for other computers to connect, you will probably need to change this to your LAN IP or external IP,
 // alternatively use: gethostbyaddr(gethostbyname($_SERVER['SERVER_NAME']))
-$Server->wsStartServer('198.211.127.72', 8880);
-
+//$Server->wsStartServer('198.211.127.72', 8880);
+$Server->wsStartServer(MAIN_SERVER_IP, WEB_SOCKET_PORT);
 ?>

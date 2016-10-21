@@ -43,7 +43,7 @@ if(!empty($_POST)){
     }
 }
 
-if(isset($_GET['draw'])) {
+if(isset($_GET['ajax'])) {
     $exi = $db->query("SELECT COUNT(*) FROM `server_subnets`");
     $num = $exi->fetch_row();
     $count = $num[0];
@@ -113,21 +113,15 @@ if(isset($_GET['draw'])) {
 ob_end_flush();
 $exi = $db->query("SELECT COUNT(*) FROM `real_ip_list` WHERE `real_ip` = '0.255.255.255'");
 ?>
-
- <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>FooTable</h2>
-        <ol class="breadcrumb">
-            <li>
-                <a href="">VPN IP info</a>
-
-            </li>
-        </ol>
-    </div>
-    <div class="col-lg-2">
-
-    </div>
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <span class="sub-page-title">VPN IP info</span>
+        </div>
+    </nav>
 </div>
+
 <div class="wrapper wrapper-content animated fadeInRight">
 
     <div class="row">
@@ -156,10 +150,10 @@ $exi = $db->query("SELECT COUNT(*) FROM `real_ip_list` WHERE `real_ip` = '0.255.
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <?php if($check==1){
+                    <?php if(isset($check) && $check==1){
                         ?>
                           <div id="msg" class="bg-success" style="padding:7px;mergin-top:5px;"><strong>VPN ip created successfully</strong></div>
-                        <?php } ?>
+                    <?php } ?>
                     <div id="" style=" min-height: 581px;">
 
                     <table id="vpn_ip_table" class="footable table table-stripped toggle-arrow-tiny table-hover dataTable" data-page-size="8">

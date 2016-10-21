@@ -1,0 +1,61 @@
+#myDiagramDiv{
+    background-color: #b1b1b1;
+}
+#gojs-contextMenu {
+    margin-top: 41px;
+    margin-left: 15px;
+    z-index: 300;
+    position: absolute;
+    left: 5px;
+    border: 1px solid #444;
+    background-color: #F5F5F5;
+    display: none;
+    box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
+    font-size: 12px;
+    font-family: sans-serif;
+    font-weight:bold;
+}
+
+#gojs-contextMenu ul {
+    list-style: none;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+}
+
+#gojs-contextMenu li a {
+    position: relative;
+    min-width: 65px;
+    color: #444;
+    display: inline-block;
+    padding: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+#gojs-contextMenu li:hover a{
+    color: #fff;
+}
+#gojs-contextMenu li:hover { background: #0082d4; }
+
+#gojs-contextMenu li:hover { color: #EEE; }
+
+#gojs-contextMenu li ul li {
+    display: none;
+}
+
+#gojs-contextMenu li ul li a{
+    position: relative;
+    min-width: 60px;
+    padding: 6px;
+    text-decoration: none;
+    cursor: pointer;
+
+}
+
+#gojs-contextMenu li:hover ul li {
+    display: block;
+    margin-left: 0px; margin-top: 0px;
+}

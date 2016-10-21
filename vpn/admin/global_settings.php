@@ -1,5 +1,5 @@
 <?php
-ob_start();
+//ob_start();
 include 'elements/admin_header.php';
 
 if(!empty($_POST)){
@@ -8,39 +8,41 @@ if(!empty($_POST)){
     $str_to_find = "";
     $str_to_replace = "";
     $command = $_POST['command'];
+    $str_to_replaceed="";
     if($command == "site")
     {
-        $str_to_find = "'SITE_STATUS' => " + $config['SITE_STATUS'] ? 'true' : 'false';
-        $str_to_replace = "'SITE_STATUS' => " + $config['SITE_STATUS'] ? 'false' : 'true';
-        file_put_contents ($file, str_replace($str_to_find, $str_to_replace, $content));
+        $str_to_find = "'SITE_STATUS' => ".($config['SITE_STATUS'] ? "true" : "false");
+        $str_to_replace = "'SITE_STATUS' => ".($config['SITE_STATUS'] ? "false" : "true");
+        $str_to_replaceed=str_replace($str_to_find, $str_to_replace, $content);
+        file_put_contents ($file, $str_to_replaceed);
+        $config['SITE_STATUS']=$config['SITE_STATUS'] ? false : true;
     }
     else if($command == "reg")
     {
-        $str_to_find = "'REG_STATUS' => " + $config['REG_STATUS'] ? '1' : '0';
-        $str_to_replace = "'REG_STATUS' => " + $config['REG_STATUS'] ? '0' : '1';
-        file_put_contents ($file, str_replace($str_to_find, $str_to_replace, $content));
+        $str_to_find = "'REG_STATUS' => ".($config['REG_STATUS']==1 ? "1" : "0");
+        $str_to_replace = "'REG_STATUS' => ".($config['REG_STATUS']==1 ? "0" : "1");
+        $str_to_replaceed=str_replace($str_to_find, $str_to_replace, $content);
+        file_put_contents ($file, $str_to_replaceed);
+        $config['REG_STATUS']=$config['REG_STATUS'] ? 0 : 1;
     }
-    sleep(2);
-    ob_clean();
-    header('Location: ../admin/global_settings.php');
-die();
+    sleep(1);
+    //ob_clean();
+    //print_r($str_to_replaceed);
+    $_POST=array();
+    header('Location: ../vpn/admin/global_settings.php');
+    //die;
 }
 
-ob_end_flush();
-
 ?>
- <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>FooTable</h2>
-        <ol class="breadcrumb">
-            <li>
-                <a href="">ServiceControl</a>
-            </li>
-        </ol>
-    </div>
-    <div class="col-lg-2">
-    </div>
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <span class="sub-page-title">Global Settings</span>
+        </div>
+    </nav>
 </div>
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row wrapper">
         <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="8">

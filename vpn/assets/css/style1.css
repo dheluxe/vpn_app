@@ -28,9 +28,8 @@ a, a:hover, a:focus {
     outline: none;
 }
 ::selection {
-
-    background: #68dff0;
-    color: #fff;
+    background: #e2e2e2;
+    color: #59514c;
 }
 ::-moz-selection {
     background: #68dff0;
@@ -399,6 +398,7 @@ ul.sidebar-menu li a.active i {
 /* MAIN CONTENT CONFIGURATION */
 #main-content {
     margin-left: 210px;
+    text-align: center;
 }
 
 .header, .footer {
