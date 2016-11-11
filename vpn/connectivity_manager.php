@@ -4,7 +4,6 @@ require_once 'includes/config.php';
 require_once 'includes/connection.php';
 include_once 'api/api_function.php';
 
-//print_r($_SESSION);die;
 $clouds_data=array();
 $token=$_SESSION['token'];
 $sql="select * from `clouds_data` where `user_token`='".$token."' and `is_deleted`=0";

@@ -163,6 +163,69 @@ $row1['shared_acl_cnt']=count($get_customer_acl_destination);
         $("#send_point_to_friend #friend_id").val(customer_id);
         $("#send_point_to_friend #friend_name").html(customer_name);
     });
+
+    /*$.contextMenu({
+        selector: '.color-box',
+        callback: function(key, options) {
+            console.log(key);
+            console.log(options);
+            if(key=="clear"){
+
+            }
+            else if(key=="undo"){
+
+            }
+        },
+        items: {
+            "clear": {name: "Clear"},
+            "undo": {name: "Undo"}
+        }
+    });
+*/
+    $.contextMenu({
+        selector: '.color-box',
+        callback: function(key, options) {
+            console.log(key);
+            console.log(options);
+            if(key=="clear"){
+                console.log(acl_value);
+                var tunnel_id=$(this).attr("data-tid");
+                var acl_info=$(this).attr("class").split(" ")[1].split("-");
+                var id=acl_info[2];
+                var type=acl_info[1];
+                var data=acl_info[0];
+                if(acl_value[id]==undefined)
+                    acl_value[id]={};
+                if(acl_value[id][type]==undefined)
+                    acl_value[id][type]={};
+
+                acl_value[id][type][data]="";
+                $("."+data+"-"+type+"-"+id).css("color","#000000");
+                $("."+data+"-"+type+"-"+id).css("opacity","0.3");
+                notify_msg("warning", "You have to save this settings...");
+                console.log(acl_value);
+            }
+            else if(key=="undo"){
+                console.log(acl_value);
+                var tunnel_id=$(this).attr("data-tid");
+                var acl_info=$(this).attr("class").split(" ")[1].split("-");
+                var id=acl_info[2];
+                var type=acl_info[1];
+                var data=acl_info[0];
+                if(acl_value[id][type][data]!=undefined){
+                    delete acl_value[id][type][data];
+                }
+                $("."+data+"-"+type+"-"+id).css("color","#ffffff");
+                $("."+data+"-"+type+"-"+id).css("opacity","1");
+                console.log(acl_value);
+            }
+        },
+        items: {
+            "clear": {name: "Clear"},
+            "undo": {name: "Undo"}
+        }
+    });
+
 </script>
 
 <div class="modal fade" id="send_point_to_friend" tabindex="-1" role="dialog" aria-labelledby="send_point_to_friend" aria-hidden="true">

@@ -65,7 +65,7 @@ function restart_webserver_scripts($cmd)
     return $result;
 }
 
-function install_remote_server($ip,$ssh_username,$ssh_password,$remote_group){
+function install_remote_server($remote_server_id,$ip,$ssh_username,$ssh_password,$remote_group){
     global $db;
     $result="";
     /////////////////////////////////////////////upload test.php/////////////////////////////////////////////////
@@ -75,6 +75,7 @@ function install_remote_server($ip,$ssh_username,$ssh_password,$remote_group){
     $remote_test_file="test.php";
     $remote_thread_file="thread.php";
     $remote_resmon_file="resmon.php";
+    $daemons_file="daemons";
 
     $remote_directory = '/var/';
 
@@ -94,6 +95,7 @@ function install_remote_server($ip,$ssh_username,$ssh_password,$remote_group){
     $upload_result3 = $sftp->put($remote_directory.$remote_thread_file, $local_directory.$remote_thread_file, NET_SFTP_LOCAL_FILE);
     $upload_result4 = $sftp->put($remote_directory.$remote_resmon_file, $local_directory.$remote_resmon_file, NET_SFTP_LOCAL_FILE);
     $upload_result5 = $sftp->put($conf_directory.$conf_file, $local_directory.$conf_file, NET_SFTP_LOCAL_FILE);
+    $sftp->put($remote_directory.$daemons_file,$local_directory.$daemons_file, NET_SFTP_LOCAL_FILE);
     $sftp->disconnect();
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -120,7 +122,38 @@ function install_remote_server($ip,$ssh_username,$ssh_password,$remote_group){
     $statusmsg="test_runner OK";
     $db->query("UPDATE `remote_server_list` SET `last_alive`='" . $utime . "',`ressnap`='" . $rs . "',`current_status`= '" . $statusmsg . "' WHERE `remote_ip` = '".$ip."'");
 
+    //////////////////////for ospf///////////////////////////////////////////////
+    $ssh->exec("apt-get -y install quagga-*");
+    $ssh->exec("cp /usr/share/doc/quagga/examples/zebra.conf.sample /etc/quagga/zebra.conf");
+    $ssh->exec("cp /usr/share/doc/quagga/examples/ospfd.conf.sample /etc/quagga/ospfd.conf");
+    $ssh->exec("chown quagga.quaggavty /etc/quagga/*.conf");
+    $ssh->exec("chmod 640 /etc/quagga/*.conf");
+
+    $ssh->exec("rm /etc/quagga/daemons");
+    $ssh->exec("cp /var/daemons /etc/quagga/");
+    $ssh->exec("chmod 640 /etc/quagga/daemons");
+
+    $ssh->exec("echo VTYSH_PAGER=more > /etc/environment");
+    $ssh->exec("/etc/init.d/quagga restart");
+    //$ssh->exec("reboot"); //todo
     $ssh->disconnect();
+    /*sleep(5);
+
+    $ssh = new Net_SSH2($ip);
+    if (!$ssh->login($ssh_username, $ssh_password)) {
+        //$result.= 'Login Failed';
+        $result.="<br/>";
+        return $result;
+    }
+    $ssh->exec("vtysh");
+    $ssh->exec("configure terminal");
+    $ssh->exec("router ospf");
+    $ssh->exec("router-id ".$remote_server_id);
+    $ssh->exec("exit");
+    $ssh->exec("exit");
+    $ssh->exec("exit");
+    $ssh->disconnect();*/
+    /////////////////////////////////////////////////////////////////////
     $result.="<br/>"."Done.";
     return $result;
 }
@@ -155,26 +188,12 @@ if(!empty($_POST)) {
                 $check = 1;
             }
         } else {
-            $db->query("INSERT INTO `remote_server_list` (`email`, `remote_ip`, `ssh_username`, `ssh_password`, `server_name`, `remote_group`) VALUES('" . $_POST['email'] . "', '" . $_POST['remote_ip'] . "', '" . $_POST['ssh_username'] . "', '" . $_POST['ssh_password'] . "', '" . $_POST['sname'] . "', '" . $_POST['remote_grp'] . "')");
+            $query=$db->query("INSERT INTO `remote_server_list` (`email`, `remote_ip`, `ssh_username`, `ssh_password`, `server_name`, `remote_group`) VALUES('" . $_POST['email'] . "', '" . $_POST['remote_ip'] . "', '" . $_POST['ssh_username'] . "', '" . $_POST['ssh_password'] . "', '" . $_POST['sname'] . "', '" . $_POST['remote_grp'] . "')");
+            $remote_server_id=$db->insert_id;
             $check = 1;
-            $subject = 'Remote Server';
-            $message = '<html>
-                                 <head>
-                                     <title>"' . $subject . '"</title>
-                                 </head>
-                                 <body>
-                                      Dear sir/madam,<br>
-                                          A new remote server added.<br><br>
-                                      Thank you,<br>
-                                      Demovpn team.
-                                 </body>
-                             </html>';
-            $headers = "MIME-Version: 1.0" . "\r\n";
-            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-            $headers .= 'From:DemoVPN <demovpn@comenzarit.com>' . "\r\n";
-            mail($_POST['email'], $subject, $message, $headers);
+            //$bashresult=install_remote_server($remote_server_id,$_POST['remote_ip'],$_POST['ssh_username'],$_POST['ssh_password'],$_POST['remote_grp']);
         }
-        $bashresult=install_remote_server($_POST['remote_ip'],$_POST['ssh_username'],$_POST['ssh_password'],$_POST['remote_grp']);
+        $bashresult=install_remote_server($remote_server_id,$_POST['remote_ip'],$_POST['ssh_username'],$_POST['ssh_password'],$_POST['remote_grp']);
     }
 }
 $arr=$db->query("SELECT * FROM `remote_server_list`");
@@ -367,6 +386,9 @@ if ($sshcon->login(MAIN_SERVER_SSH_USER_NAME, MAIN_SERVER_SSH_USER_PASS)) {
                         if($remote_server['remote_group']=="b"){
                             $text="RS_B";
                             $color="#00ffff";
+                        }
+                        if($remote_server['current_status']=="Login Failed" || $remote_server['ressnap']==""){
+                            $color="#777777";
                         }
                         $text=$remote_server['server_name'];
                         $row=array("id"=>$remote_server['id'],"loc"=>"0 0", "text"=>$text,"color"=>$color);

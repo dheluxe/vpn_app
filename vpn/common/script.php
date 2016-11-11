@@ -57,6 +57,7 @@
 <script src="assets/js/jquery.nicescroll.js" type="text/javascript"></script>
 <script src="assets/js/common-scripts.js"></script>
 
+<script src="assets/js/function.js" type="text/javascript"></script>
 <script src="assets/js/custom.js" type="text/javascript"></script>
 <script src="assets/js/socket.js" type="text/javascript"></script>
 <script src="assets/js/panel_layout.js" type="text/javascript"></script>

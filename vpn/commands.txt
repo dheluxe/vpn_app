@@ -1,0 +1,21 @@
+- install open vpn
+openvpn  --remote VPN1-Real-ip --dev tun1 --proto udp --ifconfig  192.168.222.11 192.168.222.10 --tun-mtu 48000 --fragment 0 --mssfix 0  --cipher aes-256-cbc --engine aesni
+
+how to make vpn ip:   192.168.(1-1%255)/255.1%255
+
+-remove vpn connection
+kill $(ps -ax | grep  192.168.0.86 | awk '{print $1}')
+
+
+-how to check vpn is working
+ps -ax | grep openvpn
+
+
+sample
+openvpn  --remote 37.139.9.21 --dev tun1 --proto udp --ifconfig  192.168.0.88 192.168.0.89 --tun-mtu 48000 --fragment 0 --mssfix 0  --cipher aes-256-cbc --engine aesni
+openvpn  --remote 188.166.0.154 --dev tun1 --proto udp --ifconfig  192.168.0.89 192.168.0.88 --tun-mtu 48000 --fragment 0 --mssfix 0  --cipher aes-256-cbc --engine aesni
+
+
+kill $(ps -ax | grep 192.168.0.89 | awk '{print $1}') 
+kill $(ps -ax | grep 192.168.0.88 | awk '{print $1}')
+

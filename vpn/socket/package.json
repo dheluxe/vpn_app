@@ -1,0 +1,30 @@
+{
+  "name": "vpn-socket-project",
+  "version": "1.0.0",
+  "description": "VPN server project",
+  "main": "server.js",
+  "dependencies": {
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "benchmark": "2.1.x",
+    "bufferutil": "1.2.x",
+    "eslint": "3.9.x",
+    "eslint-config-semistandard": "7.0.x",
+    "eslint-config-standard": "6.2.x",
+    "eslint-plugin-promise": "3.3.x",
+    "eslint-plugin-standard": "2.0.x",
+    "istanbul": "0.4.x",
+    "mocha": "3.1.x",
+    "utf-8-validate": "1.2.x"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "vpn"
+  ],
+  "author": "",
+  "license": "ISC"
+}

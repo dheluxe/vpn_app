@@ -8,12 +8,12 @@ if(isset($_GET['request'])){
 
   //include_once 'class.PHPWebSocket.php';
 
-    if($_GET['request']!="dologin" && $_GET['request']!="user_register" && $_GET['request']!="admin_login"){
+    /*if($_GET['request']!="dologin" && $_GET['request']!="user_register" && $_GET['request']!="admin_login"){
         if(!isset($_SESSION['vpn_user']) || trim($_SESSION['vpn_user']) == ""){
             echo("empty_session");
             die;
         }
-    }
+    }*/
 
   switch($_GET['request']){
 
@@ -135,16 +135,6 @@ if(isset($_GET['request'])){
         echo $json_arr;
       break;
 
-    case 'status_change':
-        $id=$_REQUEST['id'];
-        $val=$_REQUEST['val'];
-        $token=$_REQUEST['token'];
-        $result=status_change($id, $val, $token);
-        $json_arr=json_encode($result);
-        //socket_msg($json_arr);
-        echo $json_arr;
-        break;
-
     case 'gateway_change':
       $id=$_REQUEST['id'];
       $val=$_REQUEST['val'];
@@ -166,13 +156,8 @@ if(isset($_GET['request'])){
     break;
 
     case 'bidirection_change':
-      $id=$_REQUEST['id'];
-      $val=$_REQUEST['val'];
-      $client_id=$_REQUEST['token'];
-      $result=bidirection_change($id, $val, $client_id);
-      //print_r($result);die;
+      $result=bidirection_change($_REQUEST);
       $json_arr=json_encode($result);
-      //socket_msg($json_arr);
       echo $json_arr;
     break;
 
@@ -190,7 +175,7 @@ if(isset($_GET['request'])){
       $id=$_REQUEST['id'];
       $val=$_REQUEST['val'];
       $client_id=$_REQUEST['token'];
-      $result=route_change($id, $val, $client_id);
+      $result=route_change($_REQUEST);
       $json_arr=json_encode($result);
       //socket_msg($json_arr);
       echo $json_arr;
@@ -217,17 +202,15 @@ if(isset($_GET['request'])){
 
     case 'add_server_clone':
       $clone_id=$_GET['id'];
-      $result=add_server_clone($clone_id, $_GET['token']);
+      $result=add_server_clone($_GET);
       $json_arr=json_encode($result);
-      //socket_msg($_SESSION['token'], $result);
       echo $json_arr;
     break;
 
     case 'add_client_clone':
       $clone_id=$_GET['id'];
-      $result=add_client_clone($clone_id, $_GET['token']);
+      $result=add_client_clone($_GET);
       $json_arr=json_encode($result);
-      //socket_msg($_SESSION['token'], $result);
       echo $json_arr;
     break;
 
@@ -337,37 +320,36 @@ if(isset($_GET['request'])){
 
     case 'edit_display':
       $cid=$_GET['token'];
-      $result=edit_display($_POST, $cid);
+      $data=$_POST;
+      $data['token']=$cid;
+      $result=edit_display($data);
       $json_arr=json_encode($result);
-      //socket_msg($_SESSION['token'], $result);
       echo $json_arr;
     break;
 
     case 'request_real_ip':
-      $cid=$_GET['token'];
-      $result=request_real_ip($_GET, $cid);
+      $result=request_real_ip($_GET);
       $json_arr=json_encode($result);
-      //socket_msg($_SESSION['token'], $result);
       echo $json_arr;
     break;
 
     case 'clear_tunnel_real_ip':
       $cid=$_GET['token'];
-      $result=clear_tunnel_real_ip($_GET, $cid);
+      $result=clear_tunnel_real_ip($_GET);
       $json_arr=json_encode($result);
       echo $json_arr;
     break;
 
     case 'change_tunnel_real_ip':
       $cid=$_GET['token'];
-      $result=change_tunnel_real_ip($_GET, $cid);
+      $result=change_tunnel_real_ip($_GET);
       $json_arr=json_encode($result);
       echo $json_arr;
     break;
 
     case 'clear_acl_real_ip':
       $cid=$_GET['token'];
-      $result=clear_acl_real_ip($_GET, $cid);
+      $result=clear_acl_real_ip($_GET);
       $json_arr=json_encode($result);
       echo $json_arr;
     break;
@@ -396,7 +378,9 @@ if(isset($_GET['request'])){
 
     case 'change_location':
       $cid=$_GET['token'];
-      $result=change_location($_POST, $cid);
+      $data=$_POST;
+      $data['token']=$cid;
+      $result=change_location($data);
       $json_arr=json_encode($result);
       //socket_msg($_SESSION['token'], $result);
       echo $json_arr;
@@ -470,7 +454,7 @@ if(isset($_GET['request'])){
     break;
 
     case 'delete_user_by_admin':
-      echo delete_user_by_admin($_GET['id']);
+      echo delete_user_by_admin($_REQUEST['id']);
     break;
 
     case 'delete_voucher_by_admin':
@@ -600,8 +584,8 @@ if(isset($_GET['request'])){
         $cur_tunnel_acls=array();
         $acl_destinations=get_acl_destination_base($_REQUEST['email'], $_SESSION['user_id']);
         $cur_tunnel_acl_info=get_acl_info($_REQUEST['tunnel_id']);
-        if(count($cur_tunnel_acl_info)>0){
-            $cur_tunnel_acls=array_keys($cur_tunnel_acl_info);
+        if(count($cur_tunnel_acl_info['data'])>0){
+            $cur_tunnel_acls=array_keys($cur_tunnel_acl_info['data']);
         }
       if($acl_destinations!=0){
           echo json_encode(array('acl_destinations'=>$acl_destinations,'cur_tunnel_acls'=>$cur_tunnel_acls));
@@ -615,8 +599,8 @@ if(isset($_GET['request'])){
           $cur_tunnel_acls=array();
           $acl_destinations=get_customer_acl_destination($_REQUEST['customer_id']);
           $cur_tunnel_acl_info=get_acl_info($_REQUEST['tunnel_id']);
-          if(count($cur_tunnel_acl_info)>0){
-              $cur_tunnel_acls=array_keys($cur_tunnel_acl_info);
+          if(count($cur_tunnel_acl_info['data'])>0){
+              $cur_tunnel_acls=array_keys($cur_tunnel_acl_info['data']);
           }
           if($acl_destinations!=0){
               echo json_encode(array('acl_destinations'=>$acl_destinations,'cur_tunnel_acls'=>$cur_tunnel_acls));
@@ -708,6 +692,11 @@ if(isset($_GET['request'])){
           $res=change_searchable($data);
           echo $res;
           break;
+      case 'get_tunnels_for_cloud':
+          $cloud_id=$_REQUEST['cloud_id'];
+          $res=get_tunnels_for_cloud($cloud_id);
+          echo json_encode($res);
+          break;
       case 'get_tunnels_from_ids':
           $data=$_POST;
           $res=get_tunnels_from_ids($data);
@@ -774,7 +763,19 @@ if(isset($_GET['request'])){
           break;
       case 'save_diagram_data':
           $res=save_diagram_data($_POST);
+          print_r($res);
+          break;
+      case 'get_badge_cnt':
+          $res=get_badge_cnt($_GET['id']);
           echo(json_encode($res));
+          break;
+      case 'run_ospf':
+          $res=run_ospf($_GET);
+          print_r($res);
+          break;
+      case 'stop_ospf':
+          $res=stop_ospf($_GET);
+          print_r($res);
           break;
       default:
           echo "404 not found";

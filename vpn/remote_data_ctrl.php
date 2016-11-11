@@ -165,7 +165,7 @@
             });
         });
 
-        setInterval(function(){
+        /*setInterval(function(){
             $.ajax({
                 url:'request.php?request=test_all_remote',
                 success:function(resp){
@@ -181,7 +181,7 @@
                     });
                 }
             });
-        }, 40000);
+        }, 40000);*/
 
         $(".status").click(function(){
             var val = $(this).attr("data");

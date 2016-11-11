@@ -112,7 +112,7 @@
                 });
             });
 
-            setInterval(function(){
+            /*setInterval(function(){
                 $.ajax({
                     url:'../request.php?request=test_all_remote',
                     success:function(resp){
@@ -128,7 +128,7 @@
                         });
                     }
                 });
-            }, 40000);
+            }, 40000);*/
 
             $("body").on("click", ".status", function(){
                 var val = $(this).attr("data");
@@ -291,16 +291,17 @@
             });
 
             $("body").on("click", ".delete_user", function(){
-                var id=$(this).attr("data-pk");
+                var id=$(this).attr("data-id");
                 $.ajax({
                     url:'../request.php?request=delete_user_by_admin',
                     type:"POST",
                     data:{"id": id},
-                      success:function(resp){
-                          if(resp==1){
-                              $(".cust_tr_"+id).remove();
-                          }
-                      }
+                    success:function(resp){
+                        console.log(resp);
+                        if(resp==1){
+                            $("#cust_tr_"+id).remove();
+                        }
+                    }
                 });
             });
 
@@ -508,7 +509,7 @@
           }
      });
 
-         $(document).ajaxComplete(function(event,xhr,settings){
+         /*$(document).ajaxComplete(function(event,xhr,settings){
              console.log(xhr);
              var res=xhr.responseText;
              var trim_res=res.trim();
@@ -517,6 +518,6 @@
                  console.log(xhr.responseText);
                  location.reload(true);
              }
-         });
+         });*/
 </script>
 

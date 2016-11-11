@@ -737,72 +737,67 @@ function sponsor_tunnels($tunnel, $is_shared=true){
 //add cloud section
 function add_cloud($data){
    global $db;
-   $sql = $db->query("INSERT INTO `clouds_data` (`cloud_name`, `user_token`, `email`) VALUES ('".$db->real_escape_string($_POST['cloud_name'])."', '".$db->real_escape_string($_SESSION['token'])."', '".$db->real_escape_string($_POST['cloud_email'])."')");
+   $sql = $db->query("INSERT INTO `clouds_data` (`cloud_name`, `user_token`, `email`) VALUES ('".$db->real_escape_string($data['cloud_name'])."', '".$db->real_escape_string($data['token'])."', '".$db->real_escape_string($data['cloud_email'])."')");
        $last_id=$db->insert_id;
-       $data=array("id"=>$last_id, "clouds_data"=>$_POST['cloud_name'], "customer_id"=>$_SESSION['user_id'], "email"=>$_POST['cloud_email']);
        if($sql){
-          return array("status" => 1, 'data' => 'Cloud Added successfully');
+           return array("status" => 1, 'data' => 'A new cloud added successfully.', "type"=>"add_cloud", "value"=>$last_id);
        }
        else{
-           return array("status" => 0, 'data' => 'error occurred, try again.');
+           return array("status" => 1, 'data' => 'Error encounted.', "type"=>"add_cloud");
        }
 }
 
 //delete tunnel section
-function delete_tunnel($data){
+function delete_tunnel($data){  //for websocket
    global $db;
    $sql = $db->query("SELECT * FROM `tunnels_data` WHERE `tunnel_id`=".$data['id']);
    $row = $sql->fetch_assoc();
    if($sql->num_rows>0){
-
-          $arr=array("data"=>$data);
-
-          $res=remote($data['id'], "delete_tunnel", $arr, "a", $data["token"]);
-          if($res==1){
-            if($data['type']=="server"){
-              $db->query("UPDATE `server_subnets` SET `used_ips`=0 WHERE `subnet`='".$row['cloud_ip']."'");
-              $db->query("UPDATE `real_ip_list` SET `in_use`=0 WHERE `real_ip`='".$row['real_ip']."'");
-           }
-            return array("toclient"=>$_SESSION['token'], "status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'delete_tunnel', 'value'=>$data['id']);
-          }
-      //}
+      $arr=array("data"=>$data);
+      $res=remote($data['id'], "delete_tunnel", $arr, "a", $data["token"]);
+      if($res==1){
+        if($data['type']=="server"){
+          $db->query("UPDATE `server_subnets` SET `used_ips`=0 WHERE `subnet`='".$row['cloud_ip']."'");
+          $db->query("UPDATE `real_ip_list` SET `in_use`=0 WHERE `real_ip`='".$row['real_ip']."'");
+        }
+        return array("status" => 1, 'message_type'=>'reply', 'type'=>'delete_tunnel', 'data' => 'Your request under process, please wait...');
+      }
    }
 }
 
-function gateway_change($id, $val, $token){
+function gateway_change($data){
     global $db;
-    $arr=array("id"=>$id, "value"=>$val);
-    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='gateway_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+    $arr=array("id"=>$data['id'], "value"=>$data['val']);
+    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='gateway_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
     if($sql->num_rows==0){
-        $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$id.", '".$token."', 'gateway_change', '".serialize($arr)."')");
+        $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['id'].", '".$data['token']."', 'gateway_change', '".serialize($arr)."')");
     }else{
-        $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='gateway_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+        $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='gateway_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
     }
     return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"gateway_change", "value"=>$arr);
 }
 
-function status_change($id, $val, $token){
-
+function status_change($data){
     global $db;
-    $arr=array("id"=>$id, "value"=>$val);
-    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='status_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+    $arr=array("id"=>$data['id'], "value"=>$data['val']);
+    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='status_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
     if($sql->num_rows==0){
-        $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$id.", '".$token."', 'status_change', '".serialize($arr)."')");
+        $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['id'].", '".$data['token']."', 'status_change', '".serialize($arr)."')");
     }else{
-        $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='status_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+        $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='status_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
     }
     return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"status_change", "value"=>$arr);
 }
 
-function bidirection_change($id, $val, $token){
+function bidirection_change($data){
   global $db;
   //$_SESSION['users_data'][$id]["bidirection_change"]=array("id"=>$id, "value"=>$val);
-  $arr=array("id"=>$id, "value"=>$val);
-  $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='bidirection_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+  $arr=array("id"=>$data['id'], "value"=>$data['val']);
+  $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='bidirection_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
   if($sql->num_rows==0){
-    $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$id.", '".$token."', 'bidirection_change', '".serialize($arr)."')");
+    $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['id'].", '".$data['token']."', 'bidirection_change', '".serialize($arr)."')");
   }else{
-    $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='bidirection_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+    $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='bidirection_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
   }
   //return $_SESSION['users_data'];
   //if($sql=$db->query("UPDATE `tunnels_data` SET `bidirectional_mode`=".$val." WHERE `tunnel_id`=".$id)){
@@ -814,53 +809,43 @@ function bidirection_change($id, $val, $token){
   //}
 }
 
-function internet_change($id, $val, $token){
+function internet_change($data){
   global $db;
-  //$_SESSION['users_data'][$id]["internet_change"]=array("id"=>$id, "value"=>$val);
-  $arr=array("id"=>$id, "value"=>$val);
-  $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='internet_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+  $arr=array("id"=>$data['id'], "value"=>$data['val']);
+  $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='internet_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
   if($sql->num_rows==0){
-    $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$id.", '".$token."', 'internet_change', '".serialize($arr)."')");
+    $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['id'].", '".$data['token']."', 'internet_change', '".serialize($arr)."')");
   }else{
-    $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='internet_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+    $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='internet_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
   }
-  //if($sql=$db->query("UPDATE `tunnels_data` SET `internet`=".$val." WHERE `tunnel_id`=".$id)){
-      $arr=array("id"=>$id, "value"=>$val);
-      // $res=remote($_SESSION['user_id'], $id, "internet_change", $arr, "b");
-      // if($res==1){
-        return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"internet_change", "value"=>$arr);
-      // }
-  //}
+      $arr=array("id"=>$data['id'], "value"=>$data['val']);
+      return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"internet_change", "value"=>$arr);
 }
 
-function route_change($id, $val, $token){
-  global $db;
-  //$_SESSION['users_data'][$id]["route_change"]=array("id"=>$id, "value"=>$val);
-  $arr=array("id"=>$id, "value"=>$val);
-  $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='route_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
-  if($sql->num_rows==0){
-    $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$id.", '".$token."', 'route_change', '".serialize($arr)."')");
-  }else{
-    $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='route_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
-  }
-  // if($sql=$db->query("UPDATE `tunnels_data` SET `route`=".$val." WHERE `tunnel_id`=".$id)){
-      $arr=array("id"=>$id, "value"=>$val);
-      // $res=remote($_SESSION['user_id'], $id, "route_change", $arr, "b");
-      // if($res==1){
-        return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"route_change", "value"=>$arr);
-      // }
-  // }
+function route_change($data){
+    /*$id, $val, $token*/
+    global $db;
+    $arr=array("id"=>$data['id'], "value"=>$data['val']);
+    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='route_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
+
+    if($sql->num_rows==0){
+        $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['id'].", '".$data['token']."', 'route_change', '".serialize($arr)."')");
+    }else{
+        $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='route_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
+    }
+    $arr=array("id"=>$data['id'], "value"=>$data['val']);
+    return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"route_change", "value"=>$arr);
 }
 
-function plan_change($id, $val, $token){
+function plan_change($data){
+   /* $id, $val, $token*/
   global $db;
-  //$_SESSION['users_data'][$id]["plan_change"]=array("id"=>$id, "value"=>$val);
-  $arr=array("id"=>$id, "value"=>$val);
-  $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='plan_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+  $arr=array("id"=>$data['id'], "value"=>$data['val']);
+  $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='plan_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
   if($sql->num_rows==0){
-    $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$id.", '".$token."', 'plan_change', '".serialize($arr)."')");
+    $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['id'].", '".$data['token']."', 'plan_change', '".serialize($arr)."')");
   }else{
-    $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='plan_change' AND `tunnel_id`=".$id." AND `token`='".$token."'");
+    $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='plan_change' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
   }
   return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"plan_change", "value"=>$arr);
 }
@@ -886,13 +871,13 @@ function group_change($id, $val, $token){
 }
 
 //add tunnel section
-function addTunnel($data, $token){
+function add_tunnel($data){
    global $db;
    $tunnel=array();
    $real_ip="";
    $subnet_ip="";
    $customer_id=0;
-   $sql = $db->query("SELECT `customer_id` FROM `customers_data` WHERE `Cash_amount`>0 and `token` = '".$token."'");
+   $sql = $db->query("SELECT `customer_id` FROM `customers_data` WHERE `Cash_amount`>0 and `token` = '".$data['token']."'");
    if($sql->num_rows!=0){
        $row_customer=$sql->fetch_assoc();
        $customer_id=$row_customer['customer_id'];
@@ -918,26 +903,23 @@ function addTunnel($data, $token){
             $tunnel[0]['group_id']=0;
             $tunnel[0]['username']=$m;
             $tunnel[0]['password']=$n;
-            $tunnel[0]['token']=$token;
+            $tunnel[0]['token']=$data['token'];
             $tunnel[0]['location']=0;
        }
        //return array("status" => 0, 'data' => 'Unexpected error occured.');
-       $res=remote("", "add_new_tunnel", $tunnel, "a", $token);
+       $res=remote("", "add_new_tunnel", $tunnel, "a", $data['token']);
        //return $res;
        if($res==1){
-        /* if($val['type']=="server"){ //There is no $val! check tunnels add!!!
-            $db->query("UPDATE `server_subnets` SET `used_ips`='1'  WHERE `subnet`='".$subnet_ip."'");
-         }*/
        }
    }else{
        return array("status" => 2, 'data' => 'You have no balace to do any operations, please recharge ur account.');
    }
    if($res==1){
-      return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'add_tunnels', "uid"=>$customer_id, 'value'=>$tunnel);
+      return array("status" => 1, 'data' => 'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'add_tunnel', "uid"=>$customer_id, 'value'=>$tunnel);
    }
 }
 
-function add_server_clone($clone_id, $token){
+function add_server_clone($data){
   global $db;
   $tunnel=array();
   $sql2=$db->query("SELECT `subnet` FROM `server_subnets` WHERE `used_ips`=0");
@@ -947,19 +929,18 @@ function add_server_clone($clone_id, $token){
       $subnet_clone=$row2['subnet'];
       $uname=server_username();
       $upass=server_password();
-      $sql1=$db->query("SELECT * FROM `tunnels_data` WHERE `tunnel_id`=".$clone_id);
+      $sql1=$db->query("SELECT * FROM `tunnels_data` WHERE `tunnel_id`=".$data['id']);
       $row_clone=$sql1->fetch_assoc();
         $row_clone['uname']=$uname;
         $row_clone['upass']=$upass;
         $row_clone['cloud_ip']=$subnet_clone;
-        $row_clone['token']=$token;
-        $row_clone['clone_id']=$clone_id;
+        $row_clone['token']=$data['token'];
+        $row_clone['clone_id']=$data['id'];
 
         $tunnel['tunnel']=$row_clone;
-        $tunnel['acl_info']=get_own_acl_info($clone_id);
+        $tunnel['acl_info']=get_own_acl_info($data['id']);
 
-        $res=remote("", "add_server_clone", $tunnel, "a", $token);
-        //$_SESSION['users_data'][$id]["add_server_clone"]=$tunnel;
+        $res=remote("", "add_server_clone", $tunnel, "a", $data['token']);
         if($res==1){
           $db->query("UPDATE `server_subnets` SET `used_ips`='1'  WHERE `subnet`='".$subnet_clone."'");
           return array("status"=>1, "data"=>"Your request under process, please wait...", 'message_type'=>'reply', "type"=>"add_server_clone", "uid"=>$row_clone['customer_id'], "value"=>$tunnel);
@@ -969,18 +950,17 @@ function add_server_clone($clone_id, $token){
   }
 }
 //does nothing?
-function add_client_clone($clone_id, $token){
+function add_client_clone($data){
   global $db;
   $tunnel=array();
     if(!isset($row2)) $row2 = array();
   $subnet_clone=$row2['subnet'];
-  $sql1=$db->query("SELECT * FROM `tunnels_data` WHERE `tunnel_id`=".$clone_id);
+  $sql1=$db->query("SELECT * FROM `tunnels_data` WHERE `tunnel_id`=".$data['id']);
   $row_clone=$sql1->fetch_assoc();
 
     $tunnel['tunnel']=$row_clone;
-    $tunnel['acl_info']=get_own_acl_info($clone_id);
-    $res=remote("", "add_client_clone", $tunnel, "a", $token);
-    //$_SESSION['users_data'][$id]["add_client_clone"]=$tunnel;
+    $tunnel['acl_info']=get_own_acl_info($data['id']);
+    $res=remote("", "add_client_clone", $tunnel, "a", $data['token']);
     if($res==1){
       return array("status"=>1, "data"=>"Your request under process, please wait...", 'message_type'=>'reply', "type"=>"add_client_clone", "uid"=>$row_clone['customer_id'], "value"=>$tunnel);
     }
@@ -1111,71 +1091,56 @@ function edit_email($data, $token){
   //}
 }
 
-function edit_display($data, $token){
+function edit_display($data){
   global $db;
-  //$sql="UPDATE `tunnels_data` SET `display_name`='".$data['value']."' WHERE `tunnel_id`=".$data['pk'];
-  //if($db->query($sql)){
     $arr=array("id"=>$data['pk'], "value"=>$data['value']);
-    //$_SESSION['users_data'][$data['pk']]["edit_display"]=$arr;
-    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='edit_display' AND `tunnel_id`=".$data['pk']." AND `token`='".$token."'");
+    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='edit_display' AND `tunnel_id`=".$data['pk']." AND `token`='".$data['token']."'");
     if($sql->num_rows==0){
-      $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['pk'].", '".$token."', 'edit_display', '".serialize($arr)."')");
+      $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['pk'].", '".$data['token']."', 'edit_display', '".serialize($arr)."')");
     }else{
-      $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='edit_display' AND `tunnel_id`=".$data['pk']." AND `token`='".$token."'");
+      $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='edit_display' AND `tunnel_id`=".$data['pk']." AND `token`='".$data['token']."'");
     }
-    // $res=remote($_SESSION['user_id'], $data['pk'], "edit_display", $arr, "a");
-    // if($res==1){
-      return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"edit_display", "value"=>$arr);
-    // }
-  //}
+    return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"edit_display", "value"=>$arr);
 }
 
-function request_real_ip($data, $token){
+function request_real_ip($data){
   global $db;
   $real_res=$db->query("SELECT `real_ip` from `real_ip_list` where `in_use`='0'");
   $real_num = $real_res->num_rows;
   if($real_num>0){
     $real_row=$real_res->fetch_assoc();
-    //if($db->query("UPDATE `tunnels_data` SET `real_ip`='".$real_row['real_ip']."' WHERE `tunnel_id`=".$data['id'])){
       $arr=array("id"=>$data['id'], "real_ip"=>$real_row['real_ip']);
-      $res=remote($data['id'], "request_real_ip", $arr, "b", $token);
-      // $res=remote($_SESSION['user_id'], $data['id'], "request_real_ip", array("id"=>$data['id'], "real_ip"=>$real_row['real_ip']), "b");
+      $res=remote($data['id'], "request_real_ip", $arr, "b", $data['token']);
       if($res==1){
-        //$db->query("UPDATE `real_ip_list` SET `in_use`=1 WHERE `real_ip`='".$real_row['real_ip']."'");
-        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'request_real_ip', 'id'=>$data['id'], 'value'=>$real_row['real_ip']);
+        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'request_real_ip', 'id'=>$data['id'], 'value'=>$real_row['real_ip']);
       }
-    //}
   }else{
     return array('status'=>0, 'data'=>'Real ip not assigned, Try again');
   }
 }
-function clear_tunnel_real_ip($data, $token){
+function clear_tunnel_real_ip($data){
+    global $db;
+    $arr=array("id"=>$data['id'], "real_ip"=>$data['real_ip']);
+    $res=remote($data['id'], "clear_tunnel_real_ip", $arr, "b", $data['token']);
+    if($res==1){
+        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'clear_tunnel_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
+    }
+}
+function change_tunnel_real_ip($data){
     global $db;
     $arr=array("id"=>$data['id'], "real_ip"=>$data['real_ip']);
     //print_r($arr);die;
-    $res=remote($data['id'], "clear_tunnel_real_ip", $arr, "b", $token);
+    $res=remote($data['id'], "change_tunnel_real_ip", $arr, "b", $data['token']);
     if($res==1){
-        //$db->query("UPDATE `real_ip_list` SET `in_use`=0 WHERE `real_ip`='".$data['real_ip']."'");
-        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'clear_tunnel_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
+        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
     }
 }
-function change_tunnel_real_ip($data, $token){
-    global $db;
-    $arr=array("id"=>$data['id'], "real_ip"=>$data['real_ip']);
-    //print_r($arr);die;
-    $res=remote($data['id'], "change_tunnel_real_ip", $arr, "b", $token);
-    if($res==1){
-        //$db->query("UPDATE `real_ip_list` SET `in_use`=0 WHERE `real_ip`='".$data['real_ip']."'");
-        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
-    }
-}
-function clear_acl_real_ip($data, $token){
+function clear_acl_real_ip($data){
     global $db;
     $arr=array("id"=>$data['id'],"aid"=>$data['aid'], "real_ip"=>$data['real_ip']);
-    //print_r($arr);die;
-    $res=remote($data['id'], "clear_acl_real_ip", $arr, "b", $token);
+    $res=remote($data['id'], "clear_acl_real_ip", $arr, "b", $data['token']);
     if($res==1){
-        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'clear_acl_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
+        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'clear_acl_real_ip', 'id'=>$data['id'], 'value'=>$data['real_ip']);
     }
 }
 
@@ -1256,35 +1221,11 @@ function get_route_path_cnt($tunnel_id){
     return $path_cnt;
 }
 
-function get_cloud_cost($cloud_id,$tunnel_ids_str){
-    /*$cloud_cost=0;
-    $tunnel_ids=explode(",",$tunnel_ids_str);
-    foreach ($tunnel_ids as $tunnel_id){
-        $tunnel_data=get_tunnels_data($tunnel_id);
-        $cloud_cost+=intval(packages($tunnel_data[0]));
-    }*/
-    //return $cloud_cost;
-    global $db;
-    $cloud_cost=0;
-    $tunnel_sql = "SELECT `tunnel_id` FROM `tunnels_data` WHERE `cloud_id`='".$db->real_escape_string($cloud_id)."' and `user_token`='".$db->real_escape_string($_SESSION['token'])."' and `tunnels_data`.`is_deleted`=0";
-    $tunnel_query=$db->query($tunnel_sql);
-    while($row=$tunnel_query->fetch_assoc()){
-        $tunnel_id=$row['tunnel_id'];
-        $cloud_cost+=get_tunnel_cost($tunnel_id);
-    }
-    return $cloud_cost;
-}
-function get_tunnel_cost($tunnel_id){
-    $tunnel_data=get_tunnels_data($tunnel_id);
-    $tunnel_cost=intval(packages($tunnel_data[0])) * cash_to_point();
-    return $tunnel_cost;
-}
-
 function change_tunnel($data){
     global $db;
     $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE (`type`='change_tunnel_client' OR `type`='change_tunnel_server') AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
     $sql2=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='create_new_acl' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
-    if($data['type']=="server"){
+    if($data['val']=="client"){
         $arr=array("id"=>$data['id']);
         if($sql->num_rows==0){
             $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['id'].", '".$data['token']."', 'change_tunnel_client', '".serialize($arr)."')");
@@ -1294,13 +1235,8 @@ function change_tunnel($data){
         if($sql->num_rows > 0){
             $db->query("DELETE FROM `job_queue_temp` WHERE `type`='create_new_acl' AND `tunnel_id`=".$data['id']." AND `token`='".$data['token']."'");
         }
-
-        //$db->query("INSERT INTO `job_queue` (`tunnel_id`, `action`, `group`, `new_data`, `added_time`, `token`) VALUES('".$data2['id']."', 'create_new_acl', 'a', '".serialize($data2)."', now(), '".$data2['token']."')");
-        // $res=remote($data['id'], "change_tunnel_client", $arr, "b", $data['token']);
-        //  if($res==1){
-        return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_to_server', 'value'=>$arr);
-        //  }
-    }else if($data['type']=="client"){
+        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_to_client', 'value'=>$arr);
+    }else if($data['val']=="server"){
         $arr=array("id"=>$data['id']);
         $data2 = array(
             'id' => $data['id'],
@@ -1316,47 +1252,20 @@ function change_tunnel($data){
         if($sql2->num_rows==0){
             $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data2['id'].", '".$data2['token']."', 'create_new_acl', '".serialize($data2)."')");
         }
-        // $res=remote($data['id'], "change_tunnel_server", $arr, "b", $data['token']);
-        // if($res==1){
-        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_to_client', 'value'=>$arr);
-        //  }
+        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_to_server', 'value'=>$arr);
     }
 }
-/*
-function change_tunnel($data){
-  global $db;
-  if($data['type']=="server"){
-        $arr=array("id"=>$data['id']);
-        $res=remote($data['id'], "change_tunnel_client", $arr, "b", $data['token']);
-        if($res==1){
-          return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_to_server', 'value'=>$arr);
-        }
-  }else if($data['type']=="client"){
-      $arr=array("id"=>$data['id']);
-      $res=remote($data['id'], "change_tunnel_server", $arr, "b", $data['token']);
-      if($res==1){
-        return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', 'type'=>'change_tunnel_to_client', 'value'=>$arr);
-      }
-  }
-}*/
 
-function change_location($data, $token){
+function change_location($data){
   global $db;
-  //$sql="UPDATE `tunnels_data` SET `location`='".$data['value']."' WHERE `tunnel_id`=".$data['pk'];
-  //if($db->query($sql)){
     $arr=array("id"=>$data['pk'], "value"=>$data['value']);
-    //$_SESSION['users_data'][$data['pk']]["change_location"]=$arr;
-    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='change_location' AND `tunnel_id`=".$data['pk']." AND `token`='".$token."'");
+    $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `type`='change_location' AND `tunnel_id`=".$data['pk']." AND `token`='".$data['token']."'");
     if($sql->num_rows==0){
-      $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['pk'].", '".$token."', 'change_location', '".serialize($arr)."')");
+      $db->query("INSERT INTO `job_queue_temp` (`tunnel_id`, `token`, `type`, `data`) VALUES(".$data['pk'].", '".$data['token']."', 'change_location', '".serialize($arr)."')");
     }else{
-      $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='change_location' AND `tunnel_id`=".$data['pk']." AND `token`='".$token."'");
+      $db->query("UPDATE `job_queue_temp` SET `data`='".serialize($arr)."' WHERE `type`='change_location' AND `tunnel_id`=".$data['pk']." AND `token`='".$data['token']."'");
     }
-    // $res=remote($_SESSION['user_id'], $data['pk'], "change_location", $arr, "b");
-    // if($res==1){
-      return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"change_location", "value"=>$arr);
-    // }
-  //}
+      return array('status'=>1, 'data'=>'Your request under process, please wait...', 'message_type'=>'reply', "type"=>"change_location", "value"=>$arr);
 }
 
 function get_subnet($data){
@@ -1416,9 +1325,7 @@ function real_ip_status($data, $token){
 function save_a_tunnel($id, $token){
   global $db;
   $data=array();
-  //echo "SELECT * FROM `job_queue_temp` WHERE `tunnel_id`=".$id." AND `token`='".$token."'";die;
   $sql=$db->query("SELECT * FROM `job_queue_temp` WHERE `tunnel_id`=".$id." AND `token`='".$token."'");
-
   if($sql->num_rows>0){
     while($arr=$sql->fetch_assoc()){
       $value=unserialize($arr['data']);
@@ -1431,13 +1338,11 @@ function save_a_tunnel($id, $token){
       $res=remote($id, $arr['type'], $value, $group, $arr['token']);
     }
     if($res==1){
-      $db->query("DELETE FROM `job_queue_temp` WHERE `tunnel_id`=".$id);
-      //unset($_SESSION["users_data"][$id]);
-        if(!isset($user_id)) $user_id = ""; //What is it?????
-      return array('toclient'=>$_SESSION['token'], 'status'=>1, 'data'=>'Your request submitted, please wait for while', 'message_type'=>'reply', 'type'=>'save_a_tunnel', 'value'=>$id, 'cust_id'=>$user_id);
+        $db->query("DELETE FROM `job_queue_temp` WHERE `tunnel_id`=".$id);
+        return array('status'=>1, 'message'=>'Your request submitted, please wait for while', 'message_type'=>'reply', 'type'=>'save_a_tunnel', 'data'=>array('id'=>$id));
     }
   }else{
-    return array('status'=>0, 'data'=>'Your request either submitted, or not changed yet, please try again');
+    return array('status'=>0, 'message'=>'Your request either submitted, or not changed yet, please try again');
   }
 }
 
@@ -1467,19 +1372,55 @@ function save_all_tunnel($token){
   }
 }
 
-function delete_cloud($cloud_id, $token){
-  global $db;
-  if($db->query("DELETE FROM `clouds_data` WHERE `cloud_id`=".$cloud_id)){
-    $sql=$db->query("SELECT * FROM `tunnels_data` WHERE `cloud_id`=".$cloud_id);
-    if($sql->num_rows>0){
-      while ($row=$sql->fetch_assoc()) {
-        $data['id']=$row['tunnel_id'];
-        $data['token']=$token;
-        delete_tunnel($data);
-      }
-      $_SESSION['msg']="Cloud is_deleted successfully and its related tunnel will be removed soon";
+function delete_cloud($data){
+    global $db;
+    $cloud_id=$data['cloud_id'];
+    $tunnels_sql="select `tunnel_id`,`real_ip` from `tunnels_data` where `cloud_id`='".$cloud_id."'";
+    $tunnels_query=$db->query($tunnels_sql);
+    if($tunnels_query->num_rows>0){
+        while($tunnel_data=$tunnels_query->fetch_assoc()){
+            $tunnel_id=$tunnel_data['tunnel_id'];
+            $acls_sql="select `id` from `tunnel_acl_relation` where `tunnel_id`=".$tunnel_id;
+            $acls_query=$db->query($acls_sql);
+            if($acls_query->num_rows>0){ //clean all acls
+                while($acl_data=$acls_query->fetch_assoc()){
+                    $acl_id=$acl_data['id'];
+                    $destination_real_ip_sql="select `destination-real_ip` from `destination` where `acl_id`=".$acl_id;
+                    $destination_real_ip_query=$db->query($destination_real_ip_sql);
+                    if($destination_real_ip_query->num_rows>0){
+                        $destination_data=$destination_real_ip_query->fetch_assoc();
+                        $destination_real_ip=$destination_data['destination-real_ip'];
+                        if($destination_real_ip!="" && $destination_real_ip!="0"){
+                            unset_real_ip($destination_real_ip,$acl_id); //clean all real ips
+                        }
+                    }
+                    $db->query("DELETE FROM `tunnel_acl_relation` WHERE `id`=".$acl_id);
+                    $db->query("DELETE FROM `destination` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `d_final` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `c_firewall` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `c_forwarding` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `c_qos` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `c_routing` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `source` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `s_aliasing` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `s_firewall` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `s_qos` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `s_tos` WHERE `acl_id`=".$acl_id);
+                    $db->query("DELETE FROM `user_acl_relation` WHERE `acl_id`=".$acl_id);
+                }
+            }
+            $tunnel_real_ip=$tunnel_data["real_ip"];
+            if($tunnel_real_ip!="" && $tunnel_real_ip!="0"){
+                unset_real_ip($tunnel_real_ip,$acl_id); //clean all real ips
+            }
+            $db->query("DELETE FROM `tunnels_data` WHERE `tunnel_id`=".$tunnel_id);
+            $db->query("DELETE FROM `shared_tunnel` WHERE `tunnel_id`=".$tunnel_id);
+        }
     }
-  }
+    $db->query("DELETE FROM `shared_tunnel` WHERE `cloud_id`=".$cloud_id);
+    $db->query("DELETE FROM `clouds_data` WHERE `cloud_id`='".$cloud_id."'");
+    return array('status'=>1, 'data'=>'Cloud is_deleted successfully and its related tunnel will be removed soon', 'message_type'=>'reply', 'type'=>'delete_cloud', 'cloud_id'=>$cloud_id);
+
 }
 
 function active_user_by_admin($c_id, $value){
@@ -1527,10 +1468,9 @@ function voucher_edit($data){
   }
 }
 function delete_user_by_admin($customer_id){
-    global $db;
-    $delete_qry="DELETE FROM `customers_data` WHERE `customer_id`=".$customer_id;
-    $delete_succ=$db->query($delete_qry);
-    return $delete_succ;
+    $customer_data=get_customer_data_from_id($customer_id);
+    destroy_account($customer_data['token']);
+    return 1;
 }
 function delete_voucher_by_admin($id){
     global $db;
@@ -1588,17 +1528,6 @@ function login_as_user($data){
         return array("status" => 0, 'data' => 'User not exist', 'type'=>'login', 'message_type'=>'reply', 'value'=>array());
     }
 }
-function get_tunnels($token){
-    global $db;
-    $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE  `tunnels_data`.`user_token`='".$db->real_escape_string($token)."' and `tunnels_data`.`is_deleted`=0";
-    //echo $tunnel." order by group_id asc ";die;
-    $sql=$db->query($tunnel." order by group_id asc, group_id");
-    $data=array();
-    while($row=$sql->fetch_assoc()){
-        $data[]=$row;
-    }
-    return array("type"=>"get_tunnels", "message_type"=>"reply", "data"=>$data);
-}
 function set_def_cash($data){
     global $db;
     if($db->query("UPDATE `settings` SET `settings_value`=".$data['dcash']." WHERE `settings_name`='default_cash'")){
@@ -1611,10 +1540,10 @@ function set_point_val($data){
         return true;
     }
 }
-function dev_status_toggle($data)
+function change_dev_status($data) //for websocket
 {
     global $db;
-
+    $result=array("type"=>"change_dev_status", "message_type"=>"reply", "data"=>array("status"=>"0","data"=>$data));
     $res = $db->query("SELECT * FROM `tunnels_data` WHERE `tunnel_id`=" . $data['id']);
     if($res->num_rows > 0)
     {
@@ -1625,10 +1554,12 @@ function dev_status_toggle($data)
         {
             $dev_status = 1;
         }
-        $db->query("UPDATE `tunnels_data` SET `dev_status`=" . $dev_status . " WHERE `tunnel_id`=" . $data['id']);
-        return array('status' =>1 , 'message'=>array('st' => $dev_status, 'DeV' => $row['DeV']));
+        if($db->query("UPDATE `tunnels_data` SET `dev_status`=" . $dev_status . " WHERE `tunnel_id`=" . $data['id'])){
+            $result['data']['status']=1;
+            $result['data']['data']=array('id'=>$data['id'], 'st' => $dev_status, 'DeV' => $row['DeV']);
+        }
     }
-    return array('status' =>0 , 'message'=>'Error performing request');
+    return $result;
 }
 function is_acl_installed($tunnel_id, $acl_id){
     global $db;
@@ -1657,6 +1588,258 @@ function check_acl_status($tunnel_id,$acl_id){
         $result=$row['status'];
     }
     return $result;
+}
+function get_tunnels_for_cloud($cloud_id){
+    global $db;
+    $cloud=array();
+    $sql="select * from `clouds_data` where `cloud_id`='".$cloud_id."' and `is_deleted`=0 and `is_shared`=0";
+    $res=$db->query($sql);
+    if($res->num_rows>0){
+        $cloud=$res->fetch_assoc();
+        $cloud_id=$cloud['cloud_id'];
+        $cloud_tunnels=get_tunnels_from_cloud_id($cloud_id,$cloud['user_token']);
+        $cloud['tunnels']=$cloud_tunnels;
+        $cloud_cost=get_cloud_cost($cloud_id);
+        $cloud['cost']=$cloud_cost;
+    }
+    return $cloud;
+}
+function get_tunnels($token) //for websocket
+{
+    global $db;
+    $cloud_tunnels_data=array();
+    $sql="select * from `clouds_data` where `user_token`='".$token."' and `is_deleted`=0 and `is_shared`=0";
+    $res=$db->query($sql);
+    if($res->num_rows>0){
+        while($cloud=$res->fetch_assoc()){
+            $cloud_id=$cloud['cloud_id'];
+            $cloud_tunnels=get_tunnels_from_cloud_id($cloud_id,$token);
+            $cloud['tunnels']=$cloud_tunnels;
+            $cloud_cost=get_cloud_cost($cloud_id);
+            $cloud['cost']=$cloud_cost;
+            $cloud_tunnels_data[]=$cloud;
+        }
+    }
+    //This is for shared clouds.
+    $check_shared_cloud_sql="SELECT * FROM `clouds_data` WHERE `user_token`='".$token."' AND `is_shared`=1";
+    $shared_cloud=array();
+    $query=$db->query($check_shared_cloud_sql);
+    if($query->num_rows==0){
+        $cloud_insert_sql="INSERT INTO `clouds_data` (`cloud_name`,`user_token`,`is_shared`) VALUES ('shared','".$token."','1')";
+        $db->query($cloud_insert_sql);
+        $shared_cloud=array('cloud_id'=>"-1",'cloud_name'=>"shared",'is_searchable'=>"1");
+    }else{
+        $shared_cloud=$query->fetch_assoc();
+    }
+    $shared_cloud['cloud_id']="-1";
+    $shared_cloud_tunnels=get_tunnels_from_cloud_id($shared_cloud['cloud_id'],$token);
+    $shared_cloud['tunnels']=$shared_cloud_tunnels;
+    $shared_cloud['cost']=0;
+    $cloud_tunnels_data[]=$shared_cloud;
+    $data=array('cloud_tunnels_data'=>$cloud_tunnels_data);
+    return array("type"=>"get_tunnels", "message_type"=>"reply", "data"=>$data);
+}
+function get_tunnels_from_cloud_id($cloud_id,$token)
+{
+    global $db;
+    $customer_data=get_customer_data_from_token($token);
+    $tunnels_data = array();
+    if ($cloud_id == -1) { //shared cloud
+        $sql_tunnel= $db->query("SELECT * FROM `shared_tunnel` WHERE `shared_with`=".$db->real_escape_string($customer_data['customer_id']));
+        $tunnels="";
+        if($sql_tunnel->num_rows>0){
+            while($row_tunnel=$sql_tunnel->fetch_assoc()){
+                $tunnels.=$row_tunnel['tunnel_id'].",";
+            }
+            $tunnels=rtrim($tunnels, ",");
+        }
+        if($tunnels==""){
+            return $tunnels_data;
+        }
+
+        $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE `tunnels_data`.`tunnel_id` IN (".$tunnels.") and `tunnels_data`.`is_deleted`=0";
+        $sql=$db->query($tunnel." order by group_id asc, group_id");
+        $data=array();
+        while($row=$sql->fetch_assoc()){
+            $data[]=$row;
+        }
+
+        $tunnel_ids="";
+        foreach($data as $tunnel_data){
+            $tunnel_ids.=$tunnel_data['tunnel_id'];
+            $tunnel_ids.=",";
+
+            $acl_ids=array();
+            $installed_acl_ids=array();
+            $real_ips=array();
+            $installed_real_ips=array();
+
+            $sql="select id from tunnel_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."'";
+            $res=$db->query($sql);
+            while($row=$res->fetch_assoc()){
+                $acl_ids[]=$row['id'];
+            }
+            if($tunnel_data['real_ip']!=""){
+                $real_ips[]=$tunnel_data['real_ip'];
+            }
+            unset($tunnel_data['real_ip']);
+            if(count($acl_ids)>0){
+                $acl_ids_str=implode(",",$acl_ids);
+                $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
+                $res=$db->query($sql);
+                while($row=$res->fetch_assoc()){
+                    if(!in_array($row['destination-real_ip'],$real_ips)){
+                        if($row['destination-real_ip']!=""){
+                            $real_ips[]=$row['destination-real_ip'];
+                        }
+                    }
+                }
+            }
+            $sql="select acl_id from user_acl_relation where tunnel_id='".$tunnel_data['tunnel_id']."' and status=1";
+            $res=$db->query($sql);
+            while($row=$res->fetch_assoc()){
+                $installed_acl_ids[]=$row['acl_id'];
+            }
+            if(count($installed_acl_ids)>0){
+                $acl_ids_str=implode(",",$installed_acl_ids);
+                $sql="SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (".$acl_ids_str.") GROUP BY `destination-real_ip`";
+                $res=$db->query($sql);
+                while($row=$res->fetch_assoc()){
+                    if(!in_array($row['destination-real_ip'],$installed_real_ips)){
+                        if($row['destination-real_ip']!=""){
+                            $installed_real_ips[]=$row['destination-real_ip'];
+                        }
+                    }
+                }
+            }
+            $tunnel_data['real_ip']=$real_ips;
+            $tunnel_data['installed_real_ips']=$installed_real_ips;
+            $tunnel_data['cost']=get_tunnel_cost($tunnel_data['tunnel_id']);
+            $tunnels_data[]=$tunnel_data;
+        }
+    } else { //own cloud
+        $sql="select * from `clouds_data` where `cloud_id`='".$cloud_id."' and `is_deleted`=0 and `is_shared`=0";
+        $query=$db->query($sql);
+        if($query->num_rows == 0){
+            return $tunnels_data;
+        }
+        $cloud_data=$query->fetch_assoc();
+        $cloud_id = $cloud_data['cloud_id'];
+        $cloud_name = $cloud_data['cloud_name'];
+        $is_searchable = $cloud_data['is_searchable'];
+        $tunnel = "SELECT `tunnels_data`.*, `remote_server_list`.`server_name` `location`, `real_ip_list`.`is_active` `active` FROM `tunnels_data` left join `real_ip_list` on `tunnels_data`.`real_ip`=`real_ip_list`.`real_ip` left join `remote_server_list` on `tunnels_data`.`location`=`remote_server_list`.`id` WHERE `tunnels_data`.`cloud_id`='" . $db->real_escape_string($cloud_id) . "' and `tunnels_data`.`user_token`='" . $db->real_escape_string($token) . "' and `tunnels_data`.`is_deleted`=0";
+        $tunnel_query = $db->query($tunnel . " order by group_id asc, group_id");
+        $data = array();
+        while ($row = $tunnel_query->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        $tunnel_ids = "";
+        foreach ($data as $tunnel_data) {
+            $tunnel_ids .= $tunnel_data['tunnel_id'];
+            $tunnel_ids .= ",";
+
+            $acl_ids = array();
+            $installed_acl_ids = array();
+            $real_ips = array();
+            $installed_real_ips = array();
+
+            $sql = "select id from tunnel_acl_relation where tunnel_id='" . $tunnel_data['tunnel_id'] . "'";
+            $res = $db->query($sql);
+            while ($row = $res->fetch_assoc()) {
+                $acl_ids[] = $row['id'];
+            }
+            if ($tunnel_data['real_ip'] != "") {
+                $real_ips[] = $tunnel_data['real_ip'];
+            }
+            unset($tunnel_data['real_ip']);
+            if (count($acl_ids) > 0) {
+                $acl_ids_str = implode(",", $acl_ids);
+                $sql = "SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (" . $acl_ids_str . ") GROUP BY `destination-real_ip`";
+                $res = $db->query($sql);
+                while ($row = $res->fetch_assoc()) {
+                    if (!in_array($row['destination-real_ip'], $real_ips)) {
+                        if ($row['destination-real_ip'] != "") {
+                            $real_ips[] = $row['destination-real_ip'];
+                        }
+                    }
+                }
+            }
+            $sql = "select acl_id from user_acl_relation where tunnel_id='" . $tunnel_data['tunnel_id'] . "' and status=1";
+            $res = $db->query($sql);
+            while ($row = $res->fetch_assoc()) {
+                $installed_acl_ids[] = $row['acl_id'];
+            }
+            if (count($installed_acl_ids) > 0) {
+                $acl_ids_str = implode(",", $installed_acl_ids);
+                $sql = "SELECT `destination-real_ip` FROM `destination` WHERE `acl_id` IN (" . $acl_ids_str . ") GROUP BY `destination-real_ip`";
+                $res = $db->query($sql);
+                while ($row = $res->fetch_assoc()) {
+                    if (!in_array($row['destination-real_ip'], $installed_real_ips)) {
+                        if ($row['destination-real_ip'] != "") {
+                            $installed_real_ips[] = $row['destination-real_ip'];
+                        }
+                    }
+                }
+            }
+            $tunnel_data['real_ip'] = $real_ips;
+            $tunnel_data['installed_real_ips'] = $installed_real_ips;
+            $tunnel_data['cost']=get_tunnel_cost($tunnel_data['tunnel_id']);
+            $tunnels_data[] = $tunnel_data;
+        }
+    }
+    return $tunnels_data;
+}
+function get_cloud_cost($cloud_id){
+    global $db;
+    $cloud_cost=0;
+    $tunnel_sql = "SELECT `tunnel_id` FROM `tunnels_data` WHERE `cloud_id`='".$db->real_escape_string($cloud_id)."' and `tunnels_data`.`is_deleted`=0";
+    $tunnel_query=$db->query($tunnel_sql);
+    while($row=$tunnel_query->fetch_assoc()){
+        $tunnel_id=$row['tunnel_id'];
+        $cloud_cost+=get_tunnel_cost($tunnel_id);
+    }
+    return $cloud_cost;
+}
+function get_tunnel_cost($tunnel_id){
+    $tunnel_data=get_tunnels_data($tunnel_id);
+    $tunnel_cost=intval(packages($tunnel_data[0])) * cash_to_point();
+    return $tunnel_cost;
+}
+function get_customer_data_from_token($token){
+    global $db;
+    $customer_data=array();
+    $sql="select * from `customers_data` where `token`='".$token."'";
+    $query=$db->query($sql);
+    if($query->num_rows>0){
+        $customer_data=$query->fetch_assoc();
+    }
+    return $customer_data;
+}
+function get_customer_data_from_id($customer_id){
+    global $db;
+    $customer_data=array();
+    $sql="select * from `customers_data` where `customer_id`='".$customer_id."'";
+    $query=$db->query($sql);
+    if($query->num_rows>0){
+        $customer_data=$query->fetch_assoc();
+    }
+    return $customer_data;
+}
+function get_profile_info($token)//for websocket
+{
+    $data=get_customer_data_from_token($token);
+    return array("type"=>"get_profile_info", "message_type"=>"reply", "data"=>$data);
+}
+function get_home_info($token)//for websocket
+{
+    $data=array();
+    return array("type"=>"get_home_info", "message_type"=>"reply", "data"=>$data);
+}
+function get_social_info($token)//for websocket
+{
+    $data=array();
+    return array("type"=>"get_social_info", "message_type"=>"reply", "data"=>$data);
 }
 ?>
 

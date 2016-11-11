@@ -9,11 +9,12 @@ echo "success";
 
 <?php
 include '/var/www/html/vpn/includes/config.php';
-include '/var/www/html/vpn/includes/connection.php';
-require '/var/www/html/vpn/api/api_function.php';
+include ROOT_PATH.'/includes/connection.php';
+require ROOT_PATH.'/api/api_function.php';
 
-set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'phpseclib');
-include_once('Net/SSH2.php');
+set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . '..'.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'phpseclib');
+include_once(ROOT_PATH.'/includes/phpseclib/Net/SSH2.php');
+include_once(ROOT_PATH.'/includes/phpseclib/Net/SFTP.php');
 
 $srv = shell_exec("status serverphp_runner");
 if(strpos($srv, 'stop/waiting') !== false) {
@@ -49,8 +50,15 @@ while($server=$servers->fetch_assoc())
     try {
         $ssh = new Net_SSH2($ip);
         if (!$ssh->login($ssh_username, $ssh_password)) {
-            $db->query("UPDATE `remote_server_list` SET `current_status`= 'Login Failed' WHERE `id` = " . $server['id']);
+            $db->query("UPDATE `remote_server_list` SET `current_status`= 'Login Failed',`ressnap`='' WHERE `id` = " . $server['id']);
+            $db->query("UPDATE `diagram_nodes` SET `color`= '#777777' WHERE `id` = " . $server['id']);
             continue;
+        }else{
+            if($server['remote_group']=="a"){
+                $db->query("UPDATE `diagram_nodes` SET `color`= '#00ff00' WHERE `id` = " . $server['id']);
+            }else{
+                $db->query("UPDATE `diagram_nodes` SET `color`= '#00ffff' WHERE `id` = " . $server['id']);
+            }
         }
     }
     catch (Exception $e)

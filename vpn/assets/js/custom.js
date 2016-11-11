@@ -1,8 +1,19 @@
 var acl_value={};
 var items = ["#996600", "#003366", "#336699", "#00cc66", "#ff6666"];
-
+var status_arr=['<i class="fa fa-fw fa-circle" style="color:#DA3838"></i>', '<i class="fa fa-fw fa-circle" style="color:#1D9E74"></i>'];
+var gateway_arr=['<i class="fa fa-times" style="color:#DA3838"></i>', '<i class="fa fa-check" style="color:#1D9E74"></i>'];
+var internet_arr=['<i class="fa fa-globe" style="color:#393333"></i>', '<i class="fa fa-globe" style="color:#1D9E74"></i>'];
+var btn_arr=['#393333', '#1D9E74'];
+var biderection_arr=[
+    '<i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right"></i>',
+    '<i class="fa fa-chevron-left" style="color:#1D9E74"></i><i class="fa fa-chevron-right" style="color:#1D9E74"></i>',
+    '<i class="fa fa-chevron-left" style="color:#1D9E74"></i><i class="fa fa-chevron-right"></i>',
+    '<i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right" style="color:#1D9E74"></i>'
+];
+var group_arr=['<span style="color: #ea4335;"><strong>A</strong></span>', '<span style="color: #839D1C;"><strong>B</strong></span>', '<span style="color: #00A998;"><strong>C</strong></span>', '<span style="color: #F6AE00;"><strong>D</strong></span>', '<span style="color: #4285F4;"><strong>E</strong></span>', '<span style="color: #330033;"><strong>F</strong></span>', '<span style="color: #FF404E;"><strong>G</strong></span>', '<span style="color: #FFFF00;"><strong>H</strong></span>', '<span style="color: #FF3300;"><strong>I</strong></span>', '<span style="color: #CC6600;"><strong>J</strong></span>', '<span style="color: #9999CC;"><strong>K</strong></span>', '<span style="color: #0000CC;"><strong>L</strong></span>', '<span style="color: #FF0000;"><strong>M</strong></span>', '<span style="color: #003366;"><strong>N</strong></span>', '<span style="color: #003333;"><strong>0</strong></span>', '<span style="color: #FF00CC;"><strong>P</strong></span>', '<span style="color: #FF0066;"><strong>Q</strong></span>', '<span style="color: #CC0000;"><strong>R</strong></span>', '<span style="color: #CC6600;"><strong>S</strong></span>', '<span style="color: #666666;"><strong>T</strong></span>', '<span style="color: #330066;"><strong>U</strong></span>', '<span style="color: #CC99CC;"><strong>V</strong></span>', '<span style="color: #FFCC66;"><strong>W</strong></span>', '<span style="color: #FF3399;"><strong>X</strong></span>', '<span style="color: #99CCFF;"><strong>Y</strong></span>', '<span style="color: #0099FF;"><strong>Z</strong></span>'];
+var box_btn_val;
 $(document).ready(function(){
-    var group_arr=['<span style="color: #ea4335;"><strong>A</strong></span>', '<span style="color: #839D1C;"><strong>B</strong></span>', '<span style="color: #00A998;"><strong>C</strong></span>', '<span style="color: #F6AE00;"><strong>D</strong></span>', '<span style="color: #4285F4;"><strong>E</strong></span>', '<span style="color: #330033;"><strong>F</strong></span>', '<span style="color: #FF404E;"><strong>G</strong></span>', '<span style="color: #FFFF00;"><strong>H</strong></span>', '<span style="color: #FF3300;"><strong>I</strong></span>', '<span style="color: #CC6600;"><strong>J</strong></span>', '<span style="color: #9999CC;"><strong>K</strong></span>', '<span style="color: #0000CC;"><strong>L</strong></span>', '<span style="color: #FF0000;"><strong>M</strong></span>', '<span style="color: #003366;"><strong>N</strong></span>', '<span style="color: #003333;"><strong>0</strong></span>', '<span style="color: #FF00CC;"><strong>P</strong></span>', '<span style="color: #FF0066;"><strong>Q</strong></span>', '<span style="color: #CC0000;"><strong>R</strong></span>', '<span style="color: #CC6600;"><strong>S</strong></span>', '<span style="color: #666666;"><strong>T</strong></span>', '<span style="color: #330066;"><strong>U</strong></span>', '<span style="color: #CC99CC;"><strong>V</strong></span>', '<span style="color: #FFCC66;"><strong>W</strong></span>', '<span style="color: #FF3399;"><strong>X</strong></span>', '<span style="color: #99CCFF;"><strong>Y</strong></span>', '<span style="color: #0099FF;"><strong>Z</strong></span>'];
+
 
     dialog = $( "#dialog-form" ).dialog({
         minWidth: 700,
@@ -89,7 +100,6 @@ $(document).ready(function(){
                     success:function(resp){
                         data=$.parseJSON(resp);
                         if(data.status==1){
-                            //notify_msg("success", data.data);
                             ths.editable('toggleDisabled');
                             //ths.parent("div").attr("data-original-title", "This field is processing its last job, please wait...");
                             send(resp);
@@ -436,51 +446,19 @@ $(document).ready(function(){
         }
     });
 
-    $('#add_cloud_form').validate({
-        rules: {
-            cloud_name: {
-                required: true
-            },
-            cloud_email: {
-                required: true
+    $("body").on("click", "#add_cloud_btn", function(){
+        var cloud_name=$("#cloud_name").val();
+        var cloud_email="abcd@email.com";
+        var get={
+            "type":"add_cloud",
+            "message_type":"request",
+            "data":{
+                "token":token,
+                "cloud_name":cloud_name,
+                "cloud_email":cloud_email
             }
-        },
-        messages: {
-            cloud_name: {
-                cloud_name: "Please enter cloud name"
-            },
-            cloud_email: {
-                cloud_email: "Please enter email address"
-            }
-        },
-        submitHandler: function(form) {
-            $.ajax({
-                url:'request.php?request=add_cloud',
-                type:'POST',
-                data : $(form).serialize(),
-                success : function(resp){
-                    //alert(resp);
-                        var result = $.parseJSON(resp);
-                        if(result.status == 1){
-                            $('#manual_add_success_message').show();
-                            $('#manual_add_error_message').hide();
-                            $('#manual_add_success_message').html(result.data);
-                            setTimeout(function(){location.reload()}, 2000)
-                        }
-                        else if(result.status == 0){
-                            $('#manual_add_success_message').hide();
-                            $('#manual_add_error_message').show();
-                            $('#manual_add_error_message').html(result.data);
-                        }
-                        else{
-                            $('#manual_add_success_message').hide();
-                            $('#manual_add_error_message').show();
-                            $('#manual_add_error_message').html('Error occurred, try again');
-                        }
-                }
-            });
-            return false;
-        }
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("click", "#tunnel_form_close_btn", function(){
@@ -491,28 +469,16 @@ $(document).ready(function(){
     $('body').on('click', '.tunnel_add_form_btn',function(){
         var cloud=$(this).attr("data-cloud");
         console.log('add tunnel');
-        $.ajax({
-            url:'request.php?request=addTunnel&token='+token,
-            type:'POST',
-            data:{"cloud_id":$(this).attr("data-val"), "mail_id":$(this).attr("data-mail")},
-            success:function(resp){
-                var data=$.parseJSON(resp);
-                console.log(data);
-                //alert(resp);
-                if(data.status==1){
-                    //$("#tunnel_body").append(tunnels(data.value, packages));
-                    notify_msg("success", data.data);
-                    $("#tunnel_form").html("");
-                    $("#tunnels_form_field").css("display", "none");
-                    //$(".tunnel_editable").trigger("click");
-                }else if(data.status==0){
-                    console.log(data.data);
-                    notify_msg("error", data.data);
-                }else if(data.status==2){
-                     notify_msg("error", data.data);
-                }
+        var get={
+            "type":"add_tunnel",
+            "message_type":"request",
+            "data":{
+                "token":token,
+                "cloud_id":$(this).attr("data-val"),
+                "mail_id":$(this).attr("data-mail")
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("click", ".delete_tunnel", function(){
@@ -528,7 +494,6 @@ $(document).ready(function(){
                     resp=jQuery.parseJSON(res);
                     if(resp.status=='1'){
                         var str="This tunnel is shared with "+resp.shared_with;
-                        //notify_msg("error", str);
                         alert(str);
                         deletable=false;
                     }else{
@@ -536,17 +501,17 @@ $(document).ready(function(){
                     }
                     if(deletable){
                         if(confirm("Are you sure?")){
-                            $(".tunnel_"+id).html('<i class="fa fa-fw fa-circle-o-notch fa-spin"></i>');
-                            $.ajax({
-                                url:"request.php?request=delete_tunnel&id="+id+"&type="+type+", &token="+token,
-                                success:function(data){
-                                    resp=$.parseJSON(data);
-                                    if(resp.status==1){
-                                        notify_msg("success", resp.data);
-                                        $(".overlay_"+id).css("display", "block");
-                                    }
+                            var get={
+                                "type":"delete_tunnel",
+                                "message_type":"request",
+                                "data":{
+                                    "id":id,
+                                    "type":type,
+                                    "token":token
                                 }
-                            });
+                            };
+                            send(JSON.stringify(get));
+                            $(".tunnel_"+id).html('<i class="fa fa-fw fa-circle-o-notch fa-spin"></i>');
                         }
                     }
                 }
@@ -556,100 +521,33 @@ $(document).ready(function(){
         }
     });
 
-    var status_arr=['<i class="fa fa-fw fa-circle" style="color:#DA3838"></i>', '<i class="fa fa-fw fa-circle" style="color:#1D9E74"></i>'];
-    var gateway_arr=['<i class="fa fa-times" style="color:#DA3838"></i>', '<i class="fa fa-check" style="color:#1D9E74"></i>'];
-    var internet_arr=['<i class="fa fa-globe" style="color:#393333"></i>', '<i class="fa fa-globe" style="color:#1D9E74"></i>'];
-    var btn_arr=['#393333', '#1D9E74'];
-    var biderection_arr=[
-            '<i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right"></i>',
-            '<i class="fa fa-chevron-left" style="color:#1D9E74"></i><i class="fa fa-chevron-right" style="color:#1D9E74"></i>',
-            '<i class="fa fa-chevron-left" style="color:#1D9E74"></i><i class="fa fa-chevron-right"></i>',
-            '<i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right" style="color:#1D9E74"></i>'
-    ];
-
     //status change
     $('body').on('click','.status',function(e){
+        console.log('status_change');
         var id = $(this).attr('data-id');
         var type=$(this).attr("type");
-        var ths=$(this);
-        if(e.button==0){
-            if(type=="data"){
-                if($(".tunnel_"+id).attr('data-val')==1){
-                    $(".tunnel_chk").each(function(){
-                        if($(this).attr('data-val')==1){
-                            var id=$(this).attr('data-id');
-                            var j=$(ths).attr('data-pos');
-                            var key = parseInt($(".tunnel_stat_"+id).attr('data-val'));
-                            key=key+1;
-                            if(key in status_arr){
-                                //$('.gateway_'+id).val(key);
-                                $(".tunnel_stat_"+id).attr('data-val',key);
-                                $(".tunnel_stat_"+id).html(status_arr[key]);
-                            }else{
-                                key=0;
-                                if(key in status_arr){
-                                    //$('.gateway_'+id).val(key);
-                                    $(".tunnel_stat_"+id).attr('data-val',key);
-                                    $(".tunnel_stat_"+id).html(status_arr[key]);
-                                    alert(token);
-                                }
-                            }
-                            $.ajax({
-                                url:"request.php?request=status_change&id="+id+"&val="+key+"&token="+token,
-                                success:function(resp){
-                                    //alert(JSON.stringify(resp['value']));
-                                    var data=$.parseJSON(resp);
-                                    if(data.status==1){
-
-                                    }
-                                }
-                            });
-                        }
-                    });$(".status").attr("data-pos", 1);
-                } else if($(".tunnel_"+id).attr('data-val')==0){
-                    $(".status").attr("data-pos", 0);
-                    $(".tunnel_chk").each(function(){
-                        if($(this).attr('data-val')==1){
-                            var id=$(this).attr('data-id');
-                            var key = parseInt($(ths).attr('data-val'));
-                            if(key in status_arr){
-                                $(".tunnel_stat_"+id).attr('data-val',key);
-                                $(".tunnel_stat_"+id).html(status_arr[key]);
-                            }else{
-                                key=0;
-                                if(key in status_arr){
-                                    $(".tunnel_stat_"+id).attr('data-val',key);
-                                    $(".tunnel_stat_"+id).html(status_arr[key]);
-                                }
-                            }
-                            $.ajax({
-                                url:"request.php?request=status_change&id="+id+"&val="+key+"&token="+token,
-                                success:function(resp){
-                                    var data=$.parseJSON(resp);
-                                    if(data.status==1){
-
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-            }else{
-                var count=$(this).attr("data-count");
-                var key=parseInt($(".tunnel_gateway_"+count).attr('value'));
-                key=key+1;
-                if(key in status_arr){
-                    $(this).attr('data-val',key);
-                    $(".tunnel_gateway_"+count).attr('value',key);
-                    $(this).html(gateway_arr[key]);
+        if(type=="data"){
+            if($(".tunnel_"+id).attr('data-val')==1){
+                var key = parseInt($(".tunnel_stat_"+id).attr('data-val'));
+                if(key==0){
+                    key=1;
+                    $(".tunnel_stat_"+id).attr('data-val',key);
+                    $(".tunnel_stat_"+id).html(status_arr[key]);
                 }else{
                     key=0;
-                    if(key in status_arr){
-                        $(this).attr('data-val',key);
-                        $(".tunnel_gateway_"+count).attr('value',key);
-                        $(this).html(gateway_arr[key]);
-                    }
+                    $(".tunnel_stat_"+id).attr('data-val',key);
+                    $(".tunnel_stat_"+id).html(status_arr[key]);
                 }
+                var get={
+                    "type":"status_change",
+                    "message_type":"request",
+                    "data":{
+                        "id":id,
+                        "val":key,
+                        "token":token
+                    }
+                };
+                send(JSON.stringify(get));
             }
         }
     });
@@ -658,97 +556,30 @@ $(document).ready(function(){
     $('body').on('click','.gateway',function(e){
         var id = $(this).attr('data-id');
         var type=$(this).attr("type");
-        var ths=$(this);
-        if(e.button==0){
-            if(type=="data"){
-                if($(".tunnel_"+id).attr('data-val')==1){
-                    $(".tunnel_chk").each(function(){
-                        if($(this).attr('data-val')==1){
-                            var id=$(this).attr('data-id');
-                            var j=$(ths).attr('data-pos');
-                                var key = parseInt($(".tunnel_gate_"+id).attr('data-val'));
-                                key=key+1;
-                            if(key in gateway_arr){
-                                $('.gateway_'+id).val(key);
-                                $(".tunnel_gate_"+id).attr('data-val',key);
-                                $(".tunnel_gate_"+id).html(gateway_arr[key]);
-                            }else{
-                                key=0;
-                                if(key in gateway_arr){
-                                    $('.gateway_'+id).val(key);
-                                    $(".tunnel_gate_"+id).attr('data-val',key);
-                                    $(".tunnel_gate_"+id).html(gateway_arr[key]);
-                                }
-                            }
-                            $.ajax({
-                                url:"request.php?request=gateway_change&id="+id+"&val="+key+"&token="+token,
-                                success:function(resp){
-                                    var data=$.parseJSON(resp);
-                                    if(data.status==1){
-                                        /*json="{"+id+":{gateway_change:{id:"+id+", value:"+key+"}}}";
-                                        store.set("tunnels_data", json);*/
-                                        //value = store.get("gateway_change");
-                                        //console.log(value);
-                                        //notify_msg("success", data.data);
-                                        // $(".tunnel_gate_"+id).addClass("inactive");
-                                        // $(".tunnel_gate_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                        //send(resp);
-                                    }
-                                }
-                            });
-                        }
-                    });$(".gateway").attr("data-pos", 1);
-                } else if($(".tunnel_"+id).attr('data-val')==0){
-                    $(".gateway").attr("data-pos", 0);
-                    $(".tunnel_chk").each(function(){
-                        if($(this).attr('data-val')==1){
-                            var id=$(this).attr('data-id');
-                            var key = parseInt($(ths).attr('data-val'));
-                            if(key in gateway_arr){
-                                $('.gateway_'+id).val(key);
-                                $(".tunnel_gate_"+id).attr('data-val',key);
-                                $(".tunnel_gate_"+id).html(gateway_arr[key]);
-                            }else{
-                                key=0;
-                                if(key in gateway_arr){
-                                    $('.gateway_'+id).val(key);
-                                    $(".tunnel_gate_"+id).attr('data-val',key);
-                                    $(".tunnel_gate_"+id).html(gateway_arr[key]);
-                                }
-                            }
-                            $.ajax({
-                                url:"request.php?request=gateway_change&id="+id+"&val="+key+"&token="+token,
-                                success:function(resp){
-                                    var data=$.parseJSON(resp);
-                                    if(data.status==1){
-                                        /*json="{"+id+":{gateway_change:{id:"+id+", value:"+key+"}}}";
-                                        store.set("tunnels_data", json);*/
-                                        // notify_msg("success", data.data);
-                                        // $(".tunnel_gate_"+id).addClass("inactive");
-                                        // $(".tunnel_gate_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                        //send(resp);
-                                    }
-                                }
-                            });
-                        }
-                    });
+        if(type=="data"){
+            if($(".tunnel_"+id).attr('data-val')==1) {
+                var key = parseInt($(".tunnel_gate_" + id).attr('data-val'));
+                if (key == 0) {
+                    key = 1;
+                    $('.gateway_' + id).val(key);
+                    $(".tunnel_gate_" + id).attr('data-val', key);
+                    $(".tunnel_gate_" + id).html(gateway_arr[key]);
+                } else {
+                    key = 0;
+                    $('.gateway_' + id).val(key);
+                    $(".tunnel_gate_" + id).attr('data-val', key);
+                    $(".tunnel_gate_" + id).html(gateway_arr[key]);
                 }
-            }else{
-                var count=$(this).attr("data-count");
-                var key=parseInt($(".tunnel_gateway_"+count).attr('value'));
-                key=key+1;
-                if(key in gateway_arr){
-                    $(this).attr('data-val',key);
-                    $(".tunnel_gateway_"+count).attr('value',key);
-                    $(this).html(gateway_arr[key]);
-                }else{
-                    key=0;
-                    if(key in gateway_arr){
-                        $(this).attr('data-val',key);
-                        $(".tunnel_gateway_"+count).attr('value',key);
-                        $(this).html(gateway_arr[key]);
+                var get = {
+                    "type": "gateway_change",
+                    "message_type": "request",
+                    "data": {
+                        "id": id,
+                        "val": key,
+                        "token": token
                     }
-                }
+                };
+                send(JSON.stringify(get));
             }
         }
     });
@@ -756,116 +587,49 @@ $(document).ready(function(){
     $('body').on('click','.biderection',function(e){
         var id = $(this).attr('data-id');
         var type=$(this).attr("type");
-        var ths=$(this);
-        if(e.button==0){
-            if(type=="data"){
-                if($(this).hasClass("inactive")==false){
-                    if($(".tunnel_"+id).attr('data-val')==1){
-                        $(".tunnel_chk").each(function(){
-                            if($(this).attr('data-val')==1){
-                                var id=$(this).attr('data-id');
-                                var j=$(ths).attr('data-pos');
-                                //if(j>0){
-                                    var key = parseInt($(".tunnel_bi_"+id).attr('data-val'));
-                                    key=key+1;
-                                /*}else{
-                                    var key = parseInt($(ths).attr('data-val'));
-                                }*/
-                                if(key in biderection_arr){
-                                    $(".tunnel_bi_"+id).attr('data-val',key);
-                                    $(".tunnel_bi_"+id).html(biderection_arr[key]);
-                                }else{
-                                    key=0;
-                                    if(key in biderection_arr){
-                                        $(".tunnel_bi_"+id).attr('data-val',key);
-                                        $(".tunnel_bi_"+id).html(biderection_arr[key]);
-                                    }
-                                }
-                                $.ajax({
-                                    url:"request.php?request=bidirection_change&id="+id+"&val="+key+"&token="+token,
-                                    success:function(resp){
-                                        var data=$.parseJSON(resp);
-                                        if(data.status==1){
-                                            /*json="{"+id+":{bidirection_change:{id:"+id+", value:"+key+"}}}";
-                                            store.set("tunnels_data", json);
-                                            console.log(store.getAll());*/
-                                            // notify_msg("success", data.data);
-                                            // $(".tunnel_bi_"+id).addClass("inactive");
-                                            // $(".tunnel_bi_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                            //send(resp);
-                                        }
-                                    }
-                                });
-                            }
-                        });$(".biderection").attr("data-pos", 1);
-                    }else if($(".tunnel_"+id).attr('data-val')==0){
-                        $(".biderection").attr("data-pos", 0);
-                        $(".tunnel_chk").each(function(){
-                            if($(this).attr('data-val')==1){
-                                var id=$(this).attr('data-id');
-                                var key = parseInt($(ths).attr('data-val'));
-                                if(key in biderection_arr){
-                                    $(".tunnel_bi_"+id).attr('data-val',key);
-                                    $(".tunnel_bi_"+id).html(biderection_arr[key]);
-                                }else{
-                                    key=0;
-                                    if(key in biderection_arr){
-                                        $(".tunnel_bi_"+id).attr('data-val',key);
-                                        $(".tunnel_bi_"+id).html(biderection_arr[key]);
-                                    }
-                                }
-                                $.ajax({
-                                    url:"request.php?request=bidirection_change&id="+id+"&val="+key+", &token="+token,
-                                    success:function(resp){
-                                        var data=$.parseJSON(resp);
-                                        if(data.status==1){
-                                            /*json="{"+id+":{bidirection_change:{id:"+id+", value:"+key+"}}}";
-                                            store.set("tunnels_data", json);*/
-                                            // notify_msg("success", data.data);
-                                            // $(".tunnel_bi_"+id).addClass("inactive");
-                                            // $(".tunnel_bi_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                            //send(resp);
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }
-            }else{
-                var count=$(this).attr("data-count");
-                var key=parseInt($(".tunnel_bidirection_"+count).attr('value'));
-                key=key+1;
-                if(key in biderection_arr){
-                    $(this).attr('data-val',key);
-                    $(".tunnel_bidirection_"+count).attr('value',key);
-                    $(this).html(biderection_arr[key]);
-                }else{
-                    key=0;
+        if(type=="data"){
+            if($(this).hasClass("inactive")==false){
+                if($(".tunnel_"+id).attr('data-val')==1){
+                    var key = parseInt($(".tunnel_bi_"+id).attr('data-val'));
+                    key=key+1;
                     if(key in biderection_arr){
-                        $(this).attr('data-val',key);
-                        $(".tunnel_bidirection_"+count).attr('value',key);
-                        $(this).html(biderection_arr[key]);
+                        $(".tunnel_bi_"+id).attr('data-val',key);
+                        $(".tunnel_bi_"+id).html(biderection_arr[key]);
+                    }else{
+                        key=0;
+                        if(key in biderection_arr){
+                            $(".tunnel_bi_"+id).attr('data-val',key);
+                            $(".tunnel_bi_"+id).html(biderection_arr[key]);
+                        }
                     }
+                    var get = {
+                        "type": "bidirection_change",
+                        "message_type": "request",
+                        "data": {
+                            "id": id,
+                            "val": key,
+                            "token": token
+                        }
+                    };
+                    send(JSON.stringify(get));
                 }
             }
         }
+
+
+
     });
 
     $('body').on('click','.group',function(e){
         var type=$(this).attr("type");
         var ths=$(this);
-        // var j=0;
-        // var k=0;
         if(type=="data"){
             var data_val=$(this).attr('data-id');
             var val=$(this).attr('data-val');
-            if($(".tunnel_"+data_val).attr('data-val')==1){
+            if($(".tunnel_"+data_val).attr('data-val')==1)
+            {
                 $(".tunnel_chk").each(function(){
                     if($(this).attr('data-val')==1){
-                      /*  if(val==$(".tunnel_grp_"+id).attr("data-val")){
-                            k=k+1;
-                        }*/
                         var id=$(this).attr('data-id');
                         var j=$(ths).attr('data-pos');
                         if(j>0){
@@ -894,17 +658,15 @@ $(document).ready(function(){
                             success:function(resp){
                                 var data=$.parseJSON(resp);
                                 if(data.status==1){
-                                    // notify_msg("success", data.data);
-                                    // $(".tunnel_grp_"+id).addClass("inactive");
-                                    // $(".tunnel_grp_"+id).parent("div").attr("data-original-title", "This field is processing its last job, please wait...");
-                                    //send(resp);
+
                                 }
                             }
                         });
                     }
                 });
                 $(".group").attr('data-pos', 1);
-            }else if($(".tunnel_"+data_val).attr('data-val')==0){
+            }else if($(".tunnel_"+data_val).attr('data-val')==0)
+            {
                 var i=0;
                 $(".group").attr('data-pos', 0);
                 $(".tunnel_chk").each(function(){
@@ -930,10 +692,7 @@ $(document).ready(function(){
                             success:function(resp){
                                 var data=$.parseJSON(resp);
                                 if(data.status==1){
-                                    // notify_msg("success", data.data);
-                                    // $(".tunnel_grp_"+id).addClass("inactive");
-                                    // $(".tunnel_grp_"+id).parent("div").attr("data-original-title", "This field is processing its last job, please wait...");
-                                    //send(resp);
+
                                 }
                             }
                         });
@@ -950,233 +709,177 @@ $(document).ready(function(){
                     }
                 }
             }
-        } else{
-            var count=$(this).attr("data-count");
-            var key=parseInt($(".tunnel_group_"+count).attr('value'));
-            key=key+1;
-            if(key in group_arr){
-                $(this).attr('data-val',key);
-                $(".tunnel_group_"+count).attr('value',key);
-                $(this).html(group_arr[key]);
-            }else{
-                key=0;
-                if(key in group_arr){
-                    $(this).attr('data-val',key);
-                    $(".tunnel_group_"+count).attr('value',key);
-                    $(this).html(group_arr[key]);
-                }
-            }
         }
     });
 
+    //tunnel type change
+    $("body").on("click", ".change_tunnel", function(){
+        var id=$(this).attr("data-id");
+        if($(".tunnel_"+id).attr("data-val")==1){
+            var type=$(this).attr("data-type");
+            if(type == "server")
+            {
+                type = "client";
+                $(".change_tunnel_"+id).attr("data-type", type);
+                $(".change_tunnel_"+id).css("opacity", "0.25");
+                $(".change_tunnel_"+id).css("color", "black");
+                $(".change_tunnel_"+id).css("background-color", "transparent");
+            } else if(type == "client")
+            {
+                type = "server";
+                $(".change_tunnel_"+id).attr("data-type", type);
+                $(".change_tunnel_"+id).css("background-color", "#b9c3c8");
+                $(".change_tunnel_"+id).css("opacity", "1");
+                $(".change_tunnel_"+id).css("color", "white");
+            }
+            var get={
+                "type":"change_tunnel",
+                "message_type":"request",
+                "data":{
+                    "id":id,
+                    "val":type,
+                    "token":token
+                }
+            };
+            send(JSON.stringify(get));
+        }
+    });
+    //sponsore change
+    $("body").on("click",".sponsore",function(){
+        var ths=$(this);
+        var tunnel_id=ths.attr('data-tid');
+        var sponsored=false;
+        if($(this).html()=='Sponsoring'){
+            //var str="This tunnel is shared with "+resp.shared_with;
+            var str="This tunnel will stop sponsoring.\n Are you sure?";
+            if(confirm(str)){
+                var get={
+                    "type":"remove_sharing",
+                    "message_type":"request",
+                    "data":{
+                        "tunnel_id":tunnel_id,
+                        "user_id":current_customer_id,
+                        "token":token
+                    }
+                };
+                send(JSON.stringify(get));
+            }
+            sponsored=true;
+        }else{
+            sponsored=false;
+        }
+        if(!sponsored){
+            var cloud_id=ths.attr('data-cloud');
+            var u_id=ths.attr('data-u');
+            var tunnel_id=ths.attr('data-tid');
+            var get={
+                "type":"get_friend_list",
+                "message_type":"request",
+                "data":{
+                    "cloud_id":cloud_id,
+                    "tunnel_id":tunnel_id,
+                    "u_id":u_id
+                }
+            };
+            send(JSON.stringify(get));
+        }
+    });
     //internet change section
     $('body').on('click','.internet_change',function(e){
         var type=$(this).attr("type");
-        var ths=$(this);
         if(type=="data"){
-            var data_val=$(this).attr('data-id');
-            if($(".tunnel_"+data_val).attr('data-val')==1){
-                $(".tunnel_chk").each(function(){
-                    if($(this).attr('data-val')==1){
-                        var id=$(this).attr('data-id');
-                        var j=$(ths).attr('data-pos');
-                        //if(j>0){
-                            var key=parseInt($(".tunnel_internet_"+id).attr("data-val"));
-                            key=key+1;
-                        /*}else{
-                            key=parseInt($(ths).attr("data-val"));
-                        }*/
-                        //alert(key);
-                        if(key in btn_arr){
-                            $(".tunnel_internet_"+id).attr('data-val',key);
-                            $(".tunnel_internet_"+id).css("background-color", "#b9c3c8");
-                            $(".tunnel_internet_"+id).css("opacity", "1");
-                            $(".tunnel_internet_"+id).css("color", "white");
-                            $(ths).css("background-color", "#b9c3c8");
-                        }else{
-                            key=0;
-                            if(key in btn_arr){
-                                $(".tunnel_internet_"+id).attr('data-val',key);
-                                $(".tunnel_internet_"+id).css("background-color", "transparent");
-                                $(".tunnel_internet_"+id).css("opacity", "0.35");
-                                $(".tunnel_internet_"+id).css("color", "black");
-                                $(ths).css("background-color","transparent");
-                            }
-                        }
-                        $.ajax({
-                            url:"request.php?request=internet_change&id="+id+"&val="+key+"&token="+token,
-                            success:function(resp){
-                                var data=$.parseJSON(resp);
-                                if(data.status==1){
-                                    // notify_msg("success", data.data);
-                                    // $(".tunnel_internet_"+id).addClass("inactive");
-                                    // $(".tunnel_internet_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                    //send(resp);
-                                }
-                            }
-                        });
-                    }
-                });
-                $(".internet_change").attr('data-pos', 1);
-            }else if($(".tunnel_"+data_val).attr('data-val')==0){
-                $(".internet_change").attr('data-pos', 0);
-                $(".tunnel_chk").each(function(){
-                    if($(this).attr('data-val')==1){
-                        var id=$(this).attr('data-id');
-                        var key=parseInt($(ths).attr("data-val"));
-                        if(key in btn_arr){
-                            $(".tunnel_internet_"+id).attr('data-val',key);
-                            $(".tunnel_internet_"+id).css("background-color", "#b9c3c8");
-                            $(".tunnel_internet_"+id).css("opacity", "1");
-                            $(".tunnel_internet_"+id).css("color", "white");
-                            $(ths).css("background-color", "#b9c3c8");
-                        }else{
-                            key=0;
-                            if(key in btn_arr){
-                                $(".tunnel_internet_"+id).attr('data-val',key);
-                                $(".tunnel_internet_"+id).css("background-color", "transparent");
-                                $(".tunnel_internet_"+id).css("opacity", "0.35");
-                                $(".tunnel_internet_"+id).css("color", "black");
-                                $(ths).css("background-color", "transparent");
-                            }
-                        }
-                        $.ajax({
-                            url:"request.php?request=internet_change&id="+id+"&val="+key+"&token="+token,
-                            success:function(resp){
-                                var data=$.parseJSON(resp);
-                                if(data.status==1){
-                                    // notify_msg("success", data.data);
-                                    // $(".tunnel_internet_"+id).addClass("inactive");
-                                    // $(".tunnel_internet_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                    //send(resp);
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        } /*else{
-            var count=$(this).attr("data-count");
-            var key=parseInt($(".tunnel_group_"+count).attr('value'));
-            key=key+1;
-            if(key in group_arr){
-                $(this).attr('data-val',key);
-                $(".tunnel_group_"+count).attr('value',key);
-                $(this).html(group_arr[key]);
-            }else{
-                key=0;
-                if(key in group_arr){
-                    $(this).attr('data-val',key);
-                    $(".tunnel_group_"+count).attr('value',key);
-                    $(this).html(group_arr[key]);
+            var id=$(this).attr('data-id');
+            if($(".tunnel_"+id).attr('data-val')==1){
+                var key=($(".tunnel_internet_"+id).attr('data-val')==0 ? 1: 0);
+                if(key==0){
+                    $(".tunnel_internet_"+id).attr('data-val',key);
+                    $(".tunnel_internet_"+id).css("background-color", "transparent");
+                    $(".tunnel_internet_"+id).css("opacity", "0.35");
+                    $(".tunnel_internet_"+id).css("color", "black");
+                }else{
+                    $(".tunnel_internet_"+id).attr('data-val',key);
+                    $(".tunnel_internet_"+id).css("background-color", "#b9c3c8");
+                    $(".tunnel_internet_"+id).css("opacity", "1");
+                    $(".tunnel_internet_"+id).css("color", "white");
                 }
+                var get={
+                    "type":"internet_change",
+                    "message_type":"request",
+                    "data":{
+                        "id":id,
+                        "val":key,
+                        "token":token
+                    }
+                };
+                send(JSON.stringify(get));
             }
-        }*/
+        }
     });
 
     //route change section
     $('body').on('click','.route_change',function(e){
         var type=$(this).attr("type");
-        var ths=$(this);
         if(type=="data"){
-            var data_val=$(this).attr('data-id');
-            if($(".tunnel_"+data_val).attr('data-val')==1){
-                $(".tunnel_chk").each(function(){
-                    if($(this).attr('data-val')==1){
-                        var id=$(this).attr('data-id');
-                        var j=$(ths).attr('data-pos');
-                        //if(j>0){
-                            var key=parseInt($(".tunnel_route_"+id).attr("data-val"));
-                            key=key+1;
-                        /*}else{
-                            key=parseInt($(ths).attr("data-val"));
-                        }*/
-                        //alert(key);
-                        if(key in btn_arr){
-                            $(".tunnel_route_"+id).attr('data-val',key);
-                            $(".tunnel_route_"+id).css("background-color", "#b9c3c8");
-                            $(".tunnel_route_"+id).css("opacity", "1");
-                            $(".tunnel_route_"+id).css("color", "white");
-                            $(ths).css("background-color", "#b9c3c8");
-                        }else{
-                            key=0;
-                            if(key in btn_arr){
-                                $(".tunnel_route_"+id).attr('data-val',key);
-                                $(".tunnel_route_"+id).css("background-color", "transparent");
-                                $(".tunnel_route_"+id).css("opacity", "0.35");
-                                $(".tunnel_route_"+id).css("color", "black");
-                                $(ths).css("background-color", "transparent");
-                            }
-                        }
-                        $.ajax({
-                            url:"request.php?request=route_change&id="+id+"&val="+key+"&token="+token,
-                            success:function(resp){
-                                var data=$.parseJSON(resp);
-                                if(data.status==1){
-                                    // notify_msg("success", data.data);
-                                    // $(".tunnel_route_"+id).addClass("inactive");
-                                    // $(".tunnel_route_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                    //send(resp);
-                                }
-                            }
-                        });
-                    }
-                });
-                $(".route_change").attr('data-pos', 1);
-            }else if($(".tunnel_"+data_val).attr('data-val')==0){
-                $(".route_change").attr('data-pos', 0);
-                $(".tunnel_chk").each(function(){
-                    if($(this).attr('data-val')==1){
-                        var id=$(this).attr('data-id');
-                        var key=parseInt($(ths).attr("data-val"));
-                        if(key in btn_arr){
-                            $(".tunnel_route_"+id).attr('data-val',key);
-                            $(".tunnel_route_"+id).css("background-color", "#b9c3c8");
-                            $(".tunnel_route_"+id).css("opacity", "1");
-                            $(".tunnel_route_"+id).css("color", "white");
-                            $(ths).css("background-color", "#b9c3c8");
-                        }else{
-                            key=0;
-                            if(key in btn_arr){
-                                $(".tunnel_route_"+id).attr('data-val',key);
-                                $(".tunnel_route_"+id).css("background-color", "transparent");
-                                $(".tunnel_route_"+id).css("opacity", "0.35");
-                                $(".tunnel_route_"+id).css("color", "black");
-                                $(ths).css("background-color", "transparent");
-                            }
-                        }
-                        $.ajax({
-                            url:"request.php?request=route_change&id="+id+"&val="+key+"&token="+token,
-                            success:function(resp){
-                                var data=$.parseJSON(resp);
-                                if(data.status==1){
-                                    // notify_msg("success", data.data);
-                                    // $(".tunnel_route_"+id).addClass("inactive");
-                                    // $(".tunnel_route_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                                    //send(resp);
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        } /*else{
-            var count=$(this).attr("data-count");
-            var key=parseInt($(".tunnel_group_"+count).attr('value'));
-            key=key+1;
-            if(key in group_arr){
-                $(this).attr('data-val',key);
-                $(".tunnel_group_"+count).attr('value',key);
-                $(this).html(group_arr[key]);
-            }else{
-                key=0;
-                if(key in group_arr){
-                    $(this).attr('data-val',key);
-                    $(".tunnel_group_"+count).attr('value',key);
-                    $(this).html(group_arr[key]);
+            var id=$(this).attr('data-id');
+            if($(".tunnel_"+id).attr('data-val')==1){
+                var key=($(".tunnel_route_"+id).attr('data-val')==0 ? 1: 0);
+                if(key==0){
+                    $(".tunnel_route_"+id).attr('data-val',key);
+                    $(".tunnel_route_"+id).css("background-color", "transparent");
+                    $(".tunnel_route_"+id).css("opacity", "0.35");
+                    $(".tunnel_route_"+id).css("color", "black");
+                }else{
+                    $(".tunnel_route_"+id).attr('data-val',key);
+                    $(".tunnel_route_"+id).css("background-color", "#b9c3c8");
+                    $(".tunnel_route_"+id).css("opacity", "1");
+                    $(".tunnel_route_"+id).css("color", "white");
                 }
+                var get={
+                    "type":"route_change",
+                    "message_type":"request",
+                    "data":{
+                        "id":id,
+                        "val":key,
+                        "token":token
+                    }
+                };
+                send(JSON.stringify(get));
             }
-        }*/
+        }
+    });
+
+    //set premium or not
+    $("body").on("click", ".acc_type", function(){
+        var id=$(this).attr("data-id");
+        var ths=$(this);
+        var val=ths.attr("data-val");
+        if($(".tunnel_"+id).attr('data-val')==1){
+            if (val == 1) {
+                val = 2;
+                $(".acc_type_" + id).attr("data-val", 2);
+                $(".acc_type_" + id).html("Premium");
+                $(".acc_type_" + id).css("opacity", "0.25");
+                $(".acc_type_" + id).css("color", "black");
+                $(".acc_type_" + id).css("background-color", "transparent");
+            } else if (val == 2) {
+                val = 1;
+                $(".acc_type_" + id).attr("data-val", 1);
+                $(".acc_type_" + id).html("Premium");
+                $(".acc_type_" + id).css("color", "white");
+                $(".acc_type_" + id).css("opacity", "1");
+                $(".acc_type_" + id).css("background-color", "#b9c3c8");
+            }
+            var get={
+                "type":"plan_change",
+                "message_type":"request",
+                "data":{
+                    "id":id,
+                    "val":val,
+                    "token":token
+                }
+            };
+            send(JSON.stringify(get));
+        }
     });
 
     //dev-status change section
@@ -1190,7 +893,15 @@ $(document).ready(function(){
 
                 $(".dev-status-label_"+tid).html('Initiating');
                 var ths = $(this);
-                $.ajax({
+                var get={
+                    "type":"change_dev_status",
+                    "message_type":"request",
+                    "data":{
+                        "id":tid
+                    }
+                };
+                send(JSON.stringify(get));
+                /*$.ajax({
                     url: "request.php?request=dev_status_toggle&id=" + tid + "&token=" + token,
                     type: "POST",
                     success: function (resp) {
@@ -1223,7 +934,7 @@ $(document).ready(function(){
                             $(".dev-status-label_"+tid).html('Initiating');
                         }, 2000);
                     }
-                });
+                });*/
             }
         }else{
             notify_msg("error", "Please 1st select this tunnel");
@@ -1235,35 +946,25 @@ $(document).ready(function(){
         if($(".tunnel_"+id).attr("data-val")==1){
             var type=$(this).attr("data-type");
             if(type=="server"){
-                $.ajax({
-                    url:"request.php?request=add_server_clone&id="+id+"&token="+token,
-                    success:function(resp){
-                        var data=$.parseJSON(resp);
-                        if(data.status==1){
-                            //$("#tunnel_body").append(tunnels(data.value, packages));
-                            notify_msg("success", data.data);
-                            //$(".tunnel_editable").trigger("click");
-                            //send(resp);
-                        }else if(data.status==2){
-                            notify_msg("error", data.data);
-                        }
+                var get={
+                    "type":"add_server_clone",
+                    "message_type":"request",
+                    "data":{
+                        "id":id,
+                        "token":token
                     }
-                });
+                };
+                send(JSON.stringify(get));
             }else if(type=="client"){
-                $.ajax({
-                    url:"request.php?request=add_client_clone&id="+id+"&token="+token,
-                    success:function(resp){
-                        var data=$.parseJSON(resp);
-                        if(data.status==1){
-                            // $("#tunnel_body").append(tunnels(data.value, packages));
-                            notify_msg("success", data.data);
-                            // $(".tunnel_editable").trigger("click");
-                            //send(resp);
-                        }else if(data.status==2){
-                            notify_msg("error", data.data);
-                        }
+                var get={
+                    "type":"add_client_clone",
+                    "message_type":"request",
+                    "data":{
+                        "id":id,
+                        "token":token
                     }
-                });
+                };
+                send(JSON.stringify(get));
             }
         } else{
             notify_msg("error", "Please 1st seect this tunnel");
@@ -1295,6 +996,7 @@ $(document).ready(function(){
     });
 
     $("body").on("click", ".tunnel_chk", function(){
+        console.log('tunnel_check_click');
         var html="";
         var val=$(this).attr("data-val");
         var id=$(this).attr("data-id");
@@ -1583,63 +1285,16 @@ $(document).ready(function(){
 
     $(".tunnel_editable").trigger("click");
 
-    $("body").on("click", ".change_tunnel", function(){
-        var id=$(this).attr("data-id");
-        if($(".tunnel_"+id).attr("data-val")==1){
-            var type=$(this).attr("data-type");
-            if(type == "server")
-            {
-                $(this).attr("data-type", "client");
-                $(this).css("opacity", "0.25");
-                $(this).css("color", "black");
-                $(this).css("background-color", "transparent");
-            } else if(type == "client")
-            {
-                $(this).attr("data-type", "server");
-                $(this).css("background-color", "#b9c3c8");
-                $(this).css("opacity", "1");
-                $(this).css("color", "white");
-            }
-            $.ajax({
-                url:"request.php?request=change_tunnel&id="+id+"&type="+type+"&token="+token,
-                success:function(resp){
-                    data=$.parseJSON(resp);
-                    console.log('change_tunnel');
-                    console.log(data);
-                    if(data.status==1){
-                       // notify_msg("success", data.data);
-                      //  $(".tunnel_"+data.value.id).html("<i class='fa fa-fw fa-circle-o-notch fa-spin'></i>");
-                      //  $(".tunnel_"+data.value.id).removeClass("tunnel_chk");
-                      //  $(".tunnel_"+data.value.id).attr("data-original-title", "Request submitted, please wait...");
-                      //  send(resp);
-                    }
-                }
-            });
-        }else{
-            notify_msg("error", "Please 1st select this tunnel");
-        }
-    });
-
     $("body").on("click", ".save_this_client", function(){
         var id = $(this).attr("data-id");
-        $.ajax({
-            url:"request.php?request=save_a_tunnel&id="+id+"&token="+token,
-            success:function(resp){
-                data=$.parseJSON(resp);
-                console.log('save_this_tunnel');
-                console.log(resp);
-                if(data.status==1){
-                    notify_msg("success", data.data);
-                    $(".tunnel_"+id).html("<i class='fa fa-fw fa-circle-o-notch fa-spin'></i>");
-                    $(".tunnel_"+id).removeClass("tunnel_chk");
-                    $(".tunnel_"+id).attr("data-original-title", "Request submitted, please wait...");
-                    $(".tunnel_body_"+id).removeClass("row_chk");
-                    send(resp);
-                }else if(data.status==0){
-                    notify_msg("error", data.data);
-                }
+        var get={
+            "type":"save_a_tunnel",
+            "message_type":"request",
+            "data":{
+                "id":id
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("click", ".all_tunnel_save_btn", function(){
@@ -1666,65 +1321,19 @@ $(document).ready(function(){
     $("body").on("click", ".delete_cloud", function(){
         if(confirm("Are you sure want to delete this cloud?")){
             var cloud=$(this).attr("data-val");
-            $.ajax({
-                url:"request.php?request=delete_cloud&cloud_id="+cloud+"&token="+token,
-                success:function(resp){
-                    location.reload(true);
+            var get={
+                "type":"delete_cloud",
+                "message_type":"request",
+                "data":{
+                    "cloud_id":cloud,
+                    "token":token
                 }
-            });
+            };
+            send(JSON.stringify(get));
         }
     });
 
-    $("body").on("click", ".acc_type", function(){
-        var id=$(this).attr("data-id");
-        var ths=$(this);
-        var val=ths.attr("data-val");
-       //if($(".tunnel_"+id).attr("data-val")!=1){
-        /*    if(val==1){
-                val=2;
-            }else if(val==2){
-                val=1;
-            }*/
-        //}
-        $(".tunnel_chk").each(function() {
-            var tid=$(this).attr("data-id");
-            if($(this).attr("data-val")==1 && tid == id) {
-                //   var tid=$(this).attr("data-id");
-                // alert(val);
-                if (val == 1) {
-                    val = 2;
-                    $(".acc_type_" + id).attr("data-val", 2);
-                    $(".acc_type_" + id).html("Premium");
-                    $(".acc_type_" + id).css("opacity", "0.25");
-                    $(".acc_type_" + id).css("color", "black");
-                    $(".acc_type_" + id).css("background-color", "transparent");
-                } else if (val == 2) {
-                    val = 1;
-                    $(".acc_type_" + id).attr("data-val", 1);
-                    $(".acc_type_" + id).html("Premium");
-                    $(".acc_type_" + id).css("color", "white");
-                    $(".acc_type_" + id).css("opacity", "1");
-                    $(".acc_type_" + id).css("background-color", "#b9c3c8");
-                }
-                //  alert(".acc_type_"+id);
-                // alert(val);
-                $.ajax({
-                    url: "request.php?request=plan_change&id=" + id + "&val=" + val + "&token=" + token,
-                    success: function (resp) {
-                        /*var data=$.parseJSON(resp);
-                         if(data.status==1){
-                         // notify_msg("success", data.data);
-                         // $(".tunnel_route_"+id).addClass("inactive");
-                         // $(".tunnel_route_"+id).attr("data-original-title", "This field is processing its last job, please wait...");
-                         //send(resp);
-                         }*/
-                    }
-                });
-            }
-        });
-            //}
-        //});
-    });
+
 
     //for acl modal
     $(".simple").show();
@@ -1741,7 +1350,7 @@ $(document).ready(function(){
 
    });
 
-    var box_btn_val;
+
     $("body").on('click', '.showACL', function(){
         //$("#aclModal").modal("show");
         var opened = $(this).hasClass('open');
@@ -1750,7 +1359,15 @@ $(document).ready(function(){
         var ths = $(this);
         if(!opened){
             $(this).addClass('open');
-            $.ajax({
+            var get={
+                "type":"get_acl_info",
+                "message_type":"request",
+                "data":{
+                    "id":tunnel_id
+                }
+            };
+            send(JSON.stringify(get));
+            /*$.ajax({
                 url:"request.php?request=get_acl_info&id="+tunnel_id,
                 success:function(resp){
                     var data = $.parseJSON(resp);
@@ -1759,8 +1376,8 @@ $(document).ready(function(){
                         notify_msg("error", data.message);
                     }
                     else{
-                        $(".source_acl_content_"+ths.attr("data-id")).html('');
-                        $(".destination_acl_content_"+ths.attr("data-id")).html('');
+                        $(".source_acl_content_"+tunnel_id).html('');
+                        $(".destination_acl_content_"+tunnel_id).html('');
                         console.log('show_acl_data');
                         console.log(data);
                         acl(data, null, tunnel_id);
@@ -1768,11 +1385,7 @@ $(document).ready(function(){
                         $(".tunnel_acl_div_"+ths.attr("data-id")).toggle();
                     }
                 }
-            });
-            //if($(".source_acl_content_"+tunnel_id).html()==""){
-                // alert("Source=="+$(".source_acl_content_"+ths.attr("data-id")).html());
-                // alert($(".destination_acl_content_"+ths.attr("data-id")).html());
-            //}
+            });*/
         }
         else{
             $(this).removeClass('open');
@@ -1788,26 +1401,29 @@ $(document).ready(function(){
         var tid = $(this).attr("data-tid");
         //alert(btn_type);
         if(btn_type=="clone"){
-            if(confirm("Are you sure?")){
-                $.ajax({
-                    url:"request.php?request=create_acl_clone&id="+acl_id+"&tid="+tid+"&token="+token,
-                    success:function(resp){
-                        alert(resp);
-                    }
-                });
-            }
+            var get={
+                "type":"create_acl_clone",
+                "message_type":"request",
+                "data":{
+                    "id":acl_id,
+                    "tid":tid,
+                    "token":token
+                }
+            };
+            send(JSON.stringify(get));
         }
         if(btn_type=="delete"){
             if(confirm("Are you sure want to delete?")){
-                $.ajax({
-                    url:"request.php?request=delete_acl&id="+acl_id+"&tid="+tid+"&token="+token,
-                    success:function(resp){
-                        data=$.parseJSON(resp);
-                        if(data.status==1){
-                            notify_msg("success", data.data);
-                        }
+                var get={
+                    "type":"delete_acl",
+                    "message_type":"request",
+                    "data":{
+                        "id":acl_id,
+                        "tid":tid,
+                        "token":token
                     }
-                });
+                };
+                send(JSON.stringify(get));
             }
         }
         if(btn_type=="clear"){
@@ -1865,40 +1481,18 @@ $(document).ready(function(){
         if(btn_type=="set_default_acl"){
             var ths=$(this);
             tid=ths.closest(".tunnel_acl_div").attr("data-id");
-                $.ajax({
-                    url:"request.php?request=set_default_acl&id="+acl_id+"&tid="+tid+"&token="+token+"&val="+$(this).attr("data-val"),
-                    success:function(resp){
-                        var data=$.parseJSON(resp);
-                        console.log(data);
-                        if(data.status==1){
-                            notify_msg("success", data.data);
-                            //$(".tunnel_acl_div_"+tid).css("display","none");
-                            //ths.closest(".tunnel_acl_div").css("display","none");
-                            ths.closest(".acl_div").children(".soumya").addClass('default_acl');
-
-
-                            $.ajax({
-                                url:"request.php?request=get_acl_info&id="+tid,
-                                success:function(resp){
-                                    var data = $.parseJSON(resp);
-                                    box_btn_val = data;
-
-                                    $(".source_acl_content_"+tid).html('');
-                                    $(".destination_acl_content_"+tid).html('');
-                                    console.log('show_acl_data');
-                                    console.log(data);
-                                    acl(data, null, tid);
-
-                                    $(".box").trigger("mouseover");
-                                    $(".tunnel_acl_div_"+ths.attr("data-id")).toggle();
-
-                                }
-                            });
-
-                        }
-                    }
-                });
-
+            var val=$(this).attr("data-val");
+            var get={
+                "type":"set_default_acl",
+                "message_type":"request",
+                "data":{
+                    "id":acl_id,
+                    "tid":tid,
+                    "val":val,
+                    "token":token
+                }
+            };
+            send(JSON.stringify(get));
         }
     });
     $("body").on('click', '#simple_Destination', function(){
@@ -2293,6 +1887,67 @@ $(document).ready(function(){
         }
     });
 
+    $("body").on("click", ".source_ip_save", function(){
+        var type = $("#acl_ip_text").attr('data-type');
+        var id = $("#acl_ip_text").attr('data-id');
+        var text = $("#acl_ip_text").attr("data-text");
+        var ips = [];
+
+        var i=0;
+        var val="";
+
+        $("input[name='ip[]']").each(function() {
+            i++;
+            ips.push($(this).val());
+        });
+
+        if(i==1){
+            if(ips[0]==""){
+                val = "";
+                if(acl_value[id]==undefined)
+                    acl_value[id]={};
+                if(acl_value[id][type]==undefined)
+                    acl_value[id][type]={};
+                acl_value[id][type][text]="";
+                $("."+text+"-"+type+"-"+id).css("opacity", 0.3);
+                $("."+text+"-"+type+"-"+id).css("color", "black");
+                notify_msg("warning", "You have to save this settings...");
+            }else{
+                val += ips[0];
+                if(ipv4addr($(".acl_ip_text").val()) == true){
+                    if(acl_value[id]==undefined)
+                        acl_value[id]={};
+                    if(acl_value[id][type]==undefined)
+                        acl_value[id][type]={};
+                    acl_value[id][type][text]=val.replace(/:+$/, '');
+                    $("."+text+"-"+type+"-"+id).css("opacity", 1);
+                    notify_msg("warning", "You have to save this settings...");
+                }else{
+                    $(".acl_ip_text").next("label").html("Please enter valid IP address");
+                    $(".acl_ip_text").addClass("error");
+                }
+            }
+        }else{
+            for(j=0; j<i; j++){
+                val += ips[j]+":";
+            }
+            if(ipv4addr($(".acl_ip_text").val()) == true){
+
+                if(acl_value[id]==undefined)
+                    acl_value[id]={};
+                if(acl_value[id][type]==undefined)
+                    acl_value[id][type]={};
+                acl_value[id][type][text]=val.replace(/:+$/, '');
+                $("."+text+"-"+type+"-"+id).css("opacity", 1);
+                notify_msg("warning", "You have to save this settings...");
+
+            }else{
+                $(".acl_ip_text").next("label").html("Please enter valid IP address");
+                $(".acl_ip_text").addClass("error");
+            }
+        }
+    });
+
     $("body").on("click", ".s_aliasing_btn", function(){
         var type = $("#acl_ip_text").attr('data-type');
         var id = $("#acl_ip_text").attr('data-id');
@@ -2311,8 +1966,8 @@ $(document).ready(function(){
             ports.push($(this).val());
         });
 
-        if(i==1){ //if single value
-            if(ips[0]=="" && ports[0]==""){
+        if(i==2){ //if single value
+            if((ips[0]=="" && ports[0]=="") && (ips[1]=="" && ports[1]=="")){
                 val = "";
                 if(acl_value[id]==undefined)
                     acl_value[id]={};
@@ -2332,10 +1987,17 @@ $(document).ready(function(){
                     $(".xxxxxxxxxx").attr("class","color-box "+main_class);
                     $("."+main_class).removeClass("xxxxxxxxxx");
                 });
+                $(".internal-d_final-"+id).css("color","#000000");
+                $(".internal-d_final-"+id).css("opacity","0.3");
+                if(acl_value[id]==undefined)
+                    acl_value[id]={};
+                if(acl_value[id]['d_final']==undefined)
+                    acl_value[id]['d_final']={};
+                acl_value[id]['d_final']['internal']=0;
 
                 notify_msg("warning", "You have to save this settings...");
             }else{
-                val += ips[0]+","+ports[0];
+                val += ips[0]+","+ports[0]+","+ips[1]+","+ports[1];
                 if(ipv4addr($(".acl_ip_text").val()) == true){
                     if(isNumber($(".acl_ip_port").val(), 4) == true){
                         if(acl_value[id]==undefined)
@@ -2354,6 +2016,15 @@ $(document).ready(function(){
                             $(".xxxxxxxxxx").attr("class","disabled_color_box "+main_class);
                             $("."+main_class).removeClass("xxxxxxxxxx");
                         });
+                        $(".internal-d_final-"+id).css("color","#ffffff");
+                        $(".internal-d_final-"+id).css("opacity","1");
+                        if(acl_value[id]==undefined)
+                            acl_value[id]={};
+                        if(acl_value[id]['d_final']==undefined)
+                            acl_value[id]['d_final']={};
+                        acl_value[id]['d_final']['internal']=1;
+                        console.log('acl_value');
+                        console.log(acl_value);
                         notify_msg("warning", "You have to save this settings...");
                     }else {
                         $(".acl_ip_port").next("label").html("Please enter valid 4 digit port number");
@@ -2365,8 +2036,8 @@ $(document).ready(function(){
                 }
             }
         }else{ //if multipule value
-            for(j=0; j<i; j++){
-                val += ips[j]+","+ports[j]+":";
+            for(j=0; j < i/2; j++){
+                val += ips[j]+","+ports[j]+","+ips[j+1]+","+ports[j+1]+":";
             }
             if(ipv4addr($(".acl_ip_text").val()) == true){
                 if(isNumber($(".acl_ip_port").val(), 4) == true){
@@ -2387,6 +2058,13 @@ $(document).ready(function(){
                         $(".xxxxxxxxxx").attr("class","disabled_color_box "+main_class);
                         $("."+main_class).removeClass("xxxxxxxxxx");
                     });
+                    $(".internal-d_final-"+id).css("color","#ffffff");
+                    $(".internal-d_final-"+id).css("opacity","1");
+                    if(acl_value[id]==undefined)
+                        acl_value[id]={};
+                    if(acl_value[id]['d_final']==undefined)
+                        acl_value[id]['d_final']={};
+                    acl_value[id]['d_final']['internal']=1;
                     notify_msg("warning", "You have to save this settings...");
 
                 }else {
@@ -2405,6 +2083,7 @@ $(document).ready(function(){
         var id = $(this).attr('data-id');
         var text = $(this).attr("data-text");
         var ips = [];
+        var ports = [];
 
         var i=0;
         var val="";
@@ -2413,30 +2092,38 @@ $(document).ready(function(){
             i++;
             ips.push($(this).val());
         });
+        $("input[name='port[]']").each(function() {
+            ports.push($(this).val());
+        });
 
         for(j=0; j<i; j++){
-            val += ips[j]+":";
+            val += ips[j]+","+ports[j]+":";
         }
         //alert(val.replace(/:+$/, ''));
         if(ipv4addr($(".acl_ip_text").val()) == true){
-            if(acl_value[id]==undefined)
-                acl_value[id]={};
-            if(acl_value[id][type]==undefined)
-                acl_value[id][type]={};
-            acl_value[id][type][text]=val.replace(/:+$/, '');
-            $("."+text+"-"+type+"-"+id).css("opacity", 1);
-            $("."+text+"-"+type+"-"+id).css("color", "white");
+            if(isNumber($(".acl_ip_port").val(), 4) == true){
+                if(acl_value[id]==undefined)
+                    acl_value[id]={};
+                if(acl_value[id][type]==undefined)
+                    acl_value[id][type]={};
+                acl_value[id][type][text]=val.replace(/:+$/, '');
+                $("."+text+"-"+type+"-"+id).css("opacity", 1);
+                $("."+text+"-"+type+"-"+id).css("color", "white");
 
-            acl_value[id][type]["specific_tunnel"]="";
-            $(".specific_tunnel"+"-"+type+"-"+id).attr("data-avl_attr",0);
-            $(".specific_tunnel"+"-"+type+"-"+id).css("color","black");
-            $(".specific_tunnel"+"-"+type+"-"+id).css("opacity","0.35");
+                acl_value[id][type]["specific_tunnel"]="";
+                $(".specific_tunnel"+"-"+type+"-"+id).attr("data-avl_attr",0);
+                $(".specific_tunnel"+"-"+type+"-"+id).css("color","black");
+                $(".specific_tunnel"+"-"+type+"-"+id).css("opacity","0.35");
 
-            $(".specific_tunnel"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
-            $(".xxxxxxxxxx").attr("class", "disabled_color_box "+"specific_tunnel"+"-"+type+"-"+id);
-            $(".specific_tunnel"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");
+                $(".specific_tunnel"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
+                $(".xxxxxxxxxx").attr("class", "disabled_color_box "+"specific_tunnel"+"-"+type+"-"+id);
+                $(".specific_tunnel"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");
 
-            notify_msg("warning", "You have to save this settings...");
+                notify_msg("warning", "You have to save this settings...");
+            }else{
+                $(".acl_ip_port").next("label").html("Please enter valid 4 digit port number");
+                $(".acl_ip_port").addClass("error");
+            }
         }else{
             $(".acl_ip_text").next("label").html("Please enter valid IP address");
             $(".acl_ip_text").addClass("error");
@@ -2643,9 +2330,28 @@ $(document).ready(function(){
         console.log("out");
         $("#" + $(this).attr('id') + "_hoverdata").hide();
     });
+
+    $("body").on("click", ".disabled_color_box", function(){
+
+        var tt_id = $(this).attr("data-tid");
+        if($(".destination_acl_content_18").hasClass("disabled"))
+            return false;
+
+        var info = $(this).prop("class");
+        var all = info.split(" ")[1].split("-");
+        var field = all[0];
+        var database = all[1];
+        var id = all[2];
+
+        if(field == "new_dst" && database == "s_aliasing"){
+            notify_msg("error",'FWD "S" should be activated first');
+        }
+
+    });
+
     $("body").on("click", ".color-box", function(){
         if($(this).hasClass("no")){}else{
-            var tt_id = $(this).data("tid");
+            var tt_id = $(this).attr("data-tid");
             if($(".destination_acl_content_18").hasClass("disabled"))
                 return false;
 
@@ -2657,8 +2363,71 @@ $(document).ready(function(){
             var html="";
 
             console.log(info);
+            if(field=="every_cloud"){ //todo removed
+                return false;
+            }
+            if(field == "deny_allow_all")
+            {
+                var type = database;
+                var data = field;
+                var val_attr="";
+                var this_node=$(this);
+                val_attr=$(this).attr("data-avl_attr");
+                if(val_attr==undefined || val_attr==""){
+                    $.ajax({
+                        url: "request.php?request=get_acl_val",
+                        data: {"id": id, "type": database, "name": field},
+                        type: "POST",
+                        success: function (resp) {
+                            console.log(resp);
+                            console.log(resp);
+                            var val=0;
+                            val = (parseInt(resp)+1)%3;
+                            if(val==0){
+                                this_node.attr("data-avl_attr",val);
+                                this_node.attr("style","color:#000000;opacity:0.35;background-color:#808080 !important;");
+                            }else if(val==1){ //allow_all
+                                this_node.attr("data-avl_attr",val);
+                                this_node.attr("style","color:#00ff00;opacity:1;background-color:#ffffff !important;");
+                            }else{ //deny_all
+                                this_node.attr("data-avl_attr",val);
+                                this_node.attr("style","color:#ff0000;opacity:1;background-color:#ffffff !important;");
+                            }
 
-            if(field == "allow_all" || field == "deny_all"|| field == "country" || field == "bind_all" || field=="internal")
+                            if(acl_value[id]==undefined)
+                                acl_value[id]={};
+                            if(acl_value[id][type]==undefined)
+                                acl_value[id][type]={};
+                            acl_value[id][type][data]=val;
+                            notify_msg("warning", "You have to save this settings...");
+                            return true;
+                        }
+                    });
+                }else{
+                    var val = (parseInt(val_attr)+1)%3;
+                    if(val==0){
+                        this_node.attr("data-avl_attr",val);
+                        this_node.attr("style","color:#000000;opacity:0.35;background-color:#808080 !important;");
+                    }else if(val==1){ //allow_all
+                        this_node.attr("data-avl_attr",val);
+                        this_node.attr("style","color:#00ff00;opacity:1;background-color:#ffffff !important;");
+                    }else{ //deny_all
+                        this_node.attr("data-avl_attr",val);
+                        this_node.attr("style","color:#ff0000;opacity:1;background-color:#ffffff !important;");
+                    }
+
+                    if(acl_value[id]==undefined)
+                        acl_value[id]={};
+                    if(acl_value[id][type]==undefined)
+                        acl_value[id][type]={};
+                    acl_value[id][type][data]=val;
+
+                    notify_msg("warning", "You have to save this settings...");
+                    return true;
+                }
+                return true;
+            }
+            else if(field == "allow_all" || field == "deny_all"|| field == "country" || field == "bind_all" || field=="internal")
             {//this is activate or diactivate action
                 var type = database;
                 var data = field;
@@ -2860,23 +2629,45 @@ $(document).ready(function(){
                         if(resp.indexOf(":")==-1){
                             if(resp!=0){
                                 var ips = resp.split(",");
-                            }else{
+                            } else {
                                 var ips=["","",""];
                             }
                             html+='<div class="row">';
                             html+='<form class="ip-protoco-form">';
+
+                            html+='<div class="aliasing_block aliasing_block_1">';
                             html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_1">';
+                            html+='<div class="col-md-2 aliasing-label">';
+                            html+='From: ';
+                            html+='</div>';
                             html+='<div class="col-md-4">';
                             html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+(resp!=0?ips[0]:"")+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
                             html+='</div>';
                             html+='<div class="col-md-4">';
                             html+='<input type="text" id="acl_ip_port" class="acl_ip_port" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+(resp!=0?ips[1]:"")+'" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
                             html+='</div>';
-                            html+='<div class="col-md-1">';
+                            html+='<div class="col-md-2">';
                             html+='<a class="btn btn-danger acl-ip-data-delete" data-val="1"><i class="fa fa-trash"></i></a>';
                             html+='</div>';
                             html+='</div>';
+                            html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_1">';
+                            html+='<div class="col-md-2 aliasing-label">';
+                            html+='To: ';
+                            html+='</div>';
+                            html+='<div class="col-md-4">';
+                            html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+(resp!=0?ips[2]:"")+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
+                            html+='</div>';
+                            html+='<div class="col-md-4">';
+                            html+='<input type="text" id="acl_ip_port" class="acl_ip_port" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+(resp!=0?ips[3]:"")+'" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
+                            html+='</div>';
+                            html+='<div class="col-md-2">';
+                            html+='</div>';
+                            html+='</div>';
+                            html+='<div class="clearfix"></div>';
+                            html+='<div class="line-sepearator"></div>';
+                            html+='</div>';
                             html+='</form>';
+
 
                             html+='<div class="col-md-12 pull-right">';
                             html+='<div class="col-md-2">';
@@ -2887,7 +2678,7 @@ $(document).ready(function(){
                             html+='</div>';
                             html+='</div>';
                             html+='</div>';
-                        } else{
+                        } else {
                             var i=0;
                             ipNports=resp.split(":");
                             html+='<div class="row">';
@@ -2896,7 +2687,13 @@ $(document).ready(function(){
                             for (x in ipNports){
                                 i++;
                                 var ipNport = ipNports[x].split(",");
+
+                                html+='<div class="aliasing_block aliasing_block_'+i+'">';
+
                                 html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_'+i+'">';
+                                html+='<div class="col-md-2 aliasing-label">';
+                                html+='From: ';
+                                html+='</div>';
                                 html+='<div class="col-md-4">';
                                 html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+ipNport[0]+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
                                 html+='</div>';
@@ -2907,8 +2704,25 @@ $(document).ready(function(){
                                 html+='<a class="btn btn-danger acl-ip-data-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
                                 html+='</div>';
                                 html+='</div>';
-                            }
 
+                                html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_'+i+'">';
+                                html+='<div class="col-md-2 aliasing-label">';
+                                html+='To: ';
+                                html+='</div>';
+                                html+='<div class="col-md-4">';
+                                html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+ipNport[2]+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
+                                html+='</div>';
+                                html+='<div class="col-md-4">';
+                                html+='<input type="text" id="acl_ip_port" class="acl_ip_port" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+ipNport[3]+'" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
+                                html+='</div>';
+                                html+='<div class="col-md-2">';
+                                html+='</div>';
+                                html+='</div>';
+                                html+='<div class="clearfix"></div>';
+                                html+='<div class="line-sepearator"></div>';
+
+                                html+='</div>';
+                            }
 
                             html+='</form>';
                             html+='<div class="row">';
@@ -2930,7 +2744,6 @@ $(document).ready(function(){
                         $("span.ui-dialog-title").text('ACL Settings');
                     }
                 });
-
             }
             else if(field == "new_dst" && database == "c_forwarding")
             {
@@ -2949,9 +2762,12 @@ $(document).ready(function(){
                             html+='<div class="col-md-4">';
                             html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+(resp!=0?ips[0]:"")+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
                             html+='</div>';
+                            html+='<div class="col-md-4">';
+                            html+='<input type="text" id="acl_ip_port" class="acl_ip_port" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+(resp!=0?ips[1]:"")+'" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
+                            html+='</div>';
 
                             html+='<div class="col-md-2">';
-                            html+='<a class="btn btn-danger acl-ip-data-delete" data-val="1"><i class="fa fa-trash"></i></a>';
+                            html+='<a class="btn btn-danger c_forwarding_dst-delete" data-val="1"><i class="fa fa-trash"></i></a>';
                             html+='</div>';
                             html+='</div>';
                             html+='</form>';
@@ -2978,9 +2794,12 @@ $(document).ready(function(){
                                 html+='<div class="col-md-4">';
                                 html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+ipNport[0]+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
                                 html+='</div>';
+                                html+='<div class="col-md-4">';
+                                html+='<input type="text" id="acl_ip_port" class="acl_ip_port" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+ipNport[1]+'" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
+                                html+='</div>';
 
                                 html+='<div class="col-md-2">';
-                                html+='<a class="btn btn-danger acl-ip-data-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
+                                html+='<a class="btn btn-danger c_forwarding_dst-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
                                 html+='</div>';
                                 html+='</div>';
                             }
@@ -3294,10 +3113,10 @@ $(document).ready(function(){
                                     acl_value[id][type]["my_cloud"]=0;
                                     acl_value[id][type]["my_clouds"]=0;
 
-                                    $(".specific_tunnel"+"-"+type+"-"+id).attr("data-avl_attr",0);
+                                   /* $(".specific_tunnel"+"-"+type+"-"+id).attr("data-avl_attr",0);
                                     $(".specific_tunnel"+"-"+type+"-"+id).css("color","black");
                                     $(".specific_tunnel"+"-"+type+"-"+id).css("opacity","0.35");
-                                    $(".specific_tunnel"+"-"+type+"-"+id).attr("class", "disabled_color_box "+"specific_tunnel"+"-"+type+"-"+id);
+                                    $(".specific_tunnel"+"-"+type+"-"+id).attr("class", "disabled_color_box "+"specific_tunnel"+"-"+type+"-"+id);*/
                                     $(".specific_group"+"-"+type+"-"+id).attr("data-avl_attr",0);
                                     $(".specific_group"+"-"+type+"-"+id).css("color","black");
                                     $(".specific_group"+"-"+type+"-"+id).css("opacity","0.35");
@@ -3311,9 +3130,9 @@ $(document).ready(function(){
                                     $(".my_clouds"+"-"+type+"-"+id).css("opacity","0.35");
                                     $(".my_clouds"+"-"+type+"-"+id).attr("class", "disabled_color_box "+"my_clouds"+"-"+type+"-"+id);
                                 }else{
-                                    $(".specific_tunnel"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
+                                    /*$(".specific_tunnel"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
                                     $(".xxxxxxxxxx").attr("class", "color-box "+"specific_tunnel"+"-"+type+"-"+id);
-                                    $(".specific_tunnel"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");
+                                    $(".specific_tunnel"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");*/
                                     $(".specific_group"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
                                     $(".xxxxxxxxxx").attr("class", "color-box "+"specific_group"+"-"+type+"-"+id);
                                     $(".specific_group"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");
@@ -3352,11 +3171,11 @@ $(document).ready(function(){
                             acl_value[id][type]["my_cloud"]=0;
                             acl_value[id][type]["my_clouds"]=0;
 
-                            $(".specific_tunnel"+"-"+type+"-"+id).attr("data-avl_attr",0);
+                            /*$(".specific_tunnel"+"-"+type+"-"+id).attr("data-avl_attr",0);
                             $(".specific_tunnel"+"-"+type+"-"+id).css("color","black");
                             $(".specific_tunnel"+"-"+type+"-"+id).css("opacity","0.35");
                             $(".specific_tunnel"+"-"+type+"-"+id).removeClass("color-box");
-                            $(".specific_tunnel"+"-"+type+"-"+id).addClass("disabled_color_box");
+                            $(".specific_tunnel"+"-"+type+"-"+id).addClass("disabled_color_box");*/
                             $(".specific_group"+"-"+type+"-"+id).attr("data-avl_attr",0);
                             $(".specific_group"+"-"+type+"-"+id).css("color","black");
                             $(".specific_group"+"-"+type+"-"+id).css("opacity","0.35");
@@ -3373,9 +3192,9 @@ $(document).ready(function(){
                             $(".my_clouds"+"-"+type+"-"+id).removeClass("color-box");
                             $(".my_clouds"+"-"+type+"-"+id).addClass("disabled_color_box");
                         }else{
-                            $(".specific_tunnel"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
+                            /*$(".specific_tunnel"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
                             $(".xxxxxxxxxx").attr("class", "color-box "+"specific_tunnel"+"-"+type+"-"+id);
-                            $(".specific_tunnel"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");
+                            $(".specific_tunnel"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");*/
                             $(".specific_group"+"-"+type+"-"+id).addClass("xxxxxxxxxx");
                             $(".xxxxxxxxxx").attr("class", "color-box "+"specific_group"+"-"+type+"-"+id);
                             $(".specific_group"+"-"+type+"-"+id).removeClass("xxxxxxxxxx");
@@ -3486,7 +3305,8 @@ $(document).ready(function(){
                         notify_msg("warning", "You have to save this settings...");
                         return true;
                     }
-                }else if(field=="my_cloud"){
+                }else if(field=="my_cloud")
+                {
                     if(val_attr==undefined || val_attr==""){
                         $.ajax({
                             url: "request.php?request=get_acl_val",
@@ -3567,7 +3387,66 @@ $(document).ready(function(){
                         notify_msg("warning", "You have to save this settings...");
                         return true;
                     }
-                } else{
+                }
+                else if(field=="internet")
+                {
+                    if($(".change_tunnel_"+tt_id).attr("data-type")=="client"){
+                        notify_msg("error","please activate internet tag first");
+                        return false;
+                    }
+                    if(val_attr==undefined || val_attr==""){
+                        $.ajax({
+                            url: "request.php?request=get_acl_val",
+                            data: {"id": id, "type": database, "name": field},
+                            type: "POST",
+                            success: function (resp) {
+                                var val=1;
+                                if (resp != 0) {
+                                    val = 0;
+                                }
+                                if(val==0){
+                                    this_node.attr("data-avl_attr",val);
+                                    this_node.css("color","black");
+                                    this_node.css("opacity","0.35");
+                                }else{
+                                    this_node.attr("data-avl_attr",val);
+                                    this_node.css("color","white");
+                                    this_node.css("opacity","1");
+                                }
+
+                                if(acl_value[id]==undefined)
+                                    acl_value[id]={};
+                                if(acl_value[id][type]==undefined)
+                                    acl_value[id][type]={};
+                                acl_value[id][type][data]=val;
+                                notify_msg("warning", "You have to save this settings...");
+                                return true;
+                            }
+                        });
+                    }else{
+                        if(val_attr==1){
+                            val_attr=0;
+                            $(this).attr("data-avl_attr",val_attr);
+                            $(this).css("color","black");
+                            $(this).css("opacity","0.35");
+                        }else{
+                            val_attr=1;
+                            $(this).attr("data-avl_attr",val_attr);
+                            $(this).css("color","white");
+                            $(this).css("opacity","1");
+                        }
+                        if(acl_value[id]==undefined)
+                            acl_value[id]={};
+                        if(acl_value[id][type]==undefined)
+                            acl_value[id][type]={};
+                        acl_value[id][type][data]=val_attr;
+                        notify_msg("warning", "You have to save this settings...");
+                        return true;
+                    }
+                }
+                else
+                {
+
                     if(val_attr==undefined || val_attr==""){
                         $.ajax({
                             url: "request.php?request=get_acl_val",
@@ -3704,29 +3583,22 @@ $(document).ready(function(){
                                         data = $.parseJSON(resp);
                                         console.log('getTunnel');
                                         console.log(data);
-                                        html+='<select class="acl_option" class="" multiple="multiple" data-value="'+field+'" data-type="'+database+'" data-id="'+id+'">';
-                                            html+='<option>Select one...</option>';
-
-                                            for(x in data){
-                                                if(parseInt(res.exist_tunnel) != data[x].tunnel_id){
-                                                    /*if(data[x].tunnel_id == tunnel){
-                                                        html+='<option value="'+data[x].tunnel_id+'" '+(parseInt(res.option_val)==data[x].tunnel_id?"selected":"")+'>'+data[x].display_name+'(Group '+group_arr[data[x].group_id]+')(This tunnel)</option>';
-                                                    }else {*/
-                                                    var display_name=data[x].display_name;
-                                                    if(display_name==""){
-                                                        display_name="Tunnel "+data[x].tunnel_id;
-                                                    }
-                                                    if(res.option_val.indexOf(":")==-1){
-                                                        html+='<option value="'+data[x].tunnel_id+'" '+(parseInt(res.option_val)==data[x].tunnel_id?"selected":"")+'>'+display_name+' (Group '+group_arr[data[x].group_id]+')</option>';
-                                                    } else {
-                                                        var tnls = res.option_val.split(":");
-                                                        for(y in tnls){
-                                                            html+='<option value="'+data[x].tunnel_id+'" '+(parseInt(tnls[y])==data[x].tunnel_id?"selected":"")+'>'+display_name+' (Group '+group_arr[data[x].group_id]+')</option>';
-                                                        }
-                                                    }
-                                                    //}
+                                        html+='<select class="acl_option" style="width:50%;" multiple="multiple" data-value="'+field+'" data-type="'+database+'" data-id="'+id+'">';
+                                        html+='<option>Select one...</option>';
+                                        $.each(data,function(key,value){
+                                            if(parseInt(res.exist_tunnel) != value.tunnel_id){
+                                                var display_name=value.display_name;
+                                                if(display_name==""){
+                                                    display_name="Tunnel "+value.tunnel_id;
+                                                }
+                                                if(res.option_val.indexOf(":")==-1){
+                                                    html+='<option value="'+value.tunnel_id+'" '+(parseInt(res.option_val)==value.tunnel_id?"selected":"")+'>'+display_name+' (Group '+group_arr[value.group_id]+')</option>';
+                                                } else {
+                                                    var tnls = res.option_val.split(":");
+                                                    html+='<option value="'+value.tunnel_id+'" '+(($.inArray(value.tunnel_id, tnls)!==-1)?"selected":"")+'>'+display_name+' (Group '+group_arr[value.group_id]+')</option>';
                                                 }
                                             }
+                                        });
                                         html+='</select>';
                                         $("#acl_div_cont").html(html);
                                         dialog.dialog( "open" );
@@ -3826,6 +3698,80 @@ $(document).ready(function(){
                     }
                     return true;
                 }
+            }
+            else if(field == "source_ip" && database == "s_tos")
+            {
+                $.ajax({
+                    url:"request.php?request=get_acl_val",
+                    data:{"id":id, "type":database, "name":field},
+                    type:"POST",
+                    success:function(resp){
+                        if(resp.indexOf(":")==-1){
+                            var ips=resp.split(",");
+                            html+='<div class="row">';
+                            html+='<form class="source_ip-form">';
+                            html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_1">';
+
+                            html+='<div class="col-md-4">';
+                            html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+(resp!=0?ips[0]:"")+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
+                            html+='</div>';
+
+                            html+='<div class="col-md-2">';
+                            html+='<a class="btn btn-danger acl-ip-data-delete" data-val="1"><i class="fa fa-trash"></i></a>';
+                            html+='</div>';
+                            html+='</div>';
+                            html+='</form>';
+
+                            html+='<div class="col-md-12 pull-right">';
+                            html+='<div class="col-md-2">';
+                            html+='<a class="btn btn-primary source_ip_add_btn" data-text="'+field+'" data-type="'+database+'" data-val="1" data-id="'+id+'"><i class="fa fa-plus"></i></a>';
+                            html+='</div>';
+                            html+='<div class="col-md-2">';
+                            html+='<input type="button" class="btn source_ip_save" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" value="Save">';
+                            html+='</div>';
+                            html+='</div>';
+                            html+='</div>';
+                        } else{
+                            var i=0;
+                            ipNports=resp.split(":");
+                            html+='<div class="row">';
+                            html+='<form class="source_ip-form">';
+
+                            for (x in ipNports){
+                                i++;
+                                var ipNport = ipNports[x].split(",");
+                                html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_'+i+'">';
+
+                                html+='<div class="col-md-4">';
+                                html+='<input type="text" id="acl_ip_text" class="acl_ip_text" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" style="margin-right:10px;" value="'+ipNport[0]+'" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
+                                html+='</div>';
+
+                                html+='<div class="col-md-2">';
+                                html+='<a class="btn btn-danger acl-ip-data-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
+                                html+='</div>';
+                                html+='</div>';
+                            }
+
+                            html+='</form>';
+                            html+='<div class="row">';
+                            html+='<div class="col-md-12">';
+                            html+='<div class="col-md-1">';
+                            html+='<a class="btn btn-primary source_ip_add_btn" data-text="'+field+'" data-type="'+database+'" data-val="'+i+'" data-id="'+id+'"><i class="fa fa-plus"></i></a>';
+                            html+='</div>';
+
+                            html+='<div class="col-md-1">';
+                            html+='<input type="button" class="btn source_ip_save" data-text="'+field+'" data-type="'+database+'" data-id="'+id+'" value="Save">';
+                            html+='</div>';
+                            html+='</div>';
+                            html+='</div>';
+                            html+='</div>';
+                        }
+                        $("#acl_div_cont").html(html);
+                        console.log(html);
+                        dialog.dialog( "open" );
+                        $("span.ui-dialog-title").text('ACL Settings');
+                    }
+                });
             }
             else
             {
@@ -3952,20 +3898,57 @@ $(document).ready(function(){
         $(".ip-protoco-form").append(html);
     });
 
-    $("body").on("click", ".s_aliasing_add_btn", function(){
+    $("body").on("click", ".source_ip_add_btn", function(){
         var i = $(this).attr("data-val");
         i++;
         var html="";
         html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_'+i+'">';
+
+        html+='<div class="col-md-4">';
+        html+='<input type="text" class="acl_ip_text" data-text="" data-type="" data-id="" style="margin-right:10px;" value="" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
+        html+='</div>';
+        html+='<div class="col-md-1">';
+        html+='<a class="btn btn-danger acl-ip-data-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
+        html+='</div>';
+        html+='</div>';
+
+        $(this).attr("data-val", i);
+        $(".source_ip-form").append(html);
+    });
+
+    $("body").on("click", ".s_aliasing_add_btn", function(){
+        var i = $(this).attr("data-val");
+        i++;
+        var html="";
+        html+='<div class="aliasing_block aliasing_block_'+i+'">';
+
+        html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_'+i+'">';
+        html+='<div class="col-md-2 aliasing-label">From: </div>';
         html+='<div class="col-md-4">';
         html+='<input type="text" class="acl_ip_text" data-text="" data-type="" data-id="" style="margin-right:10px;" value="" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
         html+='</div>';
         html+='<div class="col-md-4">';
         html+='<input type="text" class="acl_ip_port" data-text="" data-type="" data-id="" style="margin-right:10px;" value="" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
         html+='</div>';
-        html+='<div class="col-md-1">';
+        html+='<div class="col-md-2">';
         html+='<a class="btn btn-danger acl-ip-data-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
         html+='</div>';
+        html+='</div>';
+
+        html+='<div class="col-md-12 acl_ip_text_div acl_ip_text_div_'+i+'">';
+        html+='<div class="col-md-2 aliasing-label">To: </div>';
+        html+='<div class="col-md-4">';
+        html+='<input type="text" class="acl_ip_text" data-text="" data-type="" data-id="" style="margin-right:10px;" value="" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
+        html+='</div>';
+        html+='<div class="col-md-4">';
+        html+='<input type="text" class="acl_ip_port" data-text="" data-type="" data-id="" style="margin-right:10px;" value="" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
+        html+='</div>';
+        html+='<div class="col-md-2">';
+        html+='</div>';
+        html+='</div>';
+
+        html+='<div class="clearfix"></div>';
+        html+='<div class="line-sepearator"></div>';
         html+='</div>';
 
         $(this).attr("data-val", i);
@@ -3980,9 +3963,12 @@ $(document).ready(function(){
         html+='<div class="col-md-4">';
         html+='<input type="text" class="acl_ip_text" data-text="" data-type="" data-id="" style="margin-right:10px;" value="" name="ip[]" placeholder="Enter IP address..."><label class="error" style="background-color:#FFFFFF"></label>';
         html+='</div>';
+        html+='<div class="col-md-4">';
+        html+='<input type="text" id="acl_ip_port" class="acl_ip_port" data-text="" data-type="" data-id="" style="margin-right:10px;" value="" name="port[]" placeholder="Enter IP port..."><label class="error" style="background-color:#FFFFFF"></label>';
+        html+='</div>';
 
         html+='<div class="col-md-2">';
-        html+='<a class="btn btn-danger acl-ip-data-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
+        html+='<a class="btn btn-danger c_forwarding_dst-delete" data-val="'+i+'"><i class="fa fa-trash"></i></a>';
         html+='</div>';
         html+='</div>';
 
@@ -4107,6 +4093,15 @@ $(document).ready(function(){
     });
 
     $("body").on("click", ".acl-ip-data-delete", function(){
+        if($(".aliasing_block").length==1){
+            $(".acl_ip_text").val("");
+            $(".acl_ip_port").val("");
+        }else{
+            $(".aliasing_block_"+$(this).attr("data-val")).remove();
+        }
+    });
+
+    $("body").on("click", ".c_forwarding_dst-delete", function(){
         if($(".acl_ip_text_div").length==1){
             $(".acl_ip_text").val("");
             $(".acl_ip_port").val("");
@@ -4114,6 +4109,7 @@ $(document).ready(function(){
             $(".acl_ip_text_div_"+$(this).attr("data-val")).remove();
         }
     });
+
     $("body").on("click", ".acl-websites-data-delete", function(){
         if($(".acl_websites_text_div").length==1){
             $(".acl_websites_text").val("");
@@ -4239,6 +4235,10 @@ $(document).ready(function(){
         var id = $(this).attr('data-id');
         var data = $(this).attr('data-value');
         var val = $(this).val();
+        console.log(val);
+        if(val=="Select one..."){
+            val="";
+        }
         if(acl_value[id]==undefined)
             acl_value[id]={};
         if(acl_value[id][type]==undefined)
@@ -4302,15 +4302,17 @@ $(document).ready(function(){
     $("body").on("click", ".acl_radio", function(){
         var id = $(this).attr("data-id");
         var val = $(this).val();
-        $.ajax({
-            url:"request.php?request=create_new_acl&id="+id+"&val="+val+"&token="+token,
-            success:function(resp){
-                data=$.parseJSON(resp);
-                if(data.status==1){
-                    notify_msg("success", data.data);
-                }
+        var get={
+            "type":"create_new_acl",
+            "message_type":"request",
+            "data":{
+                "id":id,
+                "val":val,
+                "token":token
             }
-        });
+        };
+        send(JSON.stringify(get));
+
     });
 
     var btn_add_acl=$(".btn_add_acl");
@@ -4440,58 +4442,6 @@ $(document).ready(function(){
     });
 
     $(".img_upload").initial();
-
-    $("body").on("click",".sponsore",function(){
-        console.log("sponsor");
-        var ths=$(this);
-        var tunnel_id=ths.attr('data-tid');
-        var sponsored=false;
-        $.ajax({
-            url:"request.php?request=check_tunnel_sponsored&id="+tunnel_id,
-            success:function(res){
-                console.log(res);
-                var resp=jQuery.parseJSON(res);
-                if(resp.status=='1'){
-                    //var str="This tunnel is shared with "+resp.shared_with;
-                    var str="This tunnel will stop sponsoring.\n Are you sure?";
-                    if(confirm(str)){
-                        $.ajax({
-                            url:"request.php?request=remove_sharing&tunnel_id="+tunnel_id+"&user_id="+current_customer_id,
-                            type:"GET",
-                            success:function(resp){
-                                var obj=jQuery.parseJSON(resp);
-                                if(obj.status==1) {
-                                    $(".sponsored_"+tunnel_id).css("background-color","transparent");
-                                    $(".sponsored_"+tunnel_id).css("color","black");
-                                    $(".sponsored_"+tunnel_id).css("opacity","0.25");
-                                    $(".sponsored_"+tunnel_id).html("Sponsore");
-                                }
-                            }
-                        });
-                    }
-                    sponsored=true;
-                }else{
-                    sponsored=false;
-                }
-                if(!sponsored){
-                    $("#sponsorModal").modal("show");
-                    $(".customer_search_btn").attr("data-cloud", ths.attr('data-cloud'));
-                    $(".customer_search_btn").attr("data-u", ths.attr('data-u'));
-                    $(".customer_search_btn").attr("data-tid", ths.attr('data-tid'));
-                    $.ajax({
-                        url:"request.php?request=get_friends_for_dialog&customer_id="+current_customer_id,
-                        type:"GET",
-                        success:function(resp){
-                            if(resp!="") {
-                                //console.log(resp);
-                                jQuery("#sponsor-friend-list-box").html(resp);
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    });
 
     $("body").on("click",".sponsored",function(){
         console.log("sponsored");
@@ -4670,10 +4620,10 @@ $(document).ready(function(){
             }
         });
         setTimeout(function(){
-            $(".alert").removeClass("alert-success");
-            $(".alert").removeClass("alert-danger");
-            $(".alert").html("");
-        },5000);
+            $("#msg").removeClass("alert-success");
+            $("#msg").removeClass("alert-danger");
+            $("#msg").html("");
+        },3000);
         $(this).addClass("installed_acl");
         $(this).val("Installed");
         $(this).prop('disabled',true);
@@ -4726,7 +4676,7 @@ $(document).ready(function(){
 
     $("body").on("blur",".acl_name",function(){
         var acl_id=$(this).attr("data-id");
-        var key=$(this).attr('class');
+        var key=$(this).attr('class').split(" ")[0];
         var value=$(this).val();
         console.log($(this).val());
         var ths=$(this);
@@ -4736,7 +4686,7 @@ $(document).ready(function(){
     });
     $("body").on("blur",".acl_description",function(){
         var acl_id=$(this).attr("data-id");
-        var key=$(this).attr('class');
+        var key=$(this).attr('class').split(" ")[0];
         var value=$(this).val();
         console.log($(this).val());
         var ths=$(this);
@@ -4746,7 +4696,7 @@ $(document).ready(function(){
     });
     $("body").on("keypress",".acl_name",function(event){
         var acl_id=$(this).attr("data-id");
-        var key=$(this).attr('class');
+        var key=$(this).attr('class').split(" ")[0];
         var value=$(this).val();
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if(keycode == '13'){
@@ -4759,7 +4709,7 @@ $(document).ready(function(){
     });
     $("body").on("keypress",".acl_description",function(event){
         var acl_id=$(this).attr("data-id");
-        var key=$(this).attr('class');
+        var key=$(this).attr('class').split(" ")[0];
         var value=$(this).val();
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if(keycode == '13'){
@@ -4772,28 +4722,28 @@ $(document).ready(function(){
     });
 
     $("body").on("click", ".assign_action_btn",function(){
+        console.log('request real ip');
         var id=$(this).attr("data-id");
         if($(".tunnel_"+id).attr("data-val")==1){
             var val=$(this).attr("data-val");
             $(".real_ip_select_box_"+id+" .active_option .assign_action_btn i").attr("class","fa fa-fw fa-circle-o-notch fa-spin");
             $(".real_ip_select_box_"+id+" .active_option").addClass("processing_option");
             $(".real_ip_select_box_"+id+" .processing_option").removeClass("active_option");
-            $.ajax({
-                url:"request.php?request=request_real_ip&id="+id+"&token="+token,
-                success:function(resp){
-                    var data=$.parseJSON(resp);
-                    if(data.status==1){
-                        notify_msg("success", data.data);
-                    }else{
-                        notify_msg("error", data.data);
-                    }
+            var get={
+                "type":"request_real_ip",
+                "message_type":"request",
+                "data":{
+                    "id":id,
+                    "token":token
                 }
-            });
+            };
+            send(JSON.stringify(get));
         }else{
             notify_msg("error", "Please 1st select this tunnel");
         }
     });
     $("body").on("clear",".active_option", function(){
+        console.log('clear real ip');
         var id=$(this).closest(".custom_select_box").attr("data-id");
         console.log(id);
         var real_ip=$(".real_ip_select_box_"+id+" .active_option .display_value").attr("data-value");
@@ -4802,24 +4752,23 @@ $(document).ready(function(){
             $(".real_ip_select_box_"+id+" .active_option .action_btn i").attr("class","fa fa-fw fa-circle-o-notch fa-spin");
             $(".real_ip_select_box_"+id+" .active_option").addClass("processing_option");
             $(".real_ip_select_box_"+id+" .processing_option").removeClass("active_option");
-            $.ajax({
-                url:"request.php?request=clear_tunnel_real_ip&id="+id+"&real_ip="+real_ip+"&token="+token,
-                success:function(resp){
-                    var data=$.parseJSON(resp);
-                    if(data.status==1){
-                        notify_msg("success", data.data);
-                    }else{
-                        notify_msg("error", data.data);
-                    }
+            var get={
+                "type":"clear_tunnel_real_ip",
+                "message_type":"request",
+                "data":{
+                    "id":id,
+                    "real_ip":real_ip,
+                    "token":token
                 }
-            });
+            };
+            send(JSON.stringify(get));
         }else{
             notify_msg("error", "Please 1st select this tunnel");
         }
-
     });
 
     $("body").on("change",".active_option", function(e,f){
+        console.log('change real ip');
         var id=$(this).closest(".custom_select_box").attr("data-id");
         var cur_real_ip=$(".real_ip_select_box_"+id+" .active_option .display_value").attr("data-value");
         var real_ip=f;
@@ -4832,22 +4781,22 @@ $(document).ready(function(){
             $(".real_ip_select_box_"+id+" .active_option .action_btn i").attr("class","fa fa-fw fa-circle-o-notch fa-spin");
             $(".real_ip_select_box_"+id+" .active_option").addClass("processing_option");
             $(".real_ip_select_box_"+id+" .processing_option").removeClass("active_option");
-            $.ajax({
-                url:"request.php?request=change_tunnel_real_ip&id="+id+"&real_ip="+real_ip+"&token="+token,
-                success:function(resp){
-                    var data=$.parseJSON(resp);
-                    if(data.status==1){
-                        notify_msg("success", data.data);
-                    }else{
-                        notify_msg("error", data.data);
-                    }
+            var get={
+                "type":"change_tunnel_real_ip",
+                "message_type":"request",
+                "data":{
+                    "id":id,
+                    "real_ip":real_ip,
+                    "token":token
                 }
-            });
+            };
+            send(JSON.stringify(get));
         }else{
             notify_msg("error", "Please 1st select this tunnel");
         }
     });
     $("body").on("clear",".inactive_option", function(){
+        console.log('clear acl real ip');
         var id=$(this).closest(".custom_select_box").attr("data-id");
         var aid=$(this).attr("data-aid");
         var real_ip=$(this).children(".display_value").attr("data-value");
@@ -4856,17 +4805,17 @@ $(document).ready(function(){
             $(".real_ip_select_box_"+id+" .inactive_option_"+aid+" .action_btn i").attr("class","fa fa-fw fa-circle-o-notch fa-spin");
             $(".real_ip_select_box_"+id+" .inactive_option_"+aid).addClass("processing_inactive_option");
             $(".real_ip_select_box_"+id+" .inactive_option_"+aid).removeClass("inactive_option");
-            $.ajax({
-                url:"request.php?request=clear_acl_real_ip&id="+id+"&aid="+aid+"&real_ip="+real_ip+"&token="+token,
-                success:function(resp){
-                    var data=$.parseJSON(resp);
-                    if(data.status==1){
-                        notify_msg("success", data.data);
-                    }else{
-                        notify_msg("error", data.data);
-                    }
+            var get={
+                "type":"clear_acl_real_ip",
+                "message_type":"request",
+                "data":{
+                    "id":id,
+                    "aid":aid,
+                    "real_ip":real_ip,
+                    "token":token
                 }
-            });
+            };
+            send(JSON.stringify(get));
         }else{
             notify_msg("error", "Please 1st select this tunnel");
         }
@@ -4910,979 +4859,32 @@ $(document).ready(function(){
 });
 
 function save_acl_name_description(ths, acl_id, key, value){
-    ths.attr('data-value',value);
-    $.ajax({
-        url:"request.php?request=save_acl_name_description&acl_id="+acl_id+"&field="+key+"&value="+value,
-        type:"GET",
-        success:function(resp){
-            if(resp){
-                console.log(resp);
-                if(key=="acl_name"){
-                    notify_msg("success", "ACL name saved successfully");
-                }else{
-                    notify_msg("success", "ACL description saved successfully");
-                }
-            }
+
+    var get={
+        "type":"save_acl_name_description",
+        "message_type":"request",
+        "data":{
+            "acl_id":acl_id,
+            "field":key,
+            "value":value
         }
-    });
-}
-
-//gateway change php section
-function gateway(stat, tunnel_id, user_id, ttype){
-    var html="";
-    if(ttype != "client"){
-        /*  if($stat >= 0 && $stat < 2) {
-         $html .= '<input type="hidden" class="edit_gateway_s" name="gateway" value=' . $stat . '>';
-         $html .= '<div class="gateway_stat_' . $stat . ' gateway tunnel_gate_' . $tunnel_id . '"  data-pos="0" type="data" data-toggle="tooltip" title="No" data-cast="' . $_SESSION['user_id'] . '" data-val="' . $stat .  '" data-id="' . $tunnel_id . '"><i class="fa fa-times"></i></div>';
-         }*/
-        if(stat==0){
-            html +='<input type="hidden" class="edit_gateway_s" name="gateway" value=0>';
-            html +='<div class="gateway tunnel_gate_' + tunnel_id + '"  data-pos="0" type="data" data-toggle="tooltip" title="No" data-cast="' + user_id + '" data-val="0" data-id="' + tunnel_id +'"><i class="fa fa-times" style="color:#DA3838"></i></div>';
-            /*$html.='<div class="lock_btn" data-i="unlock"><i class="fa fa-unlock"></i></div>';
-             $html.='<div class="lock_btn" data-i="lock"><i class="fa fa-lock"></i></div>';*/
-        }else if(stat==1){
-            html +='<input type="hidden" class="edit_gateway_s" name="gateway" value=1>';
-            html +='<div class="gateway tunnel_gate_' + tunnel_id + '"  data-pos="0" type="data" data-toggle="tooltip" title="Yes" data-cast="' + user_id + '" data-val="1" data-id="' + tunnel_id + '"><i class="fa fa-check" style="color:#1D9E74"></i></div>';
-            /*$html.='<div class="lock_btn" data-i="unlock"><i class="fa fa-unlock"></i></div>';
-             $html.='<div class="lock_btn" data-i="lock"><i class="fa fa-lock"></i></div>';*/
-        }
-    }
-    /*
-    if(stat==0){
-        html+='<input type="hidden" class="edit_gateway_s" name="gateway" value=0>';
-        html+='<div class="gateway tunnel_gate_'+tunnel_id+'" type="data" data-toggle="tooltip" title="No" data-cast="'+user_id+'" data-val="0" data-id="'+tunnel_id+'"><i class="fa fa-times" style="color:#DA3838"></i></div>';
-
-    }else if(stat==1){
-        html+='<input type="hidden" class="edit_gateway_s" name="gateway" value=1>';
-        html+='<div class="gateway tunnel_gate_'+tunnel_id+'" type="data" data-toggle="tooltip" title="Yes" data-cast="'+user_id+'" data-val="1" data-id="'+tunnel_id+'"><i class="fa fa-check" style="color:#1D9E74"></i></div>';
-
-    }*/
-    return html;
-}
-
-//bidirection change php section
-function biderection (stat, tunnel_id, user_id){
-    var html="";
-    if(stat==0){
-        html+='<input type="hidden" id="edit_biderection_s" name="biderection" value=0>';
-        html+='<div class="biderection tunnel_bi_'+tunnel_id+'" type="data" data-toggle="tooltip" title="Mode 1" data-ctrl="0" data-cast="'+user_id+'" data-val="0" data-id="'+tunnel_id+'" data-url="change_biderection">';
-        html+='<i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right"></i></div>';
-        /*$html.='<div class="lock_btn" data-i="unlock"><i class="fa fa-unlock"></i></div>';
-        $html.='<div class="lock_btn" data-i="lock"><i class="fa fa-lock"></i></div>';*/
-    }
-    if(stat==1){
-        html+='<input type="hidden" id="edit_biderection_s" name="biderection" value=1>';
-        html+='<div class="biderection tunnel_bi_'+tunnel_id+'" type="data" data-toggle="tooltip" title="Mode 2" data-ctrl="0" data-cast="'+user_id+'" data-val="1" data-id="'+tunnel_id+'" data-url="change_biderection">';
-        html+='<i class="fa fa-chevron-left" style="color:#1D9E74"></i><i class="fa fa-chevron-right" style="color:#1D9E74"></i></div>';
-        /*$html.='<div class="lock_btn" data-i="unlock"><i class="fa fa-unlock"></i></div>';
-        $html.='<div class="lock_btn" data-i="lock"><i class="fa fa-lock"></i></div>';*/
-    }
-    if(stat==2){
-        html+='<input type="hidden" id="edit_biderection_s" name="biderection" value=2>';
-        html+='<div class="biderection tunnel_bi_'+tunnel_id+'" type="data" data-toggle="tooltip" title="Mode 3" data-ctrl="0" data-cast="'+user_id+'" data-val="2" data-id="'+tunnel_id+'" data-url="change_biderection">';
-        html+='<i class="fa fa-chevron-left" style="color:#1D9E74"></i><i class="fa fa-chevron-right"></i></div>';
-        /*$html.='<div class="lock_btn" data-i="unlock"><i class="fa fa-unlock"></i></div>';
-        $html.='<div class="lock_btn" data-i="lock"><i class="fa fa-lock"></i></div>';*/
-    }
-    if(stat==3){
-        html+='<input type="hidden" id="edit_biderection_s" name="biderection" value=3>';
-        html+='<div class="biderection tunnel_bi_'+tunnel_id+'" type="data" data-toggle="tooltip" title="Mode 4" data-ctrl="0" data-cast="'+user_id+'" data-val="2" data-id="'+tunnel_id+'" data-url="change_biderection">';
-        html+='<i class="fa fa-chevron-left"></i><i class="fa fa-chevron-right" style="color:#1D9E74"></i></div>';
-        /*$html.='<div class="lock_btn" data-i="unlock"><i class="fa fa-unlock"></i></div>';
-        $html.='<div class="lock_btn" data-i="lock"><i class="fa fa-lock"></i></div>';*/
-    }
-    return html;
-}
-function gstatus(stat, tunnel_id, usr_id){
-    $html="";
-    /*  if($stat >= 0 && $stat < 2) {
-     $html .= '<input type="hidden" class="edit_status_s" name="status" value=' . $stat . '>';
-     $html .= '<div class="status st_ch_status_' . $stat . ' tunnel_stat_' . $tunnel_id . '" type="data" data-toggle="tooltip" title="Active" data-cast="' . $_SESSION['user_id'] . '" data-val="' . $stat . '" data-id="' . $tunnel_id . '"><i class="fa fa-fw fa-circle"></i></div>';
-     }*/
-    if(stat==1){
-        $html+='<input type="hidden" class="edit_status_s" name="status" value=1>';
-        $html+='<div class="status tunnel_stat_' + tunnel_id + '" type="data" data-toggle="tooltip" title="Active" data-cast="' + usr_id + '" data-val="1" data-id="' + tunnel_id + '"><i class="fa fa-fw fa-circle" style="color:#1D9E74"></i></div>';
-
-    }else if(stat==0){
-        $html+='<input type="hidden" class="edit_status_s" name="status" value=0>';
-        $html+='<div class="status tunnel_stat_' + tunnel_id + '" type="data" data-toggle="tooltip" title="Inactive" data-cast="' + usr_id + '" data-val="0" data-id="' + tunnel_id + '"><i class="fa fa-fw fa-circle"  style="color:#DA3838"></i></div>';
-    }else{
-        $html+='<input type="hidden" class="edit_status_s" name="status" value=0>';
-        $html+='<div class="status tunnel_stat_' + tunnel_id + '" type="data" data-toggle="tooltip" title="Inactive" data-cast="' + usr_id + '" data-val="0" data-id="' + tunnel_id + '"><i class="fa fa-fw fa-circle"  style="color:#DA3838"></i></div>';
-    }
-    return $html;
-}
-function tunnels(data, is_shared=false){
-    console.log('tunnel_data');
-    console.log(data);
-   // return "";
-    var group_arr = ['<span style="color: #ea4335;"><strong>A</strong></span>', '<span style="color: #839D1C;"><strong>B</strong></span>', '<span style="color: #00A998;"><strong>C</strong></span>', '<span style="color: #F6AE00;"><strong>D</strong></span>', '<span style="color: #4285F4;"><strong>E</strong></span>', '<span style="color: #330033;"><strong>F</strong></span>', '<span style="color: #FF404E;"><strong>G</strong></span>', '<span style="color: #FFFF00;"><strong>H</strong></span>', '<span style="color: #FF3300;"><strong>I</strong></span>', '<span style="color: #CC6600;"><strong>J</strong></span>', '<span style="color: #9999CC;"><strong>K</strong></span>', '<span style="color: #0000CC;"><strong>L</strong></span>', '<span style="color: #FF0000;"><strong>M</strong></span>', '<span style="color: #003366;"><strong>N</strong></span>', '<span style="color: #003333;"><strong>0</strong></span>', '<span style="color: #FF00CC;"><strong>P</strong></span>', '<span style="color: #FF0066;"><strong>Q</strong></span>', '<span style="color: #CC0000;"><strong>R</strong></span>', '<span style="color: #CC6600;"><strong>S</strong></span>', '<span style="color: #666666;"><strong>T</strong></span>', '<span style="color: #330066;"><strong>U</strong></span>', '<span style="color: #CC99CC;"><strong>V</strong></span>', '<span style="color: #FFCC66;"><strong>W</strong></span>', '<span style="color: #FF3399;"><strong>X</strong></span>', '<span style="color: #99CCFF;"><strong>Y</strong></span>', '<span style="color: #0099FF;"><strong>Z</strong></span>'];
-    var btn_arr=['#393333', '#1D9E74'];
-    //var route_arr=['<i class="fa fa-road" style="color:#393333"></i>', '<i class="fa fa-road" style="color:#1D9E74"></i>'];
-    var html='';
-    var x="tunnel";
-    if(typeof data[x] === 'undefined') {
-        x=0;
-    }
-
-        html +='<div class="p_div">';
-        html +='<div id="p_div_' + data[x].tunnel_id + '">';
-
-        var dev_class = 'dev-disconnect'; //GET DEV STATUS HERE TODO!!!
-        var dev_message = 'Disconnected';
-        var icon='<i class="fa fa-share-square-o" aria-hidden="true"></i>';
-        if(data[x].dev_status == 1){
-            dev_class = 'dev-connected';
-            dev_message = data[x].DeV;
-            icon='<i class="fa fa-times" aria-hidden="true"></i>';
-        }
-        else if(data[x].dev_status == 0){
-            dev_class = 'dev-connecting';
-            dev_message = 'Initiating';
-            icon='<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i>';
-        }
-        else if(data[x].dev_status == -1){
-            dev_class = 'dev-disconnected';
-            dev_message = 'Disconnected';
-            icon='<i class="fa fa-share-square-o" aria-hidden="true"></i>';
-        }
-
-        html += '<a class="btn holbol dev_status '+dev_class+'" data-tid="'+data[x].tunnel_id+'" data-val="-1" data-toggle="tooltip" data-placement="bottom" style="margin-left: 0px; background-color:transparent; color: black; width:24px!important; margin-right:0px!important; margin-left: 0px!important;">'+icon+'</a>';
-
-        html += '<a class="holbol dev-status-label dev-status-label_'+data[x].tunnel_id+'" data-id="'+data[x].tunnel_id+'" data-val="-1" data-toggle="tooltip" data-placement="bottom" style="text-align: center; margin-left: 0px; background-color:transparent; color: black; border-left:none;width: 150px!important;">'+dev_message+'</a>';
-
-        //if($data['plan_id']!=1){
-        html += '<a class="btn holbol acc_type cursor acc_type_' + data[x].tunnel_id + '" data-id="' + data[x].tunnel_id + '" data-val="' + data[x].plan_id + '" data-toggle="tooltip" data-placement="bottom" ' + ((data[x].plan_id != 1 && data[x].plan_id != undefined) ? "style='margin-left: 0px; background-color:transparent;  color: black; opacity:0.25'" : "style='margin-left: 0px; background-color:#b9c3c8;'") + '>Premium</a>';
-
-        //}
-        //if($data['route']==1){
-        html +='<a data-val="' + data[x].route + '" class="btn holbol route_change cursor tunnel_route_' + data[x].tunnel_id + '" type="data" data-pos="0" data-id="' + data[x].tunnel_id + '" ' + ( data[x].route == 1 ? "style='background-color:#b9c3c8'":"style='background-color:transparent;  color: black; opacity:0.25'") + '>Route</a>';
-        //}
-
-        //if($data['internet']==1){
-        html +='<a data-val="' +  data[x].internet + '" class="btn holbol internet_change cursor tunnel_internet_' + data[x].tunnel_id + '" type="data" data-pos="0" data-id="' + data[x].tunnel_id + '" ' + (data[x].internet == 1?"style='background-color:#b9c3c8'":"style='background-color:transparent; color: black; opacity:0.25'") + '>Internet</a>';
-        //}
-        var opacity = '';
-        if(is_shared == false){
-            opacity = 'opacity:0.25; color: black; background-color: transparent;';
-        }
-        html +='<a data-val="" class="btn holbol sponsore sponsored_' + data[x].tunnel_id + '" type="data" data-pos="0" data-tid="' + data[x].tunnel_id + '"  data-cloud="' + data[x].cloud_id + '" data-u="' + data[x].customer_id + '" style="background-color:#1D9E74;' + opacity + '">Sponsored</a>';
-
-        html +='<a class="btn holbol change_tunnel change_tunnel_' + data[x].tunnel_id + '" data-id="' + data[x].tunnel_id + '" data-type="' + (data[x].tunnel_type != "client"?"server":"client") + '" href="javascript:void(0)" ' + (data[x].tunnel_type != "client"?"style='background-color:#b9c3c8'":"style='background-color:transparent;  color: black; opacity:0.25'") + '>Server';
-
-        html +='</a>';
-
-        html +='</div>';
-
-        if(data[x].tunnel_type=="client"){
-            if(data[x].status != 0){
-                html +='<div class="list_body bg_yellow tunnel_body tunnel_body_' + data[x].tunnel_id + '">';
-            }else if(data[x].status == 0){
-                html +='<div class="list_body bg_yellow tunnel_body tunnel_body_' + data[x].tunnel_id + '" style="background-color:#cecece">';
-            }
-        }else{
-            if(data[x].status != 0){
-                html +='<div class="list_body bg_green tunnel_body tunnel_body_' + data[x].tunnel_id + '">';
-            }else if(data[x].status == 0){
-                html +='<div class="list_body bg_green tunnel_body tunnel_body_' + data[x].tunnel_id + '" style="background-color:#cecece">';
-            }
-        }
-
-        html +='<div class="meta">';
-        html +='<a href="javascript:void(0)" class="showACL" data-toggle="tooltip" data-placement="right" title="ACL view" data-cloud="' + data[x].cloud_id + '" data-type="' + data[x].tunnel_type + '" data-id="' + data[x].tunnel_id + '"><i class="fa fa-eye"></i></a>';
-        html +='</div>';
-
-        html +='<div class="meta">';
-        html +='<a href="javascript:void(0)" class="btn_add_acl btn_add_acl_' + data[x].tunnel_id + '" data-toggle="tooltip" data-placement="right" title="Create ACL" data-id="' + data[x].tunnel_id + '"><i class="fa fa-fw fa-wrench"></i></a>';
-        html +='</div>';
-
-        //html +='<div class="meta" data-toggle="tooltip" data-placement="right" title="'.($data['tunnel_type']!="client"?"Downgrade to client":"Upgrade to server").'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_' + data[x].tunnel_id + '" data-type="'.$data['tunnel_type'].'" data-id="' + data[x].tunnel_id + '">'.($data['tunnel_type']!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>").'</a></div>';
-
-        html +='<div class="meta" data-toggle="tooltip" title="Add clone"><a href="javascript:void(0)" class="add_clone" data-type="' + data[x].tunnel_type + '" data-id="' + data[x].tunnel_id + '"><i class="fa fa-fw fa-plus"></i></a></div>';
-
-        html +='<div class="meta" data-toggle="tooltip" title="Save this"><a href="javascript:void(0)" class="save_this_client" data-type="' + data[x].tunnel_type + '" data-id="' + data[x].tunnel_id + '"><i class="fa fa-floppy-o"></i></a></div>';
-
-        html +='<div class="meta cursor tunnel_chk tunnel_' + data[x].tunnel_id + ' tunnel_grp_chk_' + data[x].group_id + '" data-val="0" data-id="' + data[x].tunnel_id + '" data-toggle="tooltip" title="Select tunnel"><i class="fa fa-fw fa-square-o"></i></div>';
-
-        html +='<div class="meta cursor tunnel_grp" data-toggle="tooltip" data-gid="' + data[x].group_id + '" title="' + data[x].group_id + '"><div class="group tunnel_grp_' + data[x].tunnel_id + '" type="data" data-cast="' + data[x].customer_id +'" data-val="' + data[x].group_id + '" data-id="' + data[x].tunnel_id + '" data-pos="0">'+((data[x].group_id in group_arr)?group_arr[data[x].group_id]:"")+'</div></div>';
-     //   html+='<div class="meta cursor tunnel_grp" data-toggle="tooltip" data-gid="'+data[x].group_id+'" title="'+data[x].group_id+'"><div class="group tunnel_grp_'+data[x].tunnel_id+'" type="data" data-cast="'+data[x].customer_id+'" data-val="'+data[x].group_id+'" data-id="'+data[x].tunnel_id+'">'+((data[x].group_id in group_arr)?group_arr[data[x].group_id]:"")+'</div></div>';
-
-        //html +='<div class="meta width-140 tunnel_email_' + data[x].tunnel_id + '" data-toggle="tooltip" data-placement="bottom" title="'.$data['email'].'">'.$data['email'].'</div>';
-        html +='<div class="meta width-120 tunnel_display_' + data[x].tunnel_id + '" data-toggle="tooltip" data-placement="bottom" title="' + data[x].display_name + '"><a href="javascript:void(0);" class="display display_' + data[x].tunnel_id + ' tunnel_editable" data-type="text" data-pk="' + data[x].tunnel_id + '" data-title="Enter display name">' + (data[x].display_name!=""?data[x].display_name:"Tunnel " + data[x].tunnel_id) + '</a></div>';
-
-        html +='<div class="meta cursor">' + biderection(data[x].bidirectional_mode, data[x].tunnel_id, data[x].customer_id) + '</div>';
-        html +='<div class="meta width-80 tunnel_location_' + data[x].tunnel_id + '" data-toggle="tooltip" title=""><a href="javascript:void(0);" class="change_location location_' + data[x].tunnel_id + ' tunnel_editable" data-type="select" data-source="request.php?request=get_server_name" data-pk="' + data[x].tunnel_id + '">' + ((data[x].location!=null && data[x].location!="")?data[x].location:"Select Location") + '</a></div>';
-
-        if(data[x].tunnel_type=="client"){
-            html +='<div class="meta width-80 subnet_' + data[x].tunnel_id + '" data-toggle="tooltip" title="' + data[x].cloud_ip + '">Auto</div>';
-        }else{
-            html +='<div class="meta width-80 subnet_' + data[x].tunnel_id + '" data-toggle="tooltip" title="' + data[x].cloud_ip + '">' + data[x].cloud_ip + '</div>';
-        }
-       /*$tunnel_cost = packages($data['tunnel_type'], $data['plan_id'], $data['tunnel_id']);
-       html +='<div class="meta plan_cost_' + data[x].tunnel_id + '" data-toggle="tooltip" title="Tunnel points '.$tunnel_cost*cash_to_point().'">'.$tunnel_cost*cash_to_point().'</div>';*/
-        html+='<div class="meta plan_cost_'+data[x].tunnel_id+' width-60" data-toggle="tooltip" title="Tunnel points ' + +data[x].cost * 10 + '">' + data[x].cost * 10 + '</div>';
-        html +='<span class="not_client_' + data[x].tunnel_id + '">';
-        if(data[x].tunnel_type!="client"){
-            html +='<div class="meta width-140" data-toggle="tooltip" title="' + ((data[x].real_ip!=null && data[x].real_ip!="" && data[x].real_ip!= "Request real ip")?data[x].real_ip:"Not assigned") + '"><a href="javascript:void(0);" class="real_ip real_ip_' + data[x].tunnel_id + '" style="' + (data[x].active==0?"color:#1B1E24":"color:#1D9E74") + '" data-val="' + ((data[x].active!=null && data[x].active!="")?data[x].active:-1) + '" data-id="' + data[x].tunnel_id + '">' + ((data[x].real_ip!=null && data[x].real_ip!="" && data[x].real_ip!= "Request real ip")?data[x].real_ip:"Not assigned") + '</a></div>';
-            html+='<div class="meta cursor width-60">'+gateway(data[x].gateway_mode, data[x].tunnel_id, data[x].customer_id, data[x].tunnel_type)+'</div>';
-        } else {
-            html +='<div class="meta width-140" data-toggle="tooltip" data-placement="right" title="' + (data[x].tunnel_type!="client"?"":"To activate this field upgrade to server") + '"><a href="javascript:void(0)" class="change_tunnel change_tunnel_' + data[x].tunnel_id + '" data-type="' + data[x].tunnel_type + '" data-id="' + data[x].tunnel_id + '">' + (data[x].tunnel_type!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>") + '</a></div>';
-
-            html +='<div class="meta width-60" data-toggle="tooltip" data-placement="right" title="' + (data[x].tunnel_type != "client"?"":"To activate this field upgrade to server") + '"><a href="javascript:void(0)" class="change_tunnel change_tunnel_' + data[x].tunnel_id + '" data-type="' + data[x].tunnel_type + '" data-id="' + data[x].tunnel_id + '">' + (data[x].tunnel_type!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>") + '</a></div>';
-        }
-
-        html+='<div class="tunnel_searchable_switch_block">';
-        html+='<input id="cmn-toggle-tunnel-' + data[x].tunnel_id + '" class="cmn-toggle cmn-toggle-round tunnel_searchable_switch" data-tunnel_id="' + data[x].tunnel_id + '" type="checkbox" '+( data[x].is_searchable!=0?"checked":"")+'>';
-        html+='<label for="cmn-toggle-tunnel-' + data[x].tunnel_id + '"></label>';
-        html+='</div>';
-
-        html +='<div class="meta cursor float-right">' + gstatus(data[x].status, data[x].tunnel_id, data[x].customer_id) + '</div>';
-        html +='</span><div class="meta float-right" data-toggle="tooltip" title="Delete this tunnel" ><a href="javascript:void(0);" data-id="' + data[x].tunnel_id + '" class="delete_tunnel delete_tunnel_' + data[x].tunnel_id + '" data-type="' + data[x].tunnel_type + '"><i class="fa fa-fw fa-trash" style="color:#DA3838"></i></a></div>';
-        html +='</div>';
-        html +='</div>';
-        html +='<div class="tunnel_acl_div_' + data[x].tunnel_id + ' tunnel_acl_div" data-id="'+data[x].tunnel_id+'" style="display:none;">';
-        html +='<label style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 20px;">Source base<span class="source_no_data_p_' + data[x].tunnel_id + '" style="color: #ea4335; font-size: 15px;"></span>&nbsp;&nbsp;<input type="button" class="btn btn-xs btn-primary acl_destination_search_btn" value="Search ACL" data-tid="' + data[x].tunnel_id + '" style="margin-bottom: 3px;"/></label>';
-        html +='<div class="source_acl_content_' + data[x].tunnel_id + '"></div>';
-        html +='<label  style="border-bottom: 1px solid #000;direction: ltr;font-size: 20px;margin-left: 20px;margin-top: 5px;">Destination base<span class="destination_no_data_p_' + data[x].tunnel_id + '" style="color: #ea4335; font-size: 15px;"></span></label>';
-        var deststate = '';
-        if(data[x].tunnel_type == 'client')
-        {
-            deststate = 'disabled';
-        }
-        html +='<div class="destination_acl_content destination_acl_content_' + data[x].tunnel_id + ' ' + deststate + '"></div>';
-        html +='</div>';
-
-        /*
-         // if(data[x].tunnel_type=="client"){
-            html+='<div class="list_body tunnel_body tunnel_body_'+data[x].tunnel_id+'">';
-         // }else{
-            //html+='<div class="list_body bg_green tunnel_body tunnel_body_'+data[x].tunnel_id+'">';
-         // }
-         html+='<div class="meta">';
-            html+='<a href="javascript:void(0)" class="showACL" data-toggle="tooltip" data-placement="right" title="ACL view" data-cloud="'+data[x].cloud_id+'" data-type="'+data[x].tunnel_type+'" data-id="'+data[x].tunnel_id+'"><i class="fa fa-wrench"></i></a>';
-            html+='<a href="javascript:void(0)" class="btn_add_acl btn_add_acl_'+data[x].tunnel_id+'" data-toggle="tooltip" data-placement="right" title="Create ACL" data-id="'+data[x].tunnel_id+'"><i class="fa fa-fw fa-plus" style="margin-left: 5px; font-size: 10px;"></i></a>';
-        html+='</div>';
-
-         html+='<div class="meta" data-toggle="tooltip" data-placement="right" title="'+(data[x].tunnel_type!="client"?"Downgrade to client":"Upgrade to server")+'"><a href="javascript:void(0)" class="change_tunnel change_tunnel_'+data[x].tunnel_id+'" data-type="'+data[x].tunnel_type+'" data-id="'+data[x].tunnel_id+'">'+(data[x].tunnel_type!="client"?"<i class='fa fa-long-arrow-down'></i>":"<i class='fa fa-long-arrow-up'></i>")+'</a></div>';
-
-         html+='<div class="meta" data-toggle="tooltip" title="Add clone"><a href="javascript:void(0)" class="add_clone" data-type="'+data[x].tunnel_type+'" data-id="'+data[x].tunnel_id+'"><i class="fa fa-fw fa-plus"></i></a></div>';
-         html+='<div class="meta" data-toggle="tooltip" title="Save this"><a href="javascript:void(0)" class="save_this_client" data-type="'+data[x].tunnel_type+'" data-id="'+data[x].tunnel_id+'"><i class="fa fa-floppy-o"></i></a></div>';
-         html+='<div class="meta cursor tunnel_chk tunnel_'+data[x].tunnel_id+' tunnel_grp_chk_'+data[x].group_id+'" data-val="0" data-id="'+data[x].tunnel_id+'" data-toggle="tooltip" title="Select tunnel"><i class="fa fa-fw fa-square-o"></i></div>';
-         html+='<div class="meta cursor tunnel_grp" data-toggle="tooltip" data-gid="'+data[x].group_id+'" title="'+data[x].group_id+'"><div class="group tunnel_grp_'+data[x].tunnel_id+'" type="data" data-cast="'+data[x].customer_id+'" data-val="'+data[x].group_id+'" data-id="'+data[x].tunnel_id+'">'+((data[x].group_id in group_arr)?group_arr[data[x].group_id]:"")+'</div></div>';
-
-         //html+='<div class="meta width-140 tunnel_email_'+data[x].tunnel_id+'" data-toggle="tooltip" data-placement="bottom" title="'+data[x].email+'">'+data[x].email+'</div>';
-
-         html+='<div class="meta width-140 tunnel_display_'+data[x].tunnel_id+'" data-toggle="tooltip" data-placement="bottom" title="'+data[x].display_name+'"><a href="#" class="display display_'+data[x].tunnel_id+' tunnel_editable" data-type="text" data-pk="'+data[x].tunnel_id+'" data-title="Enter display name">'+data[x].display_name+'</a></div>';
-         //html+='<div class="meta cursor"></div>';
-         html+='<div class="meta cursor">'+biderection(data[x].bidirectional_mode, data[x].tunnel_id, data[x].customer_id)+'</div>';
-         html+='<div class="meta width-80 tunnel_location_'+data[x].tunnel_id+'" data-toggle="tooltip" title=""><a href"javascript:void(0);" class="change_location location_'+data[x].tunnel_id+' tunnel_editable" data-type="select" data-source="request.php?request=get_server_name" data-pk="'+data[x].tunnel_id+'">Select Location</a></div>';
-         //new
-         html+='<div class="meta width-77"><div class="" id="DeV_'+data[x].tunnel_id+'" data-toggle="tooltip" data-placement="top" title=""></div></div>';
-         html+='<div class="meta width-77"><div class="acc_type acc_type_'+data[x].tunnel_id+'" data-id="'+data[x].tunnel_id+'" data-val="'+data[x].plan_id+'" data-toggle="tooltip" data-placement="bottom" title="'+(data[x].plan_id==1?"Premium":"Premium")+'">'+(data[x].plan_id==1?"Premium":"Premium")+'</div></div>';
-         //!new
-         html+='<div class="meta width-80 subnet_'+data[x].tunnel_id+'" data-toggle="tooltip" data-placement="bottom" title="'+data[x].cloud_ip+'">'+(data[x].cloud_ip!=undefined || data[x].cloud_ip!=""?data[x].cloud_ip:"&nbsp;")+'</div>';
-         html+='<div class="meta plan_cost_'+data[x].tunnel_id+'" data-toggle="tooltip" title="">'+data[x].cost+'</div>';
-         html+='<div class="meta" data-toggle="tooltip" title=""><div data-val="'+data[x].internet+'" class="internet_change cursor tunnel_internet_'+data[x].tunnel_id+'" type="data" data-pos="0" data-id="'+data[x].tunnel_id+'">'+(data[x].internet==1?"<i class='fa fa-fw fa-globe' style='color:#1D9E74'></i>":"<i class='fa fa-fw fa-globe' style='color:#393333'></i>")+'</div></div>';
-
-         html+='<div class="meta" data-toggle="tooltip" title=""><div data-val="'+data[x].route+'" class="route_change cursor tunnel_route_'+data[x].tunnel_id+'" type="data" data-pos="0" data-id="'+data[x].tunnel_id+'">'+(data[x].route==1?"<i class='fa fa-fw fa-road' style='color:#1D9E74'></i>":"<i class='fa fa-fw fa-road' style='color:#393333'></i>")+'</div></div>';
-         html+='<span class="not_client_'+data[x].tunnel_id+'">';
-         if(data[x].tunnel_type!="client"){
-            html+='<div class="meta width-100" data-toggle="tooltip" title="'+(data[x].real_ip!=null?data[x].real_ip:"Not assigned")+'"><a href="javascript:void(0);" data class="real_ip real_ip_'+data[x].tunnel_id+'" style="'+(data[x].active==0||data[x].active==""?"color:#1B1E24":"color:#1D9E74")+'" data-val="'+(data[x].active!=null?data[x].active:-1)+'" data-id="'+data[x].tunnel_id+'">'+(data[x].real_ip!=undefined || data[x].real_ip!=""?data[x].real_ip:"Not assigned")+'</a></div>';
-            html+='<div class="meta cursor">'+gateway(data[x].gateway_mode, data[x].tunnel_id, data[x].customer_id)+'</div>';
-         }
-         html+='</span>';
-         html+='<div class="meta" data-toggle="tooltip" title="Delete this tunnel" ><a href="javascript:void(0);" data-id="'+data[x].tunnel_id+'" class="delete_tunnel_'+data[x].tunnel_id+' delete_tunnel" data-type="'+data[x].tunnel_type+'"><i class="fa fa-fw fa-trash" style="color:#DA3838"></i></a></div>';
-        html+='</div>';
-        html += '<div class="tunnel_acl_div_'+data[x].tunnel_id+' tunnel_acl_div" style="display:none;"></div>';*/
-
-    return html;
-}
-
-function packages(type, plan, id){
-    $.ajax({
-        url:"request.php?request=packages&type="+type+"&p_id="+plan+"&id="+id,
-        success:function(resp){
-            return resp;
-        }
-    });
-}
-var color_box_class="color-box";
-
-function acl(data, res_type, cur_tunnel){
-    var tunnel="";
-    //var html="";
-    var xyz=0;
-    var source="";
-    var destination="";
-    var source_count=0;
-    var destination_count=0;
-    $.each(data, function(key, value){
-    var html="";
-    var id = key;
-    xyz++;
-    tunnel = value.tunnel_id;
-    new_class='';//" acl_installed ";
-
-        if(value.is_installed==1){
-            color_box_class="disabled_color_box";
-        }else{
-            color_box_class="color-box";
-        }
-
-    html+='<div class="acl_upper_div">';
-    html += '<div class="acl_div_'+id+' acl_div" style="display:block;">';
-    html+='<div class="soumya_btn">';
-        html+='<a href="javascript:void(0);" class="font-awesome" btn-type="clone" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-toggle="tooltip" title="Create ACL clone"><i class="fa fa-fw fa-copy"></i></a>';
-        html+='<a href="javascript:void(0);" class="font-awesome" btn-type="save" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-toggle="tooltip" title="Save"><i class="fa fa-fw fa-floppy-o"></i></a>';
-        html+='<a href="javascript:void(0);" class="font-awesome" btn-type="clear" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-toggle="tooltip" title="Clear"><i class="fa fa-fw fa-cut"></i></a>';
-
-        if(cur_tunnel == parseInt(value.destination.specific_tunnel.value)){
-            html+='<a href="javascript:void(0);" class="" style="opacity:0.2;" btn-type="change" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-val="destination" data-toggle="tooltip" title="Change ACL base"><i class="fa fa-fw fa-arrow-right"></i></a>';
-        }else if(cur_tunnel == parseInt(value.source.specific_tunnel.value)){
-            if(value.default_acl_id!=id){
-                html+='<a href="javascript:void(0);" class="font-awesome" btn-type="change" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-val="source" data-toggle="tooltip" title="Change ACL base"><i class="fa fa-fw fa-arrow-left"></i></a>';
-            }else{
-                html+='<a href="javascript:void(0);" style="opacity: 0.3;" btn-type="change" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-val="source" data-toggle="tooltip" title="Change ACL base"><i class="fa fa-fw fa-arrow-left"></i></a>';
-            }
-        }else{
-            html+='<a href="javascript:void(0);" style="opacity: 0.3;" btn-type="change" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-val="source" data-toggle="tooltip" title="Change ACL base"><i class="fa fa-fw fa-arrow-left"></i></a>';
-        }
-
-        if(value.default_acl_id!=id){
-            if(cur_tunnel != parseInt(value.destination.specific_tunnel.value)){
-                html+='<a href="javascript:void(0);" class="font-awesome" btn-type="set_default_acl" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-toggle="tooltip" title="Set default ACL"><i class="fa fa-fw fa-home"></i></a>';
-            }
-            if(cur_tunnel == parseInt(value.destination.specific_tunnel.value)){
-                var checked_val=(value.is_searchable==1 ? "checked":"");
-                html+='<div class="acl_searchable_switch_block" >';
-                html+='<input id="cmn-toggle-acl-'+id+'" class="cmn-toggle cmn-toggle-round acl_searchable_switch" data-acl_id="'+id+'" type="checkbox" '+checked_val+'>';
-                html+='<label for="cmn-toggle-acl-'+id+'"></label>';
-                html+='</div>';
-            }
-
-            html+='<a href="javascript:void(0);" class="font-awesome" btn-type="delete" data-tid="'+value.tunnel_id+'" data-id="'+id+'" data-toggle="tooltip" title="Delete"><i class="fa fa-fw fa-trash-o red"></i></a>';
-        }else{
-            html+='<a href="javascript:void(0);" data-toggle="tooltip" title="Set default ACL" style="opacity: 0.3;"><i class="fa fa-fw fa-home"></i></a>';
-
-            html+='<a href="javascript:void(0);" style="opacity: 0.3;" data-toggle="tooltip" title="Delete"><i class="fa fa-fw fa-trash-o red"></i></a>';
-        }
-
-        html+='<div class="onoffswitch">';
-            html+='<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch-'+value.tunnel_id+'-'+id+'" checked>';
-            html+='<label class="onoffswitch-label" for="myonoffswitch-'+value.tunnel_id+'-'+id+'">';
-                html+='<span class="onoffswitch-inner"></span>';
-                html+='<span class="onoffswitch-switch"></span>';
-            html+='</label>';
-        html+='</div>';
-
-        html+='<div class="acl_name_div">';
-        html+='<input type="text" name="acl_name" class="acl_name" data-tid="'+value.tunnel_id+'" data-id="'+id+'" size="10" placeholder="Name of ACL" data-value="'+value.acl_name+'" value="'+value.acl_name+'" '+(value.is_installed==1?"disabled":"")+'>';
-        html+='</div>';
-        html+='<div class="acl_description_div">';
-            html+='<input type="text" name="acl_description" class="acl_description" data-tid="'+value.tunnel_id+'" data-id="'+id+'" size="33" placeholder="Description of ACL" data-value="'+value.acl_description+'" value="'+value.acl_description+'" '+(value.is_installed==1?"disabled":"")+'>';
-        html+='</div>';
-        var soumya_class="";
-        if(value.default_acl_id==id){
-            html+='<div class="is_default">';
-            html+="DEF";
-            html+='</div>';
-            soumya_class="default_acl ";
-        }
-        if(value.is_installed==1){
-            html+='<div class="is_installed">';
-            html+="INST";
-            html+='</div>';
-            soumya_class+="installed_acl ";
-        }else{
-            html+='<div class="not_installed">';
-            html+='</div>';
-        }
-        if(value.is_subscribed==1){
-            html+='<div class="is_subscribed">';
-            html+="SUB";
-            html+='</div>';
-            soumya_class+="subscribed_acl";
-        }else{
-            html+='<div class="not_subscribed">';
-            html+='</div>';
-        }
-
-    html+='</div>';
-    html+='<div>';
-
-    if(cur_tunnel == parseInt(value.source.specific_tunnel.value)){
-        source = parseInt(value.source.specific_tunnel.value);
-        // html+='<p>Source base</p>';
-    } else if(cur_tunnel == parseInt(value.destination.specific_tunnel.value)){
-        destination = parseInt(value.destination.specific_tunnel.value);
-        // html+='<p>Destination base</p>';
-    }
-    html+='</div>';
-    html+='<div class="clearfix"></div>';
-
-
-    html+='<div class="soumya '+(value.status==0?"disabled_soumya":"")+' '+soumya_class+'">';
-        html+='<div class="box-holder">';
-            html+='<span>then</span>';
-            html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-id="'+id+'" data-type="d_final" data-toggle="confirmation">'+show_updated_value(value.d_final, "d_final", id, tunnel , cur_tunnel," ")+'</div>';
-            html+='<label>Final Dst</label>';
-            html+='<div class="add_div">';
-            html+='</div>';
-        html+='</div>';
-
-    html+='<div class="arroww">';
-    html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    if(cur_tunnel != parseInt(value.destination.specific_tunnel.value)){ //if this acl is source acl
-        html+='<div class="box-holder">';
-        html+='<div class="box box-con box_'+id+' destination_'+id+'  '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="destination" data-id="'+id+'" style="border:3px solid #000">'+show_updated_value(value.destination, "destination", id, tunnel, cur_tunnel ," ")+'</div>';
-        html+='<label>Destination</label>';
-    } else { //if this acl is destination acl
-        destination_count++;
-        html+='<div class="box-holder" style="width: 41px;">';
-        html+='<div class="box box-con box_'+id+' destination_'+id+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="destination" data-id="'+id+'" style="border:3px solid #000;background-color:#00A998">'+show_updated_value(value.destination, "destination", id, tunnel, cur_tunnel ," ")+'</div>';
-        html+='<label style="margin-left: -12px;">Destination</label>';
-    }
-
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-    html+='<i class="fa fa-long-arrow-left green"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder" style="width: 34px;">';
-       html+='<span style="margin-left: 3px;">then</span>';
-       html+='<div  style="min-width: 36px;" class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="c_forwarding" data-id="'+id+'">'+show_updated_value(value.c_forwarding, "c_forwarding", id, tunnel, cur_tunnel ," ")+'</div>';
-       html+='<label style="margin-left: 2px;">FWD</label>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-       html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder" style="width: 25px;">';
-    html+='<span>then</span>';
-      html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="c_qos" data-id="'+id+'">'+show_updated_value(value.c_qos, "c_qos", id, tunnel, cur_tunnel ," ")+'</div>';
-      html+='<label>QOS</label>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-      html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder" style="width:25px;">';
-    html+='<span style="margin-left:-3px;">then</span>';
-        html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="c_routing" data-id="'+id+'">'+show_updated_value(value.c_routing, "c_routing", id, tunnel, cur_tunnel ," ")+'</div>';
-      html+='<label style="margin-left: -13px;">Routing</label>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-        html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    var box_status="disabled";
-    if(value.s_aliasing.new_dst.value=="" || value.s_aliasing.new_dst.value==0){
-        box_status="enabled";
-    }
-            console.log("id:");
-            console.log(id);
-            console.log("value.s_aliasing.new_dst.value");
-            console.log(value.s_aliasing.new_dst.value);
-            console.log(box_status);
-
-    html+='<div class="box-holder">';
-        html+='<span>If</span>';
-      html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="c_firewall" data-id="'+id+'">'+show_updated_value(value.c_firewall, "c_firewall", id, tunnel, cur_tunnel, box_status)+'</div>';
-
-        html+='<span>Firewall</span>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-        html+='<i class="fa fa-long-arrow-left green"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder" style="width: 25px;">';
-      html+='<span>&nbsp;</span>';
-      html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="s_aliasing" data-id="'+id+'">'+show_updated_value(value.s_aliasing, "s_aliasing", id, tunnel, cur_tunnel ," ")+'</div>';
-      html+='<label style="margin-left: -12px;">Aliasing</label>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-      html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder">';
-      html+='<span>If</span>';
-      if(cur_tunnel == parseInt(value.destination.specific_tunnel.value)){ //if(cur_tunnel != parseInt(value.source.specific_tunnel.value)){
-        html+='<div class="box box-con box_'+id+' source_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="source" data-id="'+id+'" style="border:3px solid #000">'+show_updated_value(value.source, "source", id, tunnel, cur_tunnel ," ")+'</div>';
-    } else {
-        source_count++;
-        html+='<div class="box box-con box_'+id+' source_'+id+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="source" data-id="'+id+'" style="border:3px solid #000; background-color:#00A998">&nbsp;</div>';
-    }
-       html+='<span>Source</span>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-       html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder" style="width: 25px;">';
-      html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="s_qos" data-id="'+id+'">'+show_updated_value(value.s_qos, "s_qos", id, tunnel, cur_tunnel ," ");
-
-          //html+='<i class="fa  fa-close lg_close"></i>';
-      html+='</div>';
-      html+='<span>QOS</span>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-      html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder">';
-    html+='<span>If</span>';
-      html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="s_firewall" data-id="'+id+'">'+show_updated_value(value.s_firewall, "s_firewall", id, tunnel, cur_tunnel ," ")+'</div>';
-
-      html+='<span>Firewall</span>';
-          html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-
-    html+='<div class="arroww">';
-      html+='<i class="fa fa-long-arrow-left"></i>';
-    html+='</div>';
-
-    html+='<div class="box-holder" style="width: 53px;">';
-      html+='<span>If</span>';
-      html+='<div class="box box-con box_'+id+' '+new_class+'" data-tid="'+value.tunnel_id+'" data-cloud="" data-type="s_tos" data-id="'+id+'">'+show_updated_value(value.s_tos, "s_tos", id, tunnel, cur_tunnel ," ")+'</div>';
-
-        html+='<span style="margin-left: -12px;">Binding/TOS</span>';
-              html+='<div class="add_div">';
-          html+='</div>';
-    html+='</div>';
-    html+='</div>';
-    html+='</div>';
-    html+='</div>';
-
-    if(cur_tunnel == parseInt(value.source.specific_tunnel.value)){
-        $(".source_acl_content_"+value.tunnel_id).prepend(html);
-    } else if(cur_tunnel == parseInt(value.destination.specific_tunnel.value)){
-        $(".destination_acl_content_"+value.tunnel_id).prepend(html);
-    } else{
-        $(".source_acl_content_"+cur_tunnel).prepend(html);
-    }
-
-    //alert("source=="+source_count+"   destination count"+destination_count);
-    if(source_count==0){
-        $(".source_no_data_p_"+cur_tunnel).html("  (Source ACL not found)");
-    } else {
-        $(".source_no_data_p_"+cur_tunnel).html("");
-    }
-    if(destination_count==0){
-        $(".destination_no_data_p_"+cur_tunnel).html("  (Destination ACL not found)");
-    } else {
-        $(".destination_no_data_p_"+cur_tunnel).html("");
-    }
-
-    if(destination_count==0 && source_count==0){
-        $(".source_"+id).attr("style", "border:3px solid #000; background-color:#00A998");
-        $(".source_"+id).html("&nbsp;");
-    }
-
-    }
-    );
-
-    /*if(res_type=="create_acl_clone_result"){
-        if(cur_tunnel == source){
-            $(".source_acl_content_"+value.tunnel).prepend(html);
-        } else if(cur_tunnel == destination){
-            $(".destination_acl_content_"+value.tunnel).prepend(html);
-        }
-    } else {
-        if(cur_tunnel == source){
-            $(".source_acl_content_"+tunnel).html(html);
-        } else if(cur_tunnel == destination){
-            $(".destination_acl_content_"+tunnel).html(html);
-        }
-    }*/
-}
-
-function share_acl(data, tunnel_id, cur_tunnel_acls){ //tunnel_id for where aci is searched
-    console.log("acl_data");
-    console.log(data);
-    console.log("cur_tunnel_acls");
-    console.log(cur_tunnel_acls);
-
-    var cur_tunnel = null;
-    var tunnel="";
-    //var html="";
-    var xyz=0;
-    var source="";
-    var destination="";
-    var source_count=0;
-    var destination_count=0;
-    var html="";
-    $(".acl_search_result").html("");
-    $.each(data, function(key, value){
-        var id = key;
-        xyz++;
-        tunnel = value.tunnel_id;
-        cur_tunnel=tunnel;
-
-        if(cur_tunnel == parseInt(value.destination.specific_tunnel.value)) {
-
-            html += '<div class="acl_upper_div">';
-            html += '<div class="acl_div_' + id + ' acl_div" style="display:block;">';
-
-            html += '<div class="soumya_btn_search">';
-            html+='<div class="acl_name_div">';
-            html+='<input type="text" name="acl_name" class="acl_name" data-tid="'+value.tunnel_id+'" data-id="'+id+'" size="20" placeholder="Name of ACL" data-value="'+value.acl_name+'" value="'+value.acl_name+'" disabled>';
-            html+='</div>';
-            html+='<div class="acl_description_div">';
-            html+='<input type="text" name="acl_description" class="acl_description" data-tid="'+value.tunnel_id+'" data-id="'+id+'" size="50" placeholder="Description of ACL" data-value="'+value.acl_description+'" value="'+value.acl_description+'" disabled>';
-            html+='</div>';
-
-            html += '<div class="box-install">';
-            if(jQuery.inArray(parseInt(id), cur_tunnel_acls)==-1){
-                html += '<input type="button" class="btn btn-primary btn-small install_acl" data-acl="' + id + '" data-tunnel="' + tunnel_id + '" value="Install"/>';
-            }else{
-                html += '<input type="button" class="btn btn-primary btn-small installed_acl" disabled data-acl="' + id + '" data-tunnel="' + tunnel_id + '" value="Installed"/>';
-            }
-            html += '</div>';
-
-            html+='<div class="not_subscribed"></div>';
-            html+='<div class="clearfix"></div>';
-            html += '</div>';
-
-            html += '<div class="soumya">';
-            html += '<div class="box-holder">';
-            html += '<span>then</span>';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-id="' + id + '" data-type="d_final" data-toggle="confirmation">' + show_updated_value(value.d_final, "d_final", id, tunnel, cur_tunnel ," ") + '</div>';
-            html += '<label>Final Dst</label>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder" style="width: 41px;">';
-            if (cur_tunnel != parseInt(value.destination.specific_tunnel.value)) {
-                html += '<div class="box box-con box_' + id + ' destination_' + id + '  ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="destination" data-id="' + id + '" style="border:3px solid #000">' + show_updated_value(value.destination, "destination", id, tunnel, cur_tunnel ," ") + '</div>';
-            } else {
-                destination_count++;
-                html += '<div class="box box-con box_' + id + ' destination_' + id + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="destination" data-id="' + id + '" style="border:3px solid #000;background-color:#00A998">&nbsp;</div>';
-            }
-            html += '<label style="margin-left:-12px;">Destination</label>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left green"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder" style="width: 34px;">';
-            html += '<span>then</span>';
-            html += '<div  style="min-width: 36px;" class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="c_forwarding" data-id="' + id + '">' + show_updated_value(value.c_forwarding, "c_forwarding", id, tunnel, cur_tunnel ," ") + '</div>';
-            html += '<label style="margin-left: 2px;">FWD</label>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder" style="width: 25px;">';
-            html += '<span>then</span>';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="c_qos" data-id="' + id + '">' + show_updated_value(value.c_qos, "c_qos", id, tunnel ,cur_tunnel," ") + '</div>';
-
-            html += '<span>QOS</span>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder" style="width: 25px;">';
-            html += '<span style="margin-left: -3px;">then</span>';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="c_routing" data-id="' + id + '">' + show_updated_value(value.c_routing, "c_routing", id, tunnel, cur_tunnel, " ") + '</div>';
-
-            html += '<label style="margin-left: -13px;">Routing</label>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder">';
-            html += '<span>If</span>';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="c_firewall" data-id="' + id + '">' + show_updated_value(value.c_firewall, "c_firewall", id, tunnel, cur_tunnel ," ") + '</div>';
-
-            html += '<span>Firewall</span>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left green"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder"  style="width: 25px;">';
-            html += '<span>&nbsp;</span>';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="s_aliasing"  data-id="' + id + '">' + show_updated_value(value.s_aliasing, "s_aliasing", id, tunnel, cur_tunnel ," ") + '</div>';
-            html += '<label style="margin-left: -12px;">Aliasing</span>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder">';
-            html += '<span>If</span>';
-            if (cur_tunnel != parseInt(value.source.specific_tunnel.value)) {
-                html += '<div class="box box-con box_' + id + ' source_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="source" data-id="' + id + '" style="border:3px solid #000">' + show_updated_value(value.source, "source", id, tunnel, cur_tunnel ," ") + '</div>';
-            } else {
-                source_count++;
-                html += '<div class="box box-con box_' + id + ' source_' + id + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="source" data-id="' + id + '" style="border:3px solid #000; background-color:#00A998">&nbsp;</div>';
-            }
-            html += '<span>Source</span>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder" style="width: 25px;">';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="s_qos" data-id="' + id + '">' + show_updated_value(value.s_qos, "s_qos", id, tunnel, cur_tunnel ," ");
-
-            //html+='<i class="fa  fa-close lg_close"></i>';
-            html += '</div>';
-            html += '<span>QOS</span>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder">';
-            html += '<span>If</span>';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="s_firewall" data-id="' + id + '">' + show_updated_value(value.s_firewall, "s_firewall", id, tunnel , cur_tunnel," ") + '</div>';
-
-            html += '<span>Firewall</span>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="arroww">';
-            html += '<i class="fa  fa-long-arrow-left"></i>';
-            html += '</div>';
-
-            html += '<div class="box-holder" style="width: 53px;">';
-            html += '<span>If</span>';
-            html += '<div class="box box-con box_' + id + ' ' + new_class + '" data-tid="' + value.tunnel_id + '" data-cloud="" data-type="s_tos" data-id="' + id + '">' + show_updated_value(value.s_tos, "s_tos", id, tunnel, cur_tunnel ," ") + '</div>';
-
-            html += '<span style="margin-left: -12px;">binding/TOS</span>';
-            html += '<div class="add_div">';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="clearfix">';
-            html += '</div>';
-            html += '</div>';
-            html += '</div>';
-            html += '</div>';
-        }
-
-    });
-    $(".acl_search_result").prepend(html);
-}
-
-function check_blank(data){
-    var i = 0;
-    $.each(data, function(key, val){
-        if(val.value!=0){
-            i = 1;
-        }
-    });
-    return i;
-}
-function show_destination_for_default(data, database_name, id, tunnel_id, cur_tunnel){
-    var items = ["black", "black", "black", "black", "black"];//["#996600", "#003366", "#336699", "#00cc66", "#ff6666"];
-    var item = items[Math.floor(Math.random()*items.length)];
-    var database="";
-    var html="";
-    var i = 0;
-    //console.log(data);
-    $.each(data, function(key, val){
-
-        if(!(key=="every_cloud" || key=="my_clouds" || key=="real_ip" || key=="this_tunnel")) {
-            if (val.value != 0) {
-                if (database_name == "destination" || database_name == "source") {
-                    if (cur_tunnel == parseInt(val.value) && key == "specific_tunnel") {
-                        database = database_name;
-                        html += '<div class="' + color_box_class + ' ' + key + '-' + database_name + '-' + id + '" style="background-color:transparent; color: white; opacity:1;" data-tid="' + tunnel_id + '" data-toggle="tooltip" title="' + val.label.full + '">' + val.label.short + '</div>';
-                    } else if (database != database_name) {
-                        html += '<div class="' + color_box_class + ' ' + key + '-' + database_name + '-' + id + '" style="background-color:' + item + '"; data-tid="' + tunnel_id + '" data-toggle="tooltip" title="' + val.label.full + '">' + val.label.short + '</div>';
-                    }
-                } else {
-                    html += '<div class="' + color_box_class + ' ' + key + '-' + database_name + '-' + id + '" style="background-color:' + item + '" data-tid="' + tunnel_id + '" data-toggle="tooltip" title="' + val.label.full + '">' + val.label.short + '</div>';
-                }
-            } else if (val.value == 0) {
-                if (database != database_name) {
-                    html += '<div class="' + color_box_class + ' ' + key + '-' + database_name + '-' + id + '" style="background-color:transparent; color: black; opacity:0.35;" data-tid="' + tunnel_id + '" data-toggle="tooltip" title="' + val.label.full + '">' + val.label.short + '</div>';
-                }
-            }
-        }
-    });
-    return html;
-}
-
-function show_updated_value(data, database_name, id, tunnel_id, cur_tunnel, box_status){
-    var items = ["black", "black", "black", "black", "black"];//["#996600", "#003366", "#336699", "#00cc66", "#ff6666"];
-    var item = items[Math.floor(Math.random()*items.length)];
-    var database="";
-    var html="";
-    var i = 0;
-    //console.log(box_status);
-    var color_box_class_name=color_box_class;
-    if(box_status=="disabled"){
-        color_box_class_name="disabled_color_box";
-    }
-
-    $.each(data, function(key, val){
-        if(database_name=="destination" && cur_tunnel == parseInt(data.specific_tunnel.value)){////////////////////if destinaiton acl then
-            if(key=="real_ip" || key=="this_tunnel"){
-                if(val.value!=0){
-                    html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: white; opacity:1;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                }else{
-                    html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: '+item+'; opacity:0.35;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                }
-            }
-        }else{
-            if(database_name == "destination"){
-                if(key=="every_cloud" || key=="internet"){
-                    if(val.value!=0){
-                        html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: white; opacity:1;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                    }else{
-                        html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: '+item+'; opacity:0.35;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                    }
-                }else if(key=="my_cloud" || key=="my_clouds" || key=="specific_group" || key=="specific_tunnel"){
-                    var sub_color_box_class_name=color_box_class_name;
-                    if(data.every_cloud.value=="1"){
-                        sub_color_box_class_name="disabled_color_box";
-                    }
-                    if(val.value!=0){
-                        html+='<div class="'+sub_color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: white; opacity:1;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                    }else{
-                        html+='<div class="'+sub_color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: '+item+'; opacity:0.35;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                    }
-                }
-            }else {
-                if(val.value!=0){
-                    if(database_name == "destination" || database_name == "source"){
-                        if(cur_tunnel == parseInt(val.value) && key == "specific_tunnel"){
-                            database = database_name;
-                            html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: white; opacity:1;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                        } else if(database != database_name){
-                            html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:'+item+'"; data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                        }
-                    } else {
-                        html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:'+item+'" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                    }
-                } else if(val.value==0){
-                    if(database != database_name){
-                        html+='<div class="'+color_box_class_name+' '+key+'-'+database_name+'-'+id+'" style="background-color:transparent; color: black; opacity:0.35;" data-tid="'+tunnel_id+'" data-toggle="tooltip" title="'+val.label.full+'">'+val.label.short+'</div>';
-                    }
-                }
-            }
-        }
-        //alert(html);
-    });
-    return html;
-}
-
-function notify_msg (status, msg) {
-    notify({
-        type: status,
-        title: status,
-        message: msg,
-        position: {
-          x: "left",
-          y: "bottom"
-        },
-        icon: '',
-        size: "small",
-        overlay: false,
-        closeBtn: true,
-        overflowHide: false,
-        spacing: 20,
-        theme: "default",
-        autoHide: true,
-        delay: 3000,
-        onShow: null,
-        onClick: null,
-        onHide: null,
-        template: '<div class="notify"><div class="notify-text"></div></div>'
-    });
-}
-
-function ipv4addr(value) {
-    var ip = /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/;
-    var res;
-    if (value.match(ip)) {
-       arr=[];
-        arr=value.split('.');
-        //alert(arr);
-            if(parseInt(arr[0]) <= 255){
-                if(parseInt(arr[1]) <= 255){
-                    if(parseInt(arr[2]) <= 255){
-                        if(parseInt(arr[3]) <= 255){
-                            return true;
-                        }
-                    }
-                }
-            }else{
-                return false;
-            }
-    }
-    else {
-       return false;
-    }
-}
-
-function isNumber(n, length_check) {
-    if(length_check > 0){
-        return !isNaN(parseFloat(n)) && isFinite(n) && (n.length==4);
-    }
-  return !isNaN(parseFloat(n)) && isFinite(n);
+    };
+    console.log(get);
+    send(JSON.stringify(get));
+    /*ths.attr('data-value',value);
+     $.ajax({
+     url:"request.php?request=save_acl_name_description&acl_id="+acl_id+"&field="+key+"&value="+value,
+     type:"GET",
+     success:function(resp){
+     if(resp){
+     console.log(resp);
+     if(key=="acl_name"){
+     notify_msg("success", "ACL name saved successfully");
+     }else{
+     notify_msg("success", "ACL description saved successfully");
+     }
+     }
+     }
+     });*/
 }
 

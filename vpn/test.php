@@ -180,7 +180,6 @@ $thrd->start();
 
 echo "running now....";
     while (true){
-
         $db = new mysqli($config['DB_HOST'], $config['DB_USER'], $config['DB_PASS'], $config['DB_NAME']);
         $sql_job_check=$db->query("SELECT * FROM `job_queue` WHERE `is_complete_action`=2 AND `is_seen`=0");
         if($sql_job_check->num_rows>0){

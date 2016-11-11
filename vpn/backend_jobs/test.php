@@ -415,7 +415,7 @@
                             mysql_query("INSERT INTO `s_firewall` SET `acl_id`=".$last_acl_id);
                             mysql_query("INSERT INTO `s_qos` SET `acl_id`=".$last_acl_id);
                             mysql_query("INSERT INTO `s_tos` SET `acl_id`=".$last_acl_id);
-                            mysql_query("UPDATE `".$arr_val['val']."` SET `source-specific_tunnel`='".$last_id."' WHERE `acl_id`=".$last_acl_id);
+                            mysql_query("UPDATE `source` SET `source-specific_tunnel`='".$last_id."' WHERE `acl_id`=".$last_acl_id);
                             mysql_query("UPDATE `tunnels_data` SET `default_acl`=".$last_acl_id." WHERE `tunnel_id`=".$last_id);
                         }
                         else{
@@ -608,6 +608,8 @@
         $number_successful_commands++;
         mysql_query("UPDATE `remote_server_list` SET `number_successful_commands`='" . $number_successful_commands . "' WHERE `remote_ip` = '" . $server_ip."'");
     }
+
+
 
     while (true){
         $db = mysql_connect($config['DB_HOST'], $config['DB_USER'], $config['DB_PASS'], $config['DB_NAME']) or die(mysql_error());

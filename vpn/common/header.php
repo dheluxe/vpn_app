@@ -77,6 +77,7 @@ $point = $sql_point->fetch_assoc();
 <script>
     var customer_id="<?php echo($selected_customer_id); ?>";
     var current_customer_id="<?php echo($_SESSION['customer_id']); ?>"
+    var current_customer_email="<?php echo($_SESSION['customer_email']); ?>"
 </script>
 <section id="container">
     <!--header start-->

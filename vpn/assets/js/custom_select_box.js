@@ -22,11 +22,6 @@ jQuery(document).ready(function(){
             var select_box_class=jQuery(this).closest(".custom_select_box").attr("class").split(" ")[0];
             var value=$("."+select_box_class+" .active_option .display_value").attr("data-value");
             if(value!=empty_txt){
-/*                $("."+select_box_class+" .active_option .display_value").html(empty_txt);
-                $("."+select_box_class+" .active_option .display_value").attr("data-value","");
-                $("."+select_box_class+" .active_option .action_btn").addClass("assign_action_btn");
-                $("."+select_box_class+" .active_option .assign_action_btn").removeClass("action_btn");
-                $("."+select_box_class+" .active_option .assign_action_btn i").attr("class","fa fa-fw fa-plus");*/
                 $("."+select_box_class+" .active_option").trigger("clear");
             }
         }

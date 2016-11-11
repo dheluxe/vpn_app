@@ -1,0 +1,8 @@
+[11/5/2016 1:58:00 AM] Abbadi AH: then i will make it work no worries
+[11/5/2016 1:58:43 AM] Abbadi AH: curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+sudo apt-get install -y nodejs
+[11/5/2016 1:58:48 AM] Abbadi AH: this to install nodejs
+
+[11/5/2016 3:53:48 AM] Abbadi AH: Add this too to the startup scripts :
+[11/5/2016 3:53:51 AM] Abbadi AH: apt-get install npm
+[11/5/2016 3:53:56 AM] Abbadi AH: npm install ws

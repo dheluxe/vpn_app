@@ -33,7 +33,7 @@ $descriptorspec = array(
     1 => array("pipe", "w"),   // stdout is a pipe that the child will write to
     2 => array("pipe", "w")    // stderr is a pipe that the child will write to
 );
-//flush();
+flush();
 $process = proc_open($cmd, $descriptorspec, $pipes, realpath('./'), array());
 $s="";
 if (is_resource($process)) {
@@ -42,7 +42,7 @@ if (is_resource($process)) {
     $s = fgets($pipes[1]);
     $s = fgets($pipes[1]);
 }
-//flush();
+flush();
 $free = (string)trim($s);
 $band_width = explode(" ", $free);
 $band_width = array_filter($band_width);

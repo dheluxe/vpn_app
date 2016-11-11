@@ -45,8 +45,8 @@ function gojs_init(){
                     fill: GT(go.Brush, "Linear", { 0: "rgb(254, 201, 0)", 1: "rgb(254, 162, 0)" }),
                     stroke: null,
                     portId: "",  // this Shape is the Node's port, not the whole Node
-                    fromLinkable: true, fromLinkableDuplicates: true,
-                    toLinkable: true, toLinkableDuplicates: true
+                    fromLinkable: true, fromLinkableDuplicates: false,
+                    toLinkable: true, toLinkableDuplicates: false
                 }),
             GT(go.TextBlock,
                 {
@@ -176,25 +176,32 @@ function cxcommand(val) {
         case "Run OSPF":
             console.log(selected_node);
             var id=selected_node.id;
-            alert(val);
-            $('html, body').animate({
-                scrollTop: $(document).scrollTop()
-            }, 1);
+
+            $.ajax({
+                url:'../request.php?request=run_ospf&id='+id,
+                success:function(resp){
+                    console.log(val);
+                    alert(resp);
+                }
+            });
             break;
         case "Stop OSPF":
             console.log(selected_node);
             var id=selected_node.id;
-            alert(val);
-            $('html, body').animate({
-                scrollTop: $(document).scrollTop()
-            }, 1);
+            $.ajax({
+                url:'../request.php?request=stop_ospf&id='+id,
+                success:function(resp){
+                    console.log(val);
+                    alert(resp);
+                }
+            });
             break;
         case "Control":
             console.log(selected_node);
             diagram.commandHandler.copySelection();
-            $('html, body').animate({
+            /*$('html, body').animate({
                 scrollTop: $(document).scrollTop()
-            }, 1);
+            }, 1);*/
             var id=selected_node.id;
             if(id==0){
 
@@ -227,12 +234,11 @@ function cxcommand(val) {
             }else{
 
             }
-
             break;
         case "Edit":
-            $('html, body').animate({
+            /*$('html, body').animate({
              scrollTop: $(document).scrollTop()
-             }, 1);
+             }, 1);*/
             console.log(selected_node);
             var id=selected_node.id;
             if(id==0){
@@ -268,11 +274,11 @@ function cxcommand(val) {
             }else{
                 diagram.commandHandler.deleteSelection();
             }
-
-            $('html, body').animate({
+            break;
+            /*$('html, body').animate({
                 scrollTop: $(document).scrollTop()
             }, 1);
-            break;
+            break;*/
     }
     diagram.currentTool.stopTool();
 }
@@ -301,16 +307,12 @@ function save() {
         type: "POST",
         data: {"diagram_data":diagram_data},
         success: function(resp){
+            console.log("response");
             console.log(resp);
-            /*$("#diagram_save_success_message").html("saved successfully.");
-            $("#diagram_save_success_message").css("display","block");
-            setTimeout(function(){
-                $("#diagram_save_success_message").css("display","none");
-            },3000);*/
-            //load();
             location.reload(true);
         }
     });
+    load();
 
 }
 function load() {

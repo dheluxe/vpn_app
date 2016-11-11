@@ -43,7 +43,7 @@ $sql_user = $db->query("SELECT `users_data`.`id`, `users_data`.`user_email`, `us
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="exampleModalLabel">Add New Cloud</h4>
             </div>
-            <form id="add_cloud_form">
+            <div>
                 <div class="modal-body">
                     <div class="alert alert-success" role="alert" id="manual_add_success_message" style="display: none;"></div>
                     <div class="alert alert-danger" role="alert" id="manual_add_error_message" style="display: none;"></div>
@@ -55,10 +55,10 @@ $sql_user = $db->query("SELECT `users_data`.`id`, `users_data`.`user_email`, `us
                     <input type="hidden" name="cloud_email" id="cloud_email" value="<?php echo $_SESSION['email'] ?>">
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary"> Save </button>
+                    <button type="button" class="btn btn-primary" id="add_cloud_btn"> Save </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

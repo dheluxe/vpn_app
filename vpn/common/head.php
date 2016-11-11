@@ -59,49 +59,10 @@ require_once ROOT_DIR.'/api/api_function.php';
     <script>
         var MAIN_SERVER_IP="<?php echo MAIN_SERVER_IP; ?>";
         var WEB_SOCKET_PORT="<?php echo WEB_SOCKET_PORT; ?>";
+        var ROOT_URL="<?php echo ROOT_URL; ?>";
+        var token="<?php echo(isset($_SESSION['token'])?$_SESSION['token']:''); ?>";
     </script>
     <script src="assets/plugins/jquery/jquery-1.11.3.min.js" type="text/javascript"></script>
     <script src="assets/js/pagination.js" type="text/javascript"></script>
     <script src="assets/js/jquery.contextMenu.js" type="text/javascript"></script>
-    <script>
-        var token="<?php echo(isset($_SESSION['token'])?$_SESSION['token']:''); ?>";
-
-        function tunnel_template(data,target){
-            console.log(data);
-            var template_data="";
-            var field_data={
-                tunnel_ids:data
-            };
-            $.ajax({
-                url : "request.php?request=get_tunnels_from_ids",
-                type : "POST",
-                data : field_data,
-                success : function(resp){
-                    $(target).html(resp);
-                },
-                error : function(){
-                }
-            });
-            return true;
-        }
-
-        function sponsor_tunnel_template(data,target){
-            console.log(data);
-            var template_data="";
-            var field_data={
-                tunnel_ids:data
-            };
-            $.ajax({
-                url : "request.php?request=get_sponsor_tunnels_from_ids",
-                type : "POST",
-                data : field_data,
-                success : function(resp){
-                    $(target).html(resp);
-                },
-                error : function(){
-                }
-            });
-            return true;
-        }
-    </script>
 </head>

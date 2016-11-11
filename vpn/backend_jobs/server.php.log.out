@@ -1,0 +1,415 @@
+
+$this->wsRead0
+Array
+(
+)
+$this->wsRead2:Array
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:1
+$changed
+Array
+$result:1
+$changed
+Array
+bytess:312
+buffers:GET / HTTP/1.1
+Host: 198.211.127.72:8880
+Connection: Upgrade
+Pragma: no-cache
+Cache-Control: no-cache
+Upgrade: websocket
+Origin: http://198.211.127.72
+Sec-WebSocket-Version: 13
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8,ko;q=0.6
+Sec-WebSocket-Key: SVpxUXZaQVN6cTI9KGVZTQ==
+
+
+$this->wsClients[$clientID][2]:0
+handshake processing start:1GET / HTTP/1.1
+Host: 198.211.127.72:8880
+Connection: Upgrade
+Pragma: no-cache
+Cache-Control: no-cache
+Upgrade: websocket
+Origin: http://198.211.127.72
+Sec-WebSocket-Version: 13
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8,ko;q=0.6
+Sec-WebSocket-Key: SVpxUXZaQVN6cTI9KGVZTQ==
+
+308headersArray
+(
+    [0] => GET / HTTP/1.1
+    [1] => Host: 198.211.127.72:8880
+    [2] => Connection: Upgrade
+    [3] => Pragma: no-cache
+    [4] => Cache-Control: no-cache
+    [5] => Upgrade: websocket
+    [6] => Origin: http://198.211.127.72
+    [7] => Sec-WebSocket-Version: 13
+    [8] => Accept-Encoding: gzip, deflate, sdch
+    [9] => Accept-Language: en-US,en;q=0.8,ko;q=0.6
+    [10] => Sec-WebSocket-Key: SVpxUXZaQVN6cTI9KGVZTQ==
+)
+headers_count:11
+requestPartsSize:3
+requestParts:Array
+(
+    [0] => GET
+    [1] => /
+    [2] => HTTP/1.1
+)
+
+httpParts:Array
+(
+    [0] => HTTP
+    [1] => 1.1
+)
+
+headersKeyed:Array
+(
+)
+
+headersKeyed:Array
+(
+    [Host] => 198.211.127.72
+    [Connection] => Upgrade
+    [Pragma] => no-cache
+    [Cache-Control] => no-cache
+    [Upgrade] => websocket
+    [Origin] => http
+    [Sec-WebSocket-Version] => 13
+    [Accept-Encoding] => gzip, deflate, sdch
+    [Accept-Language] => en-US,en;q=0.8,ko;q=0.6
+    [Sec-WebSocket-Key] => SVpxUXZaQVN6cTI9KGVZTQ==
+)
+
+key:SVpxUXZaQVN6cTI9KGVZTQ==
+headersKeyed_afterArray
+(
+    [Host] => 198.211.127.72
+    [Connection] => Upgrade
+    [Pragma] => no-cache
+    [Cache-Control] => no-cache
+    [Upgrade] => websocket
+    [Origin] => http
+    [Sec-WebSocket-Version] => 13
+    [Accept-Encoding] => gzip, deflate, sdch
+    [Accept-Language] => en-US,en;q=0.8,ko;q=0.6
+    [Sec-WebSocket-Key] => SVpxUXZaQVN6cTI9KGVZTQ==
+)
+
+hash:ACuBIaUppzMP4c2hAR1hIZhBHUM=
+reply headers:HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: ACuBIaUppzMP4c2hAR1hIZhBHUM=
+
+handshake_result:1handshake successconnectingArray
+(
+    [1] => Array
+        (
+            [0] => Resource id #22
+            [1] => 
+            [2] => 1
+            [3] => 1477875219
+            [4] => 
+            [5] => 0
+            [6] => 2335909977
+            [7] => 
+            [8] => 0
+            [9] => 
+            [10] => 0
+            [11] => 0
+        )
+
+)
+2016-10-31 00:53:39: 139.59.40.89 (1) has connected.
+
+$result:1
+$changed
+Array
+bytess:104
+buffers:â½Kî ÆišÙÍ.ÌšŸ*›ÔÕ$œÉÇ.ÌŒŸ&‹ÓÎ*‰Åâ?—ĞØiÔ‚Ï.ŸÕØ8š‚‘i˜ÁÑ>‹‚‡0ÌÔÒ ‹ÎŸqÌ’yÂ„}ÜÁŞ~×Š~Œ™‹ŒŠzÛ’Ùyİ”ß|Ş‚À6
+$this->wsClients[$clientID][2]:1
+clientID:1
+buffer:â½Kî ÆišÙÍ.ÌšŸ*›ÔÕ$œÉÇ.ÌŒŸ&‹ÓÎ*‰Åâ?—ĞØiÔ‚Ï.ŸÕØ8š‚‘i˜ÁÑ>‹‚‡0ÌÔÒ ‹ÎŸqÌ’yÂ„}ÜÁŞ~×Š~Œ™‹ŒŠzÛ’Ùyİ”ß|Ş‚À6
+bufferLength:104
+this->wsClients[clientID]:Array
+(
+    [0] => Resource id #22
+    [1] => 
+    [2] => 1
+    [3] => 1477875219
+    [4] => 
+    [5] => 0
+    [6] => 2335909977
+    [7] => 
+    [8] => 104
+    [9] => â½Kî ÆišÙÍ.ÌšŸ*›ÔÕ$œÉÇ.ÌŒŸ&‹ÓÎ*‰Åâ?—ĞØiÔ‚Ï.ŸÕØ8š‚‘i˜ÁÑ>‹‚‡0ÌÔÒ ‹ÎŸqÌ’yÂ„}ÜÁŞ~×Š~Œ™‹ŒŠzÛ’Ùyİ”ß|Ş‚À6
+    [10] => 0
+    [11] => 0
+)
+
+headerLength:6
+frameLength:104
+$$$this->wsClients[$clientID]:Array
+(
+    [0] => Resource id #22
+    [1] => 
+    [2] => 1
+    [3] => 1477875219
+    [4] => 
+    [5] => 0
+    [6] => 2335909977
+    [7] => 98
+    [8] => 104
+    [9] => â½Kî ÆišÙÍ.ÌšŸ*›ÔÕ$œÉÇ.ÌŒŸ&‹ÓÎ*‰Åâ?—ĞØiÔ‚Ï.ŸÕØ8š‚‘i˜ÁÑ>‹‚‡0ÌÔÒ ‹ÎŸqÌ’yÂ„}ÜÁŞ~×Š~Œ™‹ŒŠzÛ’Ùyİ”ß|Ş‚À6
+    [10] => 0
+    [11] => 0
+)
+
+$this->wsClients[$clientID][3] = time():1477875219
+buffer:â½Kî ÆišÙÍ.ÌšŸ*›ÔÕ$œÉÇ.ÌŒŸ&‹ÓÎ*‰Åâ?—ĞØiÔ‚Ï.ŸÕØ8š‚‘i˜ÁÑ>‹‚‡0ÌÔÒ ‹ÎŸqÌ’yÂ„}ÜÁŞ~×Š~Œ™‹ŒŠzÛ’Ùyİ”ß|Ş‚À6
+octet0:129
+octet1:226
+opcode:1
+mask:128
+seek:2
+maskKey:½Kî 
+array:Array
+(
+    [a] => 3175870112
+)
+
+maskKey:Array
+(
+    [0] => 189
+    [1] => 75
+    [2] => 238
+    [3] => 160
+)
+
+seek:6
+fin::128
+wsProcessClientMessage($clientID, $opcode, &$data, $dataLength):1
+pre-$this->wsClients[$clientID][2]:1pre-message:{"type":"authorize","message_type":"request","value":{"token":"202cb962ac59075b964b07152d234b70"}}
+message:
+{"type":"authorize","message_type":"request","value":{"token":"202cb962ac59075b964b07152d234b70"}}
+build_process_client_frame_result:1
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+disconnectingPHPWebSocket Object
+(
+    [wsClients] => Array
+        (
+            [1] => Array
+                (
+                    [0] => Resource id #22
+                    [1] => 
+                    [2] => 2
+                    [3] => 1477875219
+                    [4] => 1477875229
+                    [5] => 3000
+                    [6] => 2335909977
+                    [7] => 
+                    [8] => 0
+                    [9] => 
+                    [10] => 0
+                    [11] => 0
+                )
+
+        )
+
+    [wsValidClients] => Array
+        (
+            [202cb962ac59075b964b07152d234b70] => Array
+                (
+                    [0] => 1
+                )
+
+        )
+
+    [wsRead] => Array
+        (
+            [0] => Resource id #21
+            [1] => Resource id #22
+        )
+
+    [wsClientCount] => 1
+    [wsClientIPCount] => Array
+        (
+            [2335909977] => 1
+        )
+
+    [wsOnEvents] => Array
+        (
+            [message] => Array
+                (
+                    [0] => wsOnMessage
+                )
+
+            [open] => Array
+                (
+                    [0] => wsOnOpen
+                )
+
+            [close] => Array
+                (
+                    [0] => wsOnClose
+                )
+
+        )
+
+)
+Array
+(
+    [1] => Array
+        (
+            [0] => Resource id #22
+            [1] => 
+            [2] => 2
+            [3] => 1477875219
+            [4] => 1477875229
+            [5] => 3000
+            [6] => 2335909977
+            [7] => 
+            [8] => 0
+            [9] => 
+            [10] => 0
+            [11] => 0
+        )
+
+)
+2016-10-31 00:53:54: 139.59.40.89 (1) has disconnected.
+
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0
+$result:0

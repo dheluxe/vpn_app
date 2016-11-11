@@ -1,133 +1,478 @@
-Required Actions:
-
-Base Url: http://119.18.52.146/demovpn-new/request.php?request={action-name} (This path can be changed according to the server).
-
-Now the following list is for the action-name.
-
-dologin (Post Request):
-
-Post Fields: email, password
-
+user_register:
+get={
+	"type":"dosignup",
+	"message_type":"request",
+	"data":{
+		"email":email,
+		"password":password,
+		"name":name,
+		"display_name":display_name
+	}
+}
 Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
 
-user_register (Post Request):
-
-Post Fields: name, email, password
-
+dologin:
+get={
+	"type":"add_cloud",
+	"message_type":"request",
+	"data":{
+		"email":email,
+		"password":password
+	}
+}
 Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
 
-add_cloud (Post Request):
 
-Post Fields: cloud_name, cloud_email
 
+destroy_account:
+get={
+	"type":"destroy_account",
+	"message_type":"request",
+	"data":{
+		"token":token
+	}
+}
 Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
 
-add_contact (Post Request):
-
-Post Fields: contact_mail, contact_name
-
+add_cloud:
+get={
+	"type":"add_cloud",
+	"message_type":"request",
+	"data":{
+		"token":token,
+		"cloud_name":cloud_name,
+		"cloud_email":cloud_email
+	}
+}
 Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
 
-addTunnel (Post Request):
-
-Post Fields: This will be a 2D post array and detected by a field containing inside the post data, that type (server/client). So the values may look like this in PHP format array(0=>array(‘name’=>’’, ‘email’=>’’, ‘type’=>’’, ‘cloud_id’=>’’, ‘bidirection’=>’’, ‘gateway’=>’’, ‘group’=>’’), 1=>array(‘name’=>.....).....)
-bidirection => 0/1/2/3
-gateway=>0/1
-group=>0-25 (i.e. 0=A, 1=B etc.)
-cloud_id=>numeric id of cloud
-
+delete_cloud:
+get={
+	"type":"delete_cloud",
+	"message_type":"request",
+	"data":{
+		"token":token,
+		"cloud_id":cloud_id
+	}
+}
 Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
 
-delete_tunnel (Get Request):
-
-Get Fields: id
+add_contact:
+get={
+	"type":"add_contact",
+	"message_type":"request",
+	"data":{
+		"token":token,
+		"email":email
+	}
+}
 Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
 
-Now Following All has Similar Request Type –
-gateway_change, bidirection_change, internet_change, route_change, group_change:
+get_tunnels:
+get={
+	"type":"get_tunnels",
+	"message_type":"request",
+	"data":{
+		"token":token,
+		"email":email
+	}
+}
+Response: {“status”:0/1, “data”: tunnels_data}
 
-Get Fields: id, val (id=>id of the tunnel, val=>new value)
+get_profile_info:
+get={
+	"type":"get_profile_info",
+	"message_type":"request",
+	"data":{
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: profile_data}
 
-Response :
-{"status" :1, 'data':'Your request under process, please wait...', "type":"gateay_change/ bidirection_change/internet_change/route_change/group_change ", "value":{‘id’:’’, ‘val’:’’}}
+get_home_info:
+get={
+	"type":"get_home_info",
+	"message_type":"request",
+	"data":{
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: home_data}
 
-Now send this response to connected socket server, use the response from API to send as the value of ‘message’ attribute.
+get_social_info:
+get={
+	"type":"get_social_info",
+	"message_type":"request",
+	"data":{
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: social_data}
 
-Now Following All has Similar Request Type –
-add_server_clone, add_client_clone:
+change_searchable:
+get={
+	"type":"change_searchable",
+	"message_type":"request",
+	"data":{
+		"database": database,
+		"field": field,
+		"value":value,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Get Fields: id (id=>id of the tunnel)
+change_dev_status:
+get={
+	"type":"change_dev_status",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Response :
-{"status" :1, 'data':'Your request under process, please wait...', “uid”:{customer-id}, "type":" add_server_clone/ add_client_clone", "value":””}
+route_change:
+get={
+	"type":"route_change",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Now send this response to connected socket server, use the response from API to send as the value of ‘message’ attribute.
+plan_change:
+get={
+	"type":"plan_change",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+internet_change:
+get={
+	"type":"internet_change",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
 change_tunnel:
+get={
+	"type":"change_tunnel",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Get Fields: id, type (id=>id of the tunnel, type=>server/client)
+remove_sharing:
+get={
+	"type":"remove_sharing",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Response :
-{"status" :1, 'data':'Your request under process, please wait...', “uid”:{customer-id}, "type":" add_server_clone/ add_client_clone", "value":””}
+get_friend_list:
+get={
+	"type":"get_friend_list",
+	"message_type":"request",
+	"data":{
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: friend_data}
 
-Now send this response to connected socket server, use the response from API to send as the value of ‘message’ attribute.
+add_tunnel:
+get={
+	"type":"add_tunnel",
+	"message_type":"request",
+	"data":{
+		"id": cloud_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+save_a_tunnel:
+get={
+	"type":"save_a_tunnel",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+delete_tunnel:
+get={
+	"type":"delete_tunnel",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+status_change:
+get={
+	"type":"status_change",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"val":value,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+gateway_change:
+get={
+	"type":"gateway_change",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"val":value,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+edit_display:
+get={
+	"type":"edit_display",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"val":value,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+bidirection_change:
+get={
+	"type":"bidirection_change",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"value":value,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+change_location:
+get={
+	"type":"change_location",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"value":value,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+add_server_clone:
+get={
+	"type":"add_server_clone",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+add_client_clone:
+get={
+	"type":"add_client_clone",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
 request_real_ip:
+get={
+	"type":"request_real_ip",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"real_ip":real_ip,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Get Fields: id (id=>id of the tunnel)
+clear_tunnel_real_ip:
+get={
+	"type":"clear_tunnel_real_ip",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Response :
-{"status" :1, 'data':'Your request under process, please wait...', "type":" request_real_ip ", "value":””}
+change_tunnel_real_ip:
+get={
+	"type":"change_tunnel_real_ip",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"real_ip":real_ip,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
-Now send this response to connected socket server, use the response from API to send as the value of ‘message’ attribute.
-
-
-save_a_tunnel (Post Request):
-This action is for apply button on a particular tunnel.
-Post Fields: id (id of the tunnel)
-
-Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
-
-save_a_tunnel (Get Request):
-This action is for apply button for all tunnels.
-
-Response: {“status”:0/1, “data”: “Message”} status = 0 not success, status = 1 success and data containing the message.
-
-About Socket Connection:
-
-To connect the socket use IP of the hosted server and the port address, by default 8880.
-
-get subnet from desktop app:
-{"type":"get_subnet", "message_type":"request", "data":{"id":id, "ip":subnet_value}}
-
-get DeV from desktop app:
-{"type":"get_DeV", "message_type":"request", "data":{"id":id, "state":dev_value, "device":device_id}}
-
-here  dev_value are:
-
--1 = disconnected
-0 = connecting
-1 = connected
-
-get tunnels from desktop app:
-{"type":"get_tunnels", "message_type":"reply"}
-
-==============28.03.2016=============
-
-create new acl:
-{"type":"create_new_acl", "message_type":"request", "data":tunnel_id}
+clear_acl_real_ip:
+get={
+	"type":"clear_acl_real_ip",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"aid": acl_id,
+		"real_ip":real_ip,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
 
 get_acl_info:
-{"type":"get_acl_info", "message_type":"request", "data":tunnel_id}
+get={
+	"type":"get_acl_info",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
 
-get acl value by button:
-{"type":"get_acl_val", "message_type":"request", "data":{"id":id, "type":database_table_name, "name":database_field_name}}
+delete_acl:
+get={
+	"type":"delete_acl",
+	"message_type":"request",
+	"data":{
+		"id": acl_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
 
-update acl value:
-{"type":"acl_update", "message_type":"request", "data":{"id":id, "type":database_table_name, "name":database_field_name, "val":value}}
+create_new_acl:
+get={
+	"type":"create_new_acl",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
 
-check acl result stored in database
-{"type":"chk_res", "message_type":"request", "data":{"id":acl_id, "type":database_table_name, "val":database_field_name}}
+set_default_acl:
+get={
+	"type":"set_default_acl",
+	"message_type":"request",
+	"data":{
+		"id": acl_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
+
+create_acl_clone:
+get={
+	"type":"create_acl_clone",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"aid":acl_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
+
+save_acl_name_description:
+get={
+	"type":"save_acl_name_description",
+	"message_type":"request",
+	"data":{
+		"id": tunnel_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
+
+get_friends:
+get={
+	"type":"get_friends",
+	"message_type":"request",
+	"data":{
+		"customer_id": customer_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
+
+get_request_friends:
+get={
+	"type":"get_request_friends",
+	"message_type":"request",
+	"data":{
+		"customer_id": customer_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
+
+get_rejected_friends:
+get={
+	"type":"get_rejected_friends",
+	"message_type":"request",
+	"data":{
+		"customer_id": customer_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: data}
+
+set_friend:
+get={
+	"type":"set_friend",
+	"message_type":"request",
+	"data":{
+		"customer_id": customer_id,
+		"token":token
+	}
+}
+Response: {“status”:0/1, “data”: message}
+
+
 
 
 

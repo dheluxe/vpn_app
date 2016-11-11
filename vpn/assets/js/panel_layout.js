@@ -58,31 +58,31 @@ $(document).ready(function(){
 
     $("body").on("change","#cloud_selector",function(){
         var cloud_id=$(this).val();
-        var cloud_name = getSelectedText('cloud_selector')
         var token=$(this).attr("data-token");
-        $.ajax({
-            url:"request.php?request=cloud_tunnels&cloud_id="+cloud_id+"&cloud_name="+cloud_name+"&token="+token,
-            success:function(resp){
-                $(".filter-result-block").html(resp);
-            }
-        });
+        if(cloud_id!=0){
+            $(".cloud-row").addClass("hidden");
+            $(".cloud-row-"+cloud_id).removeClass("hidden");
+        }else{
+            $(".cloud-row").removeClass("hidden");
+        }
     });
 
-    $("body").on("change",".account_searchable_switch",function(){
+    $("body").on("click",".account_searchable_switch",function(){
         var is_searchable=($(this).prop("checked")?"1":"0");
         var id=$(this).attr("data-customer_id");
         var database="customers_data";
         var field="is_searchable";
-        $.ajax({
-            url:"request.php?request=change_searchable&database="+database+"&id="+id+"&field="+field+"&value="+is_searchable,
-            success:function(resp){
-                console.log(resp);
-                if(resp){
-                    //notify_msg("success",resp);
-                    notify_msg("success", "Your setting has been saved.");
-                }
+        var get={
+            "type":"change_searchable",
+            "message_type":"request",
+            "data":{
+                "database":database,
+                "id":id,
+                "field":field,
+                "value":is_searchable
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("change",".cloud_searchable_switch",function(){
@@ -90,16 +90,17 @@ $(document).ready(function(){
         var id=$(this).attr("data-cloud_id");
         var database="clouds_data";
         var field="is_searchable";
-        $.ajax({
-            url:"request.php?request=change_searchable&database="+database+"&id="+id+"&field="+field+"&value="+is_searchable,
-            success:function(resp){
-                console.log(resp);
-                if(resp){
-                    //notify_msg("success",resp);
-                    notify_msg("success", "Your setting has been saved.");
-                }
+        var get={
+            "type":"change_searchable",
+            "message_type":"request",
+            "data":{
+                "database":database,
+                "id":id,
+                "field":field,
+                "value":is_searchable
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("change",".tunnel_searchable_switch",function(){
@@ -107,16 +108,17 @@ $(document).ready(function(){
         var id=$(this).attr("data-tunnel_id");
         var database="tunnels_data";
         var field="is_searchable";
-        $.ajax({
-            url:"request.php?request=change_searchable&database="+database+"&id="+id+"&field="+field+"&value="+is_searchable,
-            success:function(resp){
-                console.log(resp);
-                if(resp){
-                    //notify_msg("success",resp);
-                    notify_msg("success", "Your setting has been saved.");
-                }
+        var get={
+            "type":"change_searchable",
+            "message_type":"request",
+            "data":{
+                "database":database,
+                "id":id,
+                "field":field,
+                "value":is_searchable
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("change",".acl_searchable_switch",function(){
@@ -124,16 +126,17 @@ $(document).ready(function(){
         var id=$(this).attr("data-acl_id");
         var database="tunnel_acl_relation";
         var field="is_searchable";
-        $.ajax({
-            url:"request.php?request=change_searchable&database="+database+"&id="+id+"&field="+field+"&value="+is_searchable,
-            success:function(resp){
-                console.log(resp);
-                if(resp){
-                    //notify_msg("success",resp);
-                    notify_msg("success", "Your setting has been saved.");
-                }
+        var get={
+            "type":"change_searchable",
+            "message_type":"request",
+            "data":{
+                "database":database,
+                "id":id,
+                "field":field,
+                "value":is_searchable
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
     $("body").on("change","#profile_image",function(){
         readImage_URL(this);
@@ -173,74 +176,35 @@ $(document).ready(function(){
             $("#content2").addClass("hidden");
             $(".main-loading-message").removeClass("hidden");
             $("#blockDiv").removeClass("hidden");
-            $.ajax({
-                url:"home.php",
-                success:function(resp){
-                    $("#content2").html(resp);
-                    setTimeout(function(){
-                        $("#content2").removeClass("hidden");
-                        $(".main-loading-message").addClass("hidden");
-                        $("#blockDiv").addClass("hidden");
-                    },ajax_loading_time_ms);
-                }
-            });
+            var get={"type":"get_home_info", "message_type":"request"};
+            send(JSON.stringify(get));
         }
     });
-
     $("body").on("change","#tab2", function () {
         if($(this).val()=="on"){
             $("#content2").addClass("hidden");
             $(".main-loading-message").removeClass("hidden");
             $("#blockDiv").removeClass("hidden");
-            $.ajax({
-                url:"connectivity_manager.php",
-                success:function(resp){
-                    $("#content2").html(resp);
-                    setTimeout(function(){
-                        $("#content2").removeClass("hidden");
-                        $(".main-loading-message").addClass("hidden");
-                        $("#blockDiv").addClass("hidden");
-                    },ajax_loading_time_ms);
-                }
-            });
+            var get={"type":"get_tunnels", "message_type":"request"};
+            send(JSON.stringify(get));
         }
     });
-
     $("body").on("change","#tab3", function () {
         if($(this).val()=="on"){
             $("#content2").addClass("hidden");
             $(".main-loading-message").removeClass("hidden");
             $("#blockDiv").removeClass("hidden");
-            $.ajax({
-                url:"profile_info.php",
-                success:function(resp){
-                    $("#content2").html(resp);
-                    setTimeout(function(){
-                        $("#content2").removeClass("hidden");
-                        $(".main-loading-message").addClass("hidden");
-                        $("#blockDiv").addClass("hidden");
-                    },ajax_loading_time_ms);
-                }
-            });
+            var get={"type":"get_profile_info", "message_type":"request"};
+            send(JSON.stringify(get));
         }
-
     });
     $("body").on("change","#tab4", function () {
         if($(this).val()=="on"){
             $("#content2").addClass("hidden");
             $(".main-loading-message").removeClass("hidden");
             $("#blockDiv").removeClass("hidden");
-            $.ajax({
-                url:"social.php",
-                success:function(resp){
-                    $("#content2").html(resp);
-                    setTimeout(function(){
-                        $("#content2").removeClass("hidden");
-                        $(".main-loading-message").addClass("hidden");
-                        $("#blockDiv").addClass("hidden");
-                    },ajax_loading_time_ms);
-                }
-            });
+            var get={"type":"get_social_info", "message_type":"request"};
+            send(JSON.stringify(get));
         }
     });
     $("body").on("change","#tab5", function () {
@@ -296,21 +260,14 @@ $(document).ready(function(){
                 $(".request-friends-box").addClass("hidden");
                 $(".rejected-friends-box").addClass("hidden");
                 $("#blockDiv").removeClass("hidden");
-                $.ajax({
-                    url:"request.php?request=get_friends&customer_id="+current_customer_id,
-                    type:"GET",
-                    success:function(resp){
-                        if(resp!="") {
-                            //console.log(resp);
-                            $(".friends-box").html(resp);
-                            setTimeout(function(){
-                                $(".friends-box").removeClass("hidden");
-                                $(".sidebar-loading-message").addClass("hidden");
-                                $("#blockDiv").addClass("hidden");
-                            },1000);
-                        }
+                var get={
+                    "type":"get_friend_list",
+                    "message_type":"request",
+                    "data":{
+                        "token":token
                     }
-                });
+                };
+                send(JSON.stringify(get));
             }
             if(current_tab=="request"){
                 $(".request-friends-box").addClass("hidden");
@@ -319,21 +276,14 @@ $(document).ready(function(){
                 jQuery(".rejected-friends-box").addClass("hidden");
                 jQuery(".request-friends-box").html("");
                 $("#blockDiv").removeClass("hidden");
-                $.ajax({
-                    url:"request.php?request=get_request_friends&customer_id="+current_customer_id,
-                    type:"GET",
-                    success:function(resp){
-                        if(resp!="") {
-                            //console.log(resp);
-                            jQuery(".request-friends-box").html(resp);
-                            setTimeout(function(){
-                                $(".request-friends-box").removeClass("hidden");
-                                $(".sidebar-loading-message").addClass("hidden");
-                                $("#blockDiv").addClass("hidden");
-                            },1000);
-                        }
+                var get={
+                    "type":"get_request_friend_list",
+                    "message_type":"request",
+                    "data":{
+                        "token":token
                     }
-                });
+                };
+                send(JSON.stringify(get));
             }
             if(current_tab=="rejected"){
                 $(".rejected-friends-box").addClass("hidden");
@@ -342,21 +292,14 @@ $(document).ready(function(){
                 jQuery(".friends-box").addClass("hidden");
                 jQuery(".rejected-friends-box").html("");
                 $("#blockDiv").removeClass("hidden");
-                $.ajax({
-                    url:"request.php?request=get_rejected_friends&customer_id="+current_customer_id,
-                    type:"GET",
-                    success:function(resp){
-                        if(resp!="") {
-                            //console.log(resp);
-                            jQuery(".rejected-friends-box").html(resp);
-                            setTimeout(function(){
-                                $(".rejected-friends-box").removeClass("hidden");
-                                $(".sidebar-loading-message").addClass("hidden");
-                                $("#blockDiv").addClass("hidden");
-                            },1000);
-                        }
+                var get={
+                    "type":"get_rejected_friend_list",
+                    "message_type":"request",
+                    "data":{
+                        "token":token
                     }
-                });
+                };
+                send(JSON.stringify(get));
             }
         }
     });
@@ -378,18 +321,16 @@ $(document).ready(function(){
 
     $("body").on("click",".request-friends-box .accept-action",function(){
         var friend_id=jQuery(this).attr("data-friend_id");
-        var node=jQuery(this);
-        $.ajax({
-            url:"request.php?request=set_friend&status=accepted&customer_id="+friend_id+"&friend_id="+current_customer_id,
-            type:"GET",
-            success:function(resp){
-                console.log(resp);
-                if(resp!="") {
-                    node.closest(".left-friend-list-content-row").addClass("deleted");
-                    update_badge_cnt();
-                }
+        var get={
+            "type":"set_friend",
+            "message_type":"request",
+            "data":{
+                "status":"accepted",
+                "customer_id":friend_id,
+                "friend_id":current_customer_id
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("click",".request-friends-box .reject-action",function(){
@@ -410,18 +351,16 @@ $(document).ready(function(){
 
     $("body").on("click",".delete-action",function(){
         var friend_id=jQuery(this).attr("data-friend_id");
-        var node=jQuery(this).closest(".left-friend-list-content-row");
-        $.ajax({
-            url:"request.php?request=set_friend&status=deleted&customer_id="+friend_id+"&friend_id="+current_customer_id,
-            type:"GET",
-            success:function(resp){
-                console.log(resp);
-                if(resp!="") {
-                    node.addClass("deleted");
-                    update_badge_cnt();
-                }
+        var get={
+            "type":"set_friend",
+            "message_type":"request",
+            "data":{
+                "status":"deleted",
+                "customer_id":friend_id,
+                "friend_id":current_customer_id
             }
-        });
+        };
+        send(JSON.stringify(get));
     });
 
     $("body").on("keyup",".friend-search-text",function(){
@@ -486,8 +425,6 @@ $(document).ready(function(){
         }
     });
 
-
-
     $("body").on("click",".dialog-tab-element",function(){
         jQuery(".dialog-tab-element").removeClass("dialog-tab-element-selected");
         jQuery(this).addClass("dialog-tab-element-selected");
@@ -512,7 +449,22 @@ $(document).ready(function(){
         if(confirm("Are you sure to destroy this account?")){
             console.log("delete this account");
             console.log(token);
-            $.ajax({
+
+            $("#content2").addClass("hidden");
+            $("#content5").addClass("hidden");
+            $(".main-loading-message").removeClass("hidden");
+            $("#blockDiv").removeClass("hidden");
+
+            var get={
+                "type":"destroy_account",
+                "message_type":"request",
+                "data":{
+                    "token":token
+                }
+            };
+            send(JSON.stringify(get));
+
+            /*$.ajax({
                 url:"request.php?request=destroy_account&token="+token,
                 success:function(resp){
                     console.log(resp);
@@ -523,8 +475,7 @@ $(document).ready(function(){
                     var get={"type":"destroy_account", "message_type":"request", "token":token};
                     send(JSON.stringify(get));
                 }
-            });
-
+            });*/
         }
     });
 });

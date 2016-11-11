@@ -15,8 +15,9 @@ input.custom_res_tab {
 
 label.custom_res_tab {
     display: inline-block;
-    margin: 0 0 -1px;
-    padding: 15px 25px;
+    margin: 15px 25px;
+    padding-bottom: 15px;
+    margin-bottom: 0px;
     font-weight: 600;
     text-align: center;
     color: #bbb;
@@ -29,23 +30,23 @@ label.custom_res_tab:before {
     margin-right: 10px;
 }
 
-label.custom_res_tab[for*='1']:before { content: '\f1cb'; }
+/*label.custom_res_tab[for*='1']:before { content: '\f1cb'; }
 label.custom_res_tab[for*='2']:before { content: '\f17d'; }
 label.custom_res_tab[for*='3']:before { content: '\f16b'; }
 label.custom_res_tab[for*='4']:before { content: '\f1a9'; }
 label.custom_res_tab[for*='5']:before { content: '\f1cb'; }
-label.custom_res_tab[for*='6']:before { content: '\f17d'; }
+label.custom_res_tab[for*='6']:before { content: '\f17d'; }*/
 
 label.custom_res_tab:hover {
     color: #888;
     cursor: pointer;
+    border-bottom: 2px solid #888;
 }
 
 input.custom_res_tab:checked + label.custom_res_tab {
-    color: #555;
-    border: 1px solid #ddd;
-    border-top: 2px solid orange;
-    border-bottom: 1px solid #f2f2f2;
+    color: #0069ff;
+    border-bottom: 2px solid #0069ff;
+    border-top: 1px solid #f2f2f2;
 }
 
 
@@ -314,6 +315,9 @@ input.custom_res_tab:checked + label.custom_res_tab {
     margin-top: 22px;
     border-radius: 3px;
     font-size: 10px;
+}
+.accept-action{
+    margin-right: 2px;
 }
 .tabs-panel-top{
     margin-top: 8px;
@@ -652,4 +656,14 @@ body.panel_body{
     padding-right: 30px;
     width: 830px;
     margin: auto;
+}
+.aliasing-label{
+    line-height: 36px;
+}
+.line-sepearator{
+    border-bottom: 1px dotted #ccc;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    margin-left: 25px;
+    margin-right: 75px;
 }
